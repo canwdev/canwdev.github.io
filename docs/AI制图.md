@@ -1,0 +1,2 @@
+- [AUTOMATIC1111/stable-diffusion-webui: Stable Diffusion web UI (github.com)](https://github.com/AUTOMATIC1111/stable-diffusion-webui/)
+- [AI绘画 【Stable Diffusion】 NovelAI 整合包 解压即用_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV1aN4y1A7j1)
