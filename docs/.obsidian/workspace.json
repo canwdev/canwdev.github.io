@@ -4,19 +4,15 @@
     "type": "split",
     "children": [
       {
-        "id": "fe42e37143e1a7c1",
+        "id": "027553d20a6e12b2",
         "type": "tabs",
         "children": [
           {
-            "id": "d3c221172210595b",
+            "id": "f6bda03ed2adb655",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "index.md",
-                "mode": "source",
-                "source": false
-              }
+              "type": "empty",
+              "state": {}
             }
           }
         ]
@@ -85,7 +81,6 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "index.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +97,6 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "index.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -124,9 +118,7 @@
             "type": "leaf",
             "state": {
               "type": "outline",
-              "state": {
-                "file": "index.md"
-              }
+              "state": {}
             }
           }
         ]
@@ -146,8 +138,9 @@
       "command-palette:打开命令面板": false
     }
   },
-  "active": "d3c221172210595b",
+  "active": "f6bda03ed2adb655",
   "lastOpenFiles": [
+    "index.md",
     "Windows/Windows.md",
     "index.md.md"
   ]
