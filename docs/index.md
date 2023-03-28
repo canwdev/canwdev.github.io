@@ -1,10 +1,8 @@
-# Obsidian Notes
+# My Obsidian Tech Vault
 
-Publish your public notes with MkDocs
+Author: [Canwdev](https://github.com/canwdev)
 
-## Hello World!
-
-The `index.md` in the `/docs` folder is the homepage you see here.
-
-The folders in `/docs` appear as the main sections on the navigation bar.
+- [[Windows]]
+- [[Linux常用命令汇总]]
+- 在左侧文件目录探索更多内容
 
