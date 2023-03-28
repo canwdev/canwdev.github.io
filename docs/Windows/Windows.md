@@ -1,12 +1,12 @@
 
 ## 镜像下载
 
-- uupdump https://uupdump.net/
-- https://msdn.itellyou.cn/
-- https://latest10.win/
-- https://github.com/WhatTheBlock/WindowsSimplify
-- 不忘初心 https://www.pc521.net/ 
-- 修系统 https://www.xiuxitong.com/
+- [uupdump](https://uupdump.net/)
+- [msdn itellyou](https://msdn.itellyou.cn/)
+- [https://latest10.win/](https://latest10.win/)
+- [WindowsSimplify](https://github.com/WhatTheBlock/WindowsSimplify)
+- [不忘初心](https://www.pc521.net/)
+- [修系统](https://www.xiuxitong.com/)
 
 ## Win11 跳过OOBE联网
 在 oobe 界面按 shift+f10，弹出cmd，输入 `oobe\BypassNRO.cmd` 系统重启后就不用联网了。
