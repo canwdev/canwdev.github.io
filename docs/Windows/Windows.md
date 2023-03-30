@@ -5,6 +5,7 @@
 - [msdn itellyou](https://msdn.itellyou.cn/)
 - [https://latest10.win/](https://latest10.win/)
 - [WindowsSimplify](https://github.com/WhatTheBlock/WindowsSimplify)
+- [系统 - 果核剥壳](https://www.ghxi.com/category/all/system)
 - [不忘初心](https://www.pc521.net/)
 - [修系统](https://www.xiuxitong.com/)
 
