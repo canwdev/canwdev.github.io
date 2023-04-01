@@ -1,6 +1,12 @@
 # My Obsidian Tech Vault
 
-Author: [Canwdev](https://github.com/canwdev)
+Author: [canwdev](https://github.com/canwdev/canwdev.github.io)
+
+## 最近更新
+
+- [[Xiaomi Book 12.4 二合一]]
+
+## 常用链接
 
 - [[Windows]]
 - [[Linux常用命令汇总]]

@@ -11,8 +11,24 @@
             "id": "9b53146daa2966c6",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {}
+              "type": "markdown",
+              "state": {
+                "file": "index.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          },
+          {
+            "id": "7b1ee364dcf82e8b",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "index.md",
+                "mode": "source",
+                "source": false
+              }
             }
           }
         ]
@@ -81,6 +97,7 @@
             "state": {
               "type": "backlink",
               "state": {
+                "file": "index.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -97,6 +114,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
+                "file": "index.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -118,7 +136,9 @@
             "type": "leaf",
             "state": {
               "type": "outline",
-              "state": {}
+              "state": {
+                "file": "index.md"
+              }
             }
           }
         ]
@@ -138,10 +158,12 @@
       "command-palette:打开命令面板": false
     }
   },
-  "active": "daae8f4033fdb21b",
+  "active": "9b53146daa2966c6",
   "lastOpenFiles": [
-    "Windows/Windows.md",
+    "Windows/Windows UEFI 引导修复.md",
     "index.md",
+    "硬件/Xiaomi Book 12.4 二合一.md",
+    "Windows/Windows.md",
     "index.md.md"
   ]
 }
