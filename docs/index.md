@@ -8,6 +8,7 @@ Author: [canwdev](https://github.com/canwdev/canwdev.github.io)
 
 ## 常用链接
 
+- [[Node.js 笔记]]
 - [[Windows]]
 - [[Linux常用命令汇总]]
 - 在左侧文件目录探索更多内容

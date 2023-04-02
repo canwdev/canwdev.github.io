@@ -13,19 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "index.md",
-                "mode": "source",
-                "source": false
-              }
-            }
-          },
-          {
-            "id": "7b1ee364dcf82e8b",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "index.md",
+                "file": "Web前端/Node.js 笔记.md",
                 "mode": "source",
                 "source": false
               }
@@ -97,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "index.md",
+                "file": "Web前端/Node.js 笔记.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -114,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "index.md",
+                "file": "Web前端/Node.js 笔记.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -137,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "index.md"
+                "file": "Web前端/Node.js 笔记.md"
               }
             }
           }
@@ -160,10 +148,12 @@
   },
   "active": "9b53146daa2966c6",
   "lastOpenFiles": [
-    "Windows/Windows UEFI 引导修复.md",
-    "index.md",
-    "硬件/Xiaomi Book 12.4 二合一.md",
     "Windows/Windows.md",
+    "Windows/Windows 常用命令.md",
+    "Web前端/Node.js 笔记.md",
+    "index.md",
+    "Windows/Windows UEFI 引导修复.md",
+    "硬件/Xiaomi Book 12.4 二合一.md",
     "index.md.md"
   ]
 }
