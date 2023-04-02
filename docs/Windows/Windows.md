@@ -1,4 +1,8 @@
 
+- [[Windows 常用命令]]
+- [[Windows使用VHD镜像无损备份恢复系统]]
+- [[Windows UEFI 引导修复]]
+
 ## 镜像下载
 
 - [uupdump](https://uupdump.net/)
@@ -67,7 +71,9 @@ net start winnat
 ```
 
 
-## [记录 WSL 从 C 盘迁移至 D 盘 | Laravel China 社区 (learnku.com)](https://learnku.com/articles/46234)
+## WSL 从 C 盘迁移至 D 盘
+
+参考 https://learnku.com/articles/46234
 
 1. 下载并解压 [LxRunOffline](https://github.com/DDoSolitary/LxRunOffline) 在终端运行
 2. 查看已安装的子系统：`.\LxRunOffline.exe list`
@@ -78,7 +84,8 @@ net start winnat
 7. 如果启动出现“拒绝访问”，请在文件夹属性的安全设置里把当前用户的“完全控制”权限勾上
 
 ## 删除 Win11 小组件
-参考：[不喜欢Windows 11的小组件功能？直接命令行彻底删除 - 蓝点网 (landiannews.com)](https://www.landiannews.com/archives/95616.html)
+
+参考 [不喜欢Windows 11的小组件功能？直接命令行彻底删除 - 蓝点网 (landiannews.com)](https://www.landiannews.com/archives/95616.html)
 ```
 1.  #打开管理员模式的命令提示符，然后执行下面的命令
 2.  winget uninstall MicrosoftWindows.Client.WebExperience_cw5n1h2txyewy
