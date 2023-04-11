@@ -1,19 +1,19 @@
 {
   "main": {
-    "id": "9310d5a382e6380f",
+    "id": "69b3d99042a2cab5",
     "type": "split",
     "children": [
       {
-        "id": "e819011b10d2937f",
+        "id": "e301af68b0b18fe2",
         "type": "tabs",
         "children": [
           {
-            "id": "813121ecbea8d11f",
+            "id": "0ec685fa6ec29bd4",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Web前端/Node.js 笔记.md",
+                "file": "index.md",
                 "mode": "source",
                 "source": false
               }
@@ -25,15 +25,15 @@
     "direction": "vertical"
   },
   "left": {
-    "id": "b1fe180adc84abdb",
+    "id": "1f9540688b3919ae",
     "type": "split",
     "children": [
       {
-        "id": "c9033f43b77a3693",
+        "id": "6ff5dd8494209417",
         "type": "tabs",
         "children": [
           {
-            "id": "daae8f4033fdb21b",
+            "id": "d723c535ba304b94",
             "type": "leaf",
             "state": {
               "type": "file-explorer",
@@ -43,7 +43,7 @@
             }
           },
           {
-            "id": "d69a5e59a09c3ae2",
+            "id": "25181d43225f1081",
             "type": "leaf",
             "state": {
               "type": "search",
@@ -58,7 +58,7 @@
             }
           },
           {
-            "id": "995c1ab10a595c70",
+            "id": "9664653f9b3e7087",
             "type": "leaf",
             "state": {
               "type": "starred",
@@ -72,24 +72,20 @@
     "width": 300
   },
   "right": {
-    "id": "dbaefc4903b124d4",
+    "id": "12394b7d9633e93b",
     "type": "split",
     "children": [
       {
-        "id": "032beac199294a0b",
+        "id": "4dd97e0be8223b40",
         "type": "tabs",
         "children": [
           {
-            "id": "b530100ff0fef4e4",
+            "id": "a5a2e15cfad60e88",
             "type": "leaf",
             "state": {
               "type": "backlink",
               "state": {
-<<<<<<< HEAD
-                "file": "AI制图.md",
-=======
-                "file": "Web前端/Node.js 笔记.md",
->>>>>>> b5e3e08be9d49419be04878312b12106b17fd6bd
+                "file": "index.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -101,23 +97,19 @@
             }
           },
           {
-            "id": "21eff857e34cfd22",
+            "id": "761da5e173809c2e",
             "type": "leaf",
             "state": {
               "type": "outgoing-link",
               "state": {
-<<<<<<< HEAD
-                "file": "AI制图.md",
-=======
-                "file": "Web前端/Node.js 笔记.md",
->>>>>>> b5e3e08be9d49419be04878312b12106b17fd6bd
+                "file": "index.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
             }
           },
           {
-            "id": "dc4a38864d6806e5",
+            "id": "7996cf3c85ef5443",
             "type": "leaf",
             "state": {
               "type": "tag",
@@ -128,16 +120,12 @@
             }
           },
           {
-            "id": "1657dc9d91c2f4dd",
+            "id": "6fe4ae43d833ce9b",
             "type": "leaf",
             "state": {
               "type": "outline",
               "state": {
-<<<<<<< HEAD
-                "file": "AI制图.md"
-=======
-                "file": "Web前端/Node.js 笔记.md"
->>>>>>> b5e3e08be9d49419be04878312b12106b17fd6bd
+                "file": "index.md"
               }
             }
           }
@@ -158,19 +146,9 @@
       "command-palette:打开命令面板": false
     }
   },
-<<<<<<< HEAD
-  "active": "813121ecbea8d11f",
-=======
-  "active": "9b53146daa2966c6",
->>>>>>> b5e3e08be9d49419be04878312b12106b17fd6bd
+  "active": "0ec685fa6ec29bd4",
   "lastOpenFiles": [
-    "VM虚拟机/虚拟机笔记.md",
-    "Windows/Windows.md",
-    "Windows/Windows 常用命令.md",
-    "Web前端/Node.js 笔记.md",
-    "index.md",
-    "Windows/Windows UEFI 引导修复.md",
-    "硬件/Xiaomi Book 12.4 二合一.md",
-    "index.md.md"
+    "AI Collection.md",
+    "index.md"
   ]
 }
