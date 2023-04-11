@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "AI制图.md",
+                "file": "Web前端/Node.js 笔记.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,11 @@
             "state": {
               "type": "backlink",
               "state": {
+<<<<<<< HEAD
                 "file": "AI制图.md",
+=======
+                "file": "Web前端/Node.js 笔记.md",
+>>>>>>> b5e3e08be9d49419be04878312b12106b17fd6bd
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +106,11 @@
             "state": {
               "type": "outgoing-link",
               "state": {
+<<<<<<< HEAD
                 "file": "AI制图.md",
+=======
+                "file": "Web前端/Node.js 笔记.md",
+>>>>>>> b5e3e08be9d49419be04878312b12106b17fd6bd
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +133,11 @@
             "state": {
               "type": "outline",
               "state": {
+<<<<<<< HEAD
                 "file": "AI制图.md"
+=======
+                "file": "Web前端/Node.js 笔记.md"
+>>>>>>> b5e3e08be9d49419be04878312b12106b17fd6bd
               }
             }
           }
@@ -146,11 +158,19 @@
       "command-palette:打开命令面板": false
     }
   },
+<<<<<<< HEAD
   "active": "813121ecbea8d11f",
+=======
+  "active": "9b53146daa2966c6",
+>>>>>>> b5e3e08be9d49419be04878312b12106b17fd6bd
   "lastOpenFiles": [
     "VM虚拟机/虚拟机笔记.md",
     "Windows/Windows.md",
+    "Windows/Windows 常用命令.md",
+    "Web前端/Node.js 笔记.md",
     "index.md",
+    "Windows/Windows UEFI 引导修复.md",
+    "硬件/Xiaomi Book 12.4 二合一.md",
     "index.md.md"
   ]
 }
