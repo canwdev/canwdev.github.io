@@ -4,15 +4,19 @@
     "type": "split",
     "children": [
       {
-        "id": "133a644c53bc0e38",
+        "id": "e819011b10d2937f",
         "type": "tabs",
         "children": [
           {
-            "id": "9b53146daa2966c6",
+            "id": "813121ecbea8d11f",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {}
+              "type": "markdown",
+              "state": {
+                "file": "AI制图.md",
+                "mode": "source",
+                "source": false
+              }
             }
           }
         ]
@@ -81,6 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
+                "file": "AI制图.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -97,6 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
+                "file": "AI制图.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -118,7 +124,9 @@
             "type": "leaf",
             "state": {
               "type": "outline",
-              "state": {}
+              "state": {
+                "file": "AI制图.md"
+              }
             }
           }
         ]
@@ -138,8 +146,9 @@
       "command-palette:打开命令面板": false
     }
   },
-  "active": "daae8f4033fdb21b",
+  "active": "813121ecbea8d11f",
   "lastOpenFiles": [
+    "VM虚拟机/虚拟机笔记.md",
     "Windows/Windows.md",
     "index.md",
     "index.md.md"
