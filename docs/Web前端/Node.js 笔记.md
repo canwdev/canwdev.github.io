@@ -1,3 +1,8 @@
+## 下载 Node.js
+
+- [Node.js 官网](https://nodejs.org/en)
+- [非官方Build 包含 arm64 版本](https://unofficial-builds.nodejs.org/download/release/v18.15.0/)
+
 ## 设置 npm/yarn 镜像
 
 ```sh
