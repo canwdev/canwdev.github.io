@@ -1,6 +1,4 @@
-# [My Obsidian Tech Vault](https://canwdev.github.io/)
-
-Author: [canwdev](https://github.com/canwdev/canwdev.github.io)
+My Obsidian Tech Vault: [canwdev](https://github.com/canwdev/canwdev.github.io)
 
 ## 最近更新
 
@@ -12,5 +10,5 @@ Author: [canwdev](https://github.com/canwdev/canwdev.github.io)
 - [[Node.js 笔记]]
 - [[Windows]]
 - [[Linux常用命令汇总]]
-- 在左侧文件目录探索更多内容
+- 👈在左侧目录探索更多
 
