@@ -4,16 +4,16 @@
     "type": "split",
     "children": [
       {
-        "id": "e301af68b0b18fe2",
+        "id": "dcbd38688be2418a",
         "type": "tabs",
         "children": [
           {
-            "id": "0ec685fa6ec29bd4",
+            "id": "4b1d2fc6baa57675",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "index.md",
+                "file": "Python/Python学习.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "index.md",
+                "file": "Python/Python学习.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "index.md",
+                "file": "Python/Python学习.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "index.md"
+                "file": "Python/Python学习.md"
               }
             }
           }
@@ -146,9 +146,22 @@
       "command-palette:打开命令面板": false
     }
   },
-  "active": "0ec685fa6ec29bd4",
+  "active": "4b1d2fc6baa57675",
   "lastOpenFiles": [
+    "计算机基础/assets/Pasted image 20230412110229.png",
+    "计算机基础/assets",
+    "计算机基础/斐波那契数列.md",
+    "Misc.md",
+    "常用压缩、解压命令.md",
+    "计算机基础/位运算.md",
+    "计算机基础",
+    "计算机基础/进制转换.md",
+    "Python/Python学习.md",
+    "Python/assets",
+    "Pasted image 20230412110204.png",
     "AI Collection.md",
+    "Py.md",
+    "Python",
     "index.md"
   ]
 }
