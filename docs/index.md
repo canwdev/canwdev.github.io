@@ -1,4 +1,4 @@
-My Obsidian Tech Vault: [canwdev](https://github.com/canwdev/canwdev.github.io)
+My Obsidian Tech Vault: [Github](https://github.com/canwdev/canwdev.github.io)
 
 ## 最近更新
 
