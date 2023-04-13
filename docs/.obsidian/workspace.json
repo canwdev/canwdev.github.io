@@ -4,16 +4,16 @@
     "type": "split",
     "children": [
       {
-        "id": "20eccdebf1eeed36",
+        "id": "bd39c60268c98264",
         "type": "tabs",
         "children": [
           {
-            "id": "daefa2281074b922",
+            "id": "6a90d729bb156435",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "index.md",
+                "file": "硬件/ESP-IDF笔记.md",
                 "mode": "source",
                 "source": false
               }
@@ -48,7 +48,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "",
+                "query": "tag:#ab_slot",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -69,7 +69,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 207.5
   },
   "right": {
     "id": "12394b7d9633e93b",
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "index.md",
+                "file": "硬件/ESP-IDF笔记.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "index.md",
+                "file": "硬件/ESP-IDF笔记.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "index.md"
+                "file": "硬件/ESP-IDF笔记.md"
               }
             }
           }
@@ -146,18 +146,31 @@
       "command-palette:打开命令面板": false
     }
   },
-  "active": "daefa2281074b922",
+  "active": "6a90d729bb156435",
   "lastOpenFiles": [
-    "Misc.md",
-    "index.md",
-    "AI Collection.md",
-    "计算机基础/位运算.md",
-    "计算机基础/斐波那契数列.md",
-    "计算机基础/进制转换.md",
-    "刷机/MI6 Flash日志.md",
-    "刷机/一加6T 问题.md",
+    "硬件/ESPlay Micro 制作记.md",
+    "硬件/SurfacePro7.md",
+    "硬件/NUC11 安装 ArchLinux.md",
+    "硬件/IKBC C87 键盘改造记录.md",
+    "硬件/MI6.md",
+    "硬件/ESP-IDF笔记.md",
     "刷机/一加 6T WoA 指南.md",
+    "硬件/一加6T.md",
+    "刷机/一加6T(fajita) 编译 EDK2-UEFI 以修改分辨率【失败】.md",
+    "刷机/一加6T(fajita) 编译 EDK2-UEFI 以修改分辨率【失败】.md.bak",
+    "刷机/MI6 Flash 日志.md",
+    "Android 常用命令.md",
+    "刷机/一加 6T 问题.md",
+    "android-rom-modify/README.md",
+    "android-rom-modify",
     "Python/Python学习.md",
+    "Python/Python如何创建和读取json文件.md",
+    "计算机基础/斐波那契数列.md",
+    "AI Collection.md",
+    "index.md",
+    "Misc.md",
+    "计算机基础/位运算.md",
+    "计算机基础/进制转换.md",
     "计算机基础/assets/Pasted image 20230412110229.png",
     "计算机基础/assets",
     "常用压缩、解压命令.md",
