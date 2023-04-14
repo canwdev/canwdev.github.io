@@ -60,12 +60,12 @@ netsh int ipv4 add excludedportrange protocol=tcp startport=7890 numberofports=1
 net start winnat
 ```
 
-方案2：
+方案2（推荐）：
 
 ```sh
 # 修改TCP动态端口起始端口即可，管理员运行终端命令：
 netsh int ipv4 set dynamic tcp start=49152 num=16384 
-# 重启后生效！
+# 重启服务后立即生效！
 net stop winnat
 net start winnat
 ```
