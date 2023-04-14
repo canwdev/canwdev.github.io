@@ -1,18 +1,22 @@
 {
   "main": {
-    "id": "9310d5a382e6380f",
+    "id": "69b3d99042a2cab5",
     "type": "split",
     "children": [
       {
-        "id": "4580ebb90fee389d",
+        "id": "bd39c60268c98264",
         "type": "tabs",
         "children": [
           {
-            "id": "98b1fc2bc6b359f8",
+            "id": "6a90d729bb156435",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {}
+              "type": "markdown",
+              "state": {
+                "file": "硬件/ESP-IDF笔记.md",
+                "mode": "source",
+                "source": false
+              }
             }
           }
         ]
@@ -21,15 +25,15 @@
     "direction": "vertical"
   },
   "left": {
-    "id": "b1fe180adc84abdb",
+    "id": "1f9540688b3919ae",
     "type": "split",
     "children": [
       {
-        "id": "c9033f43b77a3693",
+        "id": "6ff5dd8494209417",
         "type": "tabs",
         "children": [
           {
-            "id": "daae8f4033fdb21b",
+            "id": "d723c535ba304b94",
             "type": "leaf",
             "state": {
               "type": "file-explorer",
@@ -39,12 +43,12 @@
             }
           },
           {
-            "id": "d69a5e59a09c3ae2",
+            "id": "25181d43225f1081",
             "type": "leaf",
             "state": {
               "type": "search",
               "state": {
-                "query": "",
+                "query": "tag:#ab_slot",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -54,7 +58,7 @@
             }
           },
           {
-            "id": "995c1ab10a595c70",
+            "id": "9664653f9b3e7087",
             "type": "leaf",
             "state": {
               "type": "starred",
@@ -65,22 +69,23 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 207.5
   },
   "right": {
-    "id": "dbaefc4903b124d4",
+    "id": "12394b7d9633e93b",
     "type": "split",
     "children": [
       {
-        "id": "032beac199294a0b",
+        "id": "4dd97e0be8223b40",
         "type": "tabs",
         "children": [
           {
-            "id": "b530100ff0fef4e4",
+            "id": "a5a2e15cfad60e88",
             "type": "leaf",
             "state": {
               "type": "backlink",
               "state": {
+                "file": "硬件/ESP-IDF笔记.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -92,18 +97,19 @@
             }
           },
           {
-            "id": "21eff857e34cfd22",
+            "id": "761da5e173809c2e",
             "type": "leaf",
             "state": {
               "type": "outgoing-link",
               "state": {
+                "file": "硬件/ESP-IDF笔记.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
             }
           },
           {
-            "id": "dc4a38864d6806e5",
+            "id": "7996cf3c85ef5443",
             "type": "leaf",
             "state": {
               "type": "tag",
@@ -114,11 +120,13 @@
             }
           },
           {
-            "id": "1657dc9d91c2f4dd",
+            "id": "6fe4ae43d833ce9b",
             "type": "leaf",
             "state": {
               "type": "outline",
-              "state": {}
+              "state": {
+                "file": "硬件/ESP-IDF笔记.md"
+              }
             }
           }
         ]
@@ -138,14 +146,38 @@
       "command-palette:打开命令面板": false
     }
   },
-  "active": "98b1fc2bc6b359f8",
+  "active": "6a90d729bb156435",
   "lastOpenFiles": [
-    "Web前端/Node.js 笔记.md",
-    "Windows/Windows.md",
-    "Windows/Windows 常用命令.md",
+    "硬件/ESPlay Micro 制作记.md",
+    "硬件/SurfacePro7.md",
+    "硬件/NUC11 安装 ArchLinux.md",
+    "硬件/IKBC C87 键盘改造记录.md",
+    "硬件/MI6.md",
+    "硬件/ESP-IDF笔记.md",
+    "刷机/一加 6T WoA 指南.md",
+    "硬件/一加6T.md",
+    "刷机/一加6T(fajita) 编译 EDK2-UEFI 以修改分辨率【失败】.md",
+    "刷机/一加6T(fajita) 编译 EDK2-UEFI 以修改分辨率【失败】.md.bak",
+    "刷机/MI6 Flash 日志.md",
+    "Android 常用命令.md",
+    "刷机/一加 6T 问题.md",
+    "android-rom-modify/README.md",
+    "android-rom-modify",
+    "Python/Python学习.md",
+    "Python/Python如何创建和读取json文件.md",
+    "计算机基础/斐波那契数列.md",
+    "AI Collection.md",
     "index.md",
-    "Windows/Windows UEFI 引导修复.md",
-    "硬件/Xiaomi Book 12.4 二合一.md",
-    "index.md.md"
+    "Misc.md",
+    "计算机基础/位运算.md",
+    "计算机基础/进制转换.md",
+    "计算机基础/assets/Pasted image 20230412110229.png",
+    "计算机基础/assets",
+    "常用压缩、解压命令.md",
+    "计算机基础",
+    "Python/assets",
+    "Pasted image 20230412110204.png",
+    "Py.md",
+    "Python"
   ]
 }

@@ -17,6 +17,8 @@
 6.A/B分区手机刷入twrp比一般手机要麻烦
 7.为什么需要提供手机内系统相同版本的boot镜像文件，因为如果twrp不和系统版本匹配可能会导致：进入系统后无法使用WiFi等功能，或者系统崩溃。
 8.如果刷入twrp有问题，请用fastboot flash boot boot.img命令刷入官方boot.img（与手机内系统版本相同）即可，恢复官方boot和recovery。
+
+(来源于网络)
 ```
 
 ## 必须先解锁
@@ -39,9 +41,9 @@
 
 ## 安装 Windows 11 ARM
 
-强烈推荐 Mindows 工具箱自动刷入：https://mindows.cn/
+强烈推荐 [Mindows](https://mindows.cn/) 工具箱自动刷入
 
-或 到 Renegade Project 网站选择对应型号下载：https://download.renegade-project.cn/
+或 到 [Renegade Project](https://download.renegade-project.cn/) 网站选择对应型号下载
 
 ## 常见问题 · FAQ
 
@@ -60,6 +62,7 @@ A：进入 PE 后，删除所有驱动再安装，[fajita.tar.gz](https://github
 A：在 TWRP 下：Reboot -> Slot A/B
 在 Renegade Project UEFI 下，UEFI Boot Menu -> Reboot to anther slot
 Bootloader `fastboot set_active b`
+[[Android 常用命令#a/b 分区的设备，如何切换 ab 分区]]
 
 ### Q：如何进入大容量存储模式
 A：在 Renegade Project UEFI 下，Enter Simple Init -> Mass Storage 并且连接电脑，成功后可在资源管理器中直接访问手机的磁盘文件，此时可以配合 dism++ 备份分区，或倒入驱动。
