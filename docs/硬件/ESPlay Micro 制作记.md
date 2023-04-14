@@ -1,19 +1,3 @@
-## 固件魔改
-
-> [!INFO] [Can you update to the latest IDF · Issue #30 · pebri86/esplay-retro-emulation (github.com)](https://github.com/pebri86/esplay-retro-emulation/issues/30)
-> Actually i have it in my local repo, but it's very experimental, also the current code only support idf v4.2 not the latest one 4.4 because conflict of DMA between sdcard sdmmc and i2s driver
-
-- [x] ugui 支持中文显示
-- [ ] 迁移到 IDF v4.2
-	- [ ] lvgl 图形引擎
-- [ ] LR 按键修复
-- 音乐播放器
-	- [x] 新增随机模式
-	- [ ] 保存播放index
-	- [ ] 播放速度问题
-	- [ ] 显示播放进度条
-	- [ ] 一键删除
-
 ## 参考
 
 - [ESPlay Micro微型开源游戏掌机（精修版2.0） - 嘉立创EDA开源硬件平台 (oshwhub.com)](https://oshwhub.com/LiiGuang/esplay-micro-V2#P6)

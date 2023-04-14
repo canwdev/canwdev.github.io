@@ -17,6 +17,7 @@
 
 > [!Info]
 > 造成时间重启不保存的原因，可能是主板时钟电池电量耗尽，与 Windows 系统无关。
+> [[Android 常用命令#修改 NTP 服务器以同步时间]]
 
 ---
 
@@ -29,28 +30,6 @@
 > [!Warning] 找到原因
 > 刷入系统重启之后，如果再刷入任意一个包（如magisk或官方root），必然会导致蓝牙闪退！ 
 > 原因：系统开启了 SELinux，再次刷包破坏了系统的稳定性
-> 解决方案：在开发者模式中启用 root 授权：仅限于 ADB 后，关闭 SELinux。
+> 解决方案：在开发者模式中启用 root 授权：仅限于 ADB 后，关闭 SELinux：[[Android 常用命令#如何关闭 SELinux]]
 > 或者，在刷入系统之后立即刷入root包，并且在以后的日常使用中不再刷入其他包。
 
-
-
-
-如何关闭 SELinux
-
-**adb shell getenforce**
-
-查看当前 Selinux 功能是 **permissive**(关闭)还是 **enforce**(打开)的
-
-**adb shell setenforce 0**
-
-开Selinux：设置成模式permissive
-
-**adb shell setenforce 1**
-
-关Selinux：设置成模式enforce
-
-说明：setenforce 修改的状态在`设备重启后会失效`，需要重新执行命令重新设置。
-
----
-
-TWRP -> Advanced -> Fix Contexts 没用
