@@ -28,6 +28,7 @@
 
 ## 工具箱
 
+- https://huggingface.co/
 - [ChatGPT Next Web](https://chat-gpt-next-web.vercel.app)
 - [TTS Maker](https://ttsmaker.com/zh-cn)
 - [小白兔AI](https://github.com/Baiyuetribe/paper2gui)
