@@ -4,19 +4,15 @@
     "type": "split",
     "children": [
       {
-        "id": "8190aa490c8fe574",
+        "id": "96663e9f055119ad",
         "type": "tabs",
         "children": [
           {
-            "id": "862b974b4f165461",
+            "id": "1c347bfdd0788e7b",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Windows/Windows.md",
-                "mode": "source",
-                "source": false
-              }
+              "type": "empty",
+              "state": {}
             }
           }
         ]
@@ -48,7 +44,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "端口占用",
+                "query": "",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -65,8 +61,7 @@
               "state": {}
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "horizontal",
@@ -147,7 +142,7 @@
       "command-palette:打开命令面板": false
     }
   },
-  "active": "862b974b4f165461",
+  "active": "d723c535ba304b94",
   "lastOpenFiles": [
     "AI Collection.md",
     "硬件/ESP-IDF笔记.md",
