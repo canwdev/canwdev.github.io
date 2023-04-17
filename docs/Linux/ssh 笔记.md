@@ -1,4 +1,4 @@
-## Linux 服务端安装 ssh 服务
+## Ubuntu 服务端安装 ssh 服务
 
 ```sh
 # 安装ssh服务器
