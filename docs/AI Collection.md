@@ -13,10 +13,13 @@
 		- [ChatGPT-Next-Web](https://github.com/Yidadaa/ChatGPT-Next-Web) 使用key访问 ChatGPT
 		- https://github.com/weekend-project-space/chatgpt-sites
 	- [WebLLM](https://github.com/mlc-ai/web-llm) 浏览器离线运行模型，基于WebGPU
+	- [GPT4All](https://github.com/nomic-ai/gpt4all) is Nomic AI’s LLaMA model trained on ~800k GPT-3.5-Turbo Generations.
+	- [Vicuna](https://vicuna.lmsys.org/) is a model created by fine-tuning LLaMA on user-shared conversations collected from ShareGPT. Preliminary testing suggests it achieves more than 90% of the quality of ChatGPT and Google Bard
 - 图像生成
 	- [DALL·E](https://labs.openai.com)
 	- Stable Diffusion
 		- [Stable Diffusion web UI](https://github.com/AUTOMATIC1111/stable-diffusion-webui/)
+	- Midjourney
 - 语音合成
 	- Azure TTS
 		- https://speech.microsoft.com/portal/8011b92d505e40668728881234c3708a/voicegallery
@@ -30,6 +33,7 @@
 
 - https://huggingface.co/
 - [ChatGPT Next Web](https://chat-gpt-next-web.vercel.app)
+- [LlamaChat (macOS only)](https://llamachat.app/)
 - [TTS Maker](https://ttsmaker.com/zh-cn)
 - [小白兔AI](https://github.com/Baiyuetribe/paper2gui)
 
