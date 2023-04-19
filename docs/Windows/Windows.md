@@ -71,17 +71,6 @@ net start winnat
 ```
 
 
-## WSL 从 C 盘迁移至 D 盘
-
-参考 https://learnku.com/articles/46234
-
-1. 下载并解压 [LxRunOffline](https://github.com/DDoSolitary/LxRunOffline) 在终端运行
-2. 查看已安装的子系统：`.\LxRunOffline.exe list`
-3. 查看子系统所在目录：`.\LxRunOffline.exe get-dir -n Ubuntu-20.04`
-4. 新建目标目录并授权：`icacls D:\wsl\installed /grant "cnguu:(OI)(CI)(F)"`
-5. 关闭正在运行的子系统：`wsl --shutdown`
-6. 迁移系统：`.\LxRunOffline move -n Ubuntu-20.04 -d D:\wsl\installed\Ubuntu-20.04`
-7. 如果启动出现“拒绝访问”，请在文件夹属性的安全设置里把当前用户的“完全控制”权限勾上
 
 ## 删除 Win11 小组件
 
