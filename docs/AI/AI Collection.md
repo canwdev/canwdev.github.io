@@ -1,8 +1,7 @@
 ## 教程
 
 - 目前多数工具都是基于 Python，推荐先 [[Python 学习]]
-- [【完结】动手学深度学习 PyTorch版 - 跟李沐学AI](https://space.bilibili.com/1567748478/channel/seriesdetail?sid=358497)
-	- [《动手学深度学习》](https://zh-v2.d2l.ai/)
+- [[动手学深度学习]]
 - [CS DIY](https://github.com/pkuflyingpig/cs-self-learning/)
 
 ## 技术
@@ -29,15 +28,13 @@
 			- https://www.bilibili.com/video/BV1rV4y177Z7
 
 
-## 工具箱
+## 有用的链接
 
 - https://huggingface.co/
 - [ChatGPT Next Web](https://chat-gpt-next-web.vercel.app)
 - [LlamaChat (macOS only)](https://llamachat.app/)
 - [TTS Maker](https://ttsmaker.com/zh-cn)
+- https://novelai.dev/
 - [小白兔AI](https://github.com/Baiyuetribe/paper2gui)
-
-## 训练硬件设备
-
 - [能效曲线 - **笔记本显卡**](https://www.socpk.com/laptopgpucurve/)
 

@@ -71,11 +71,12 @@ net start winnat
 ## 删除 Win11 小组件
 
 参考 [不喜欢Windows 11的小组件功能？直接命令行彻底删除 - 蓝点网 (landiannews.com)](https://www.landiannews.com/archives/95616.html)
-```
-1.  #打开管理员模式的命令提示符，然后执行下面的命令
-2.  winget uninstall MicrosoftWindows.Client.WebExperience_cw5n1h2txyewy
-3.  #该操作可能需要联网，如果报错那就再执行一次
-```
+
+1.  打开管理员模式的命令提示符，然后执行下面的命令
+2.  `winget uninstall MicrosoftWindows.Client.WebExperience_cw5n1h2txyewy`
+3.  该操作可能需要联网，如果报错那就再执行一次
+4. 或可以直接使用 Dism++ 删除 Appx 包
+
 
 ## 消除【这些文件可能对你的计算机有害】对话框
 
