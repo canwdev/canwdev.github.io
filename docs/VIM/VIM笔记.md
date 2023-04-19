@@ -109,8 +109,6 @@ source ~/.vimrc
 
 或者安装 vim，然后使用 vim 编辑
 
----
+## 参考
 
-参考：
-
-- [即將失傳的古老技藝](https://www.bilibili.com/video/BV1fV41187Zr?p=5)
+- [[即將失傳的古老技藝Vim]]
