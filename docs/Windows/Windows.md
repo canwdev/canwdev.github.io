@@ -1,6 +1,6 @@
 
 - [[Windows 常用命令]]
-- [[Windows使用VHD镜像无损备份恢复系统]]
+- [[Windows 使用VHD镜像无损备份恢复系统]]
 - [[Windows UEFI 引导修复]]
 
 ## 镜像下载
@@ -52,8 +52,7 @@ Win10/11 端口占用无法绑定，产生这个问题的原因是安装了 wsl2
 - https://github.com/Fndroid/clash_for_windows_pkg/issues/671
 - https://www.v2ex.com/t/835798
 
-## 解决方案：
-
+方案1：
 ```sh
 net stop winnat
 netsh int ipv4 add excludedportrange protocol=tcp startport=7890 numberofports=1
@@ -61,7 +60,6 @@ net start winnat
 ```
 
 方案2（推荐）：
-
 ```sh
 # 修改TCP动态端口起始端口即可，管理员运行终端命令：
 netsh int ipv4 set dynamic tcp start=49152 num=16384 
@@ -69,8 +67,6 @@ netsh int ipv4 set dynamic tcp start=49152 num=16384
 net stop winnat
 net start winnat
 ```
-
-
 
 ## 删除 Win11 小组件
 
@@ -80,3 +76,21 @@ net start winnat
 2.  winget uninstall MicrosoftWindows.Client.WebExperience_cw5n1h2txyewy
 3.  #该操作可能需要联网，如果报错那就再执行一次
 ```
+
+## 消除【这些文件可能对你的计算机有害】对话框
+
+从网络复制文件时，消除“这些文件可能对你的计算机有害”对话框
+
+如果你要访问的域是 192.168.1.1，可以按照以下步骤在 Internet 属性中添加信任：
+
+1. 打开 Internet Explorer 浏览器，在菜单栏上点击“工具”选项，然后选择“Internet 选项”。
+2. 在 Internet 属性窗口中，切换到“安全”选项卡。
+3. 选中“本地 Intranet”区域，并点击“站点”按钮。
+4. 在“本地 Intranet”窗口中，点击“高级”按钮。
+5. 在“向此区域中添加此站点”文本框中输入 IP 地址：192.168.1.1，并点击“添加”按钮。
+6. 确认 IP 地址已被添加到“网站列表”中，然后点击“关闭”按钮。
+8. 在“安全”选项卡中，选中“本地 Intranet”，点击“默认级别”按钮。
+9. 将该区域的安全级别调整为“低”。
+10. 点击“确定”按钮，关闭所有窗口。
+
+现在你可以重新访问 192.168.0.1，如果还是有弹窗可以尝试重启。

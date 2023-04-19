@@ -1,5 +1,3 @@
-# 命令行安装 ArchLinux 记录
-
 参考：[2021.02. Arch Linux 安装小记](https://zhuanlan.zhihu.com/p/348370646)
 
 ## 1. 准备安装
