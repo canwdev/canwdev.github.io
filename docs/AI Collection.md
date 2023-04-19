@@ -1,6 +1,6 @@
 ## 教程
 
-- 目前多数工具都是基于 Python，推荐先 [[Python学习]]
+- 目前多数工具都是基于 Python，推荐先 [[Python 学习]]
 - [【完结】动手学深度学习 PyTorch版 - 跟李沐学AI](https://space.bilibili.com/1567748478/channel/seriesdetail?sid=358497)
 	- [《动手学深度学习》](https://zh-v2.d2l.ai/)
 - [CS DIY](https://github.com/pkuflyingpig/cs-self-learning/)

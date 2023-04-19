@@ -4,6 +4,7 @@
 - https://github.com/myd7349/mirrors
 - [[Node.js 笔记#设置 npm/yarn 镜像]]
 - [[Docker笔记#Docker Hub 镜像配置]]
+- [[安装 Python#TUNA pypi 镜像使用帮助]]
 
 ## Ubuntu 
 

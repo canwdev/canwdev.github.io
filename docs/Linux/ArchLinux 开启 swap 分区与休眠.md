@@ -1,13 +1,3 @@
----
-title: ArchLinux 开启swap分区与休眠
-date: 2021-08-07 23:24:15
-categories:
-  - technology
-  - manual
-tags:
-  - Linux
----
-
 参考：
 
 - [Archlinux Hibernating（休眠） - WEREWOLFGHOST - 博客园 (cnblogs.com)](https://www.cnblogs.com/WEREWOLFGHOST-Zedekiah/p/6347123.html)

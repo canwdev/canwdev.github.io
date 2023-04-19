@@ -9,6 +9,6 @@ My Obsidian Tech Vault: [Github](https://github.com/canwdev/canwdev.github.io)
 
 - [[Node.js 笔记]]
 - [[Windows]]
-- [[Linux常用命令汇总]]
+- [[Linux 常用命令汇总]]
 - 👈在左侧目录探索更多
 

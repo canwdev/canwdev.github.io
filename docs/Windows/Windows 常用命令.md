@@ -19,7 +19,7 @@
 2. 根据 PID 找到应用程序：`tasklist|findstr "9820"`
 
 ## Windows 在 Powershell 安装 oh-my-posh
-[[Powershell-如何安装OnMyPosh]]
+[[Powershell 如何安装 OnMyPosh]]
 
 ## 无法加载文件 xxx.ps1，因为在此系统上禁止运行脚本
 使用管理权限运行命令：`set-executionpolicy remotesigned`

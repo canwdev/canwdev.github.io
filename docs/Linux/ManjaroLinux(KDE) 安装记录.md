@@ -9,7 +9,7 @@ KDE 是一款桌面环境，UI类似于 Windows。
 
 到[Manjaro官网](https://manjaro.org/download/)下载最新版本（[manjaro-kde-20.0.3-200606-linux56.iso](https://osdn.net/projects/manjaro/storage/kde/20.0.3/manjaro-kde-20.0.3-200606-linux56.iso)）后，使用 rufus 刷入 U 盘，然后启动系统，让其直接抹掉硬盘安装。
 
-安到最后报了一个错，似乎是 `/boot/efi` 装不上去，折腾了半天也没有解决，于是我翻出了旧版（19.0.2）进行安装。解决方案：[[使用rsync克隆Linux并修复GRUB引导]]
+安到最后报了一个错，似乎是 `/boot/efi` 装不上去，折腾了半天也没有解决，于是我翻出了旧版（19.0.2）进行安装。解决方案：[[使用 rsync 克隆 Linux 并修复 GRUB 引导]]
 
 安装很顺利，重启后成功进入桌面。
 
@@ -51,7 +51,7 @@ sudo pacman -S neofetch
 
 一键更新所有软件包（包括Linux内核）：`sudo pacman -Syu`
 
-[[ArchLinux实用软件]]
+[[ArchLinux 实用软件]]
 
 ### 字体
 

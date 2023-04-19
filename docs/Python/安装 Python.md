@@ -19,8 +19,6 @@ curl -o get-pip.py https://bootstrap.pypa.io/pip/2.7/get-pip.py
 sudo python2 get-pip.py
 ```
 
-
-
 ## 查看 Python 版本
 
 ```sh
@@ -32,8 +30,6 @@ Python 3.8.5
 pip -V
 pip 20.1.1 from /usr/lib/python3.8/site-packages/pip (python 3.8)
 ```
-
-
 
 ## TUNA pypi 镜像使用帮助
 
