@@ -47,7 +47,8 @@ PS C:\Windows\system32> wsl -l -v
 * Ubuntu-22.04    Stopped         2
 ```
 
-安装好之后，你也许需要：[[Linux Repository 国内镜像汇总#Ubuntu]]
+- 安装好之后，你也许需要：[[Linux Repository 国内镜像汇总#Ubuntu]]
+- 使用文件资源管理器访问子系统路径：`\\wsl$`
 
 ## WSL 备份还原
 

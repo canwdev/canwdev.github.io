@@ -73,7 +73,7 @@ PasswordAuthentication no
 sudo systemctl restart sshd
 ```
 
-## ssh经常一段时间就断掉解决办法
+## ssh 经常一段时间就断掉解决办法
 
 ```
 sudo vim /etc/ssh/sshd_config
@@ -92,7 +92,7 @@ ClientAliveCountMax 86400
 sudo systemctl restart sshd
 ```
 
-## ssh允许root登录
+## ssh 允许 root 登录
 
 ```
 # /etc/ssh/sshd_config
@@ -118,7 +118,7 @@ Host demo
 
 保存文件后，在终端输入 `ssh demo` 即可直接连接，无需输入密码（公钥认证）。
 
-## ssh 执行远程命令
+## 执行远程命令
 
 参考：[How To Run / Execute Command Using SSH](https://www.cyberciti.biz/faq/unix-linux-execute-command-using-ssh/)
 
@@ -141,4 +141,11 @@ ssh -T $_remote <<'EOL'
 	echo "Server uptime: $up"
 	echo "Bye"
 EOL
+```
+
+## 端口转发
+
+转发远端8888端口到本地8888端口
+```sh
+ssh -L8888:localhost:8888 ubuntu@192.168.1.100
 ```
