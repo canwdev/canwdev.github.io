@@ -1,4 +1,4 @@
-# [即將失傳的古老技藝 Vim](https://www.bilibili.com/video/BV1fV41187Zr) 
+- 教学视频：[即將失傳的古老技藝 Vim](https://www.bilibili.com/video/BV1fV41187Zr) 
 
 ## 02 Install vim
 
