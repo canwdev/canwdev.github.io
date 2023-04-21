@@ -30,7 +30,8 @@
 
 ## 有用的链接
 
-- https://huggingface.co/
+- [huggingface](https://huggingface.co/)
+- [Colab](https://colab.research.google.com/)
 - [ChatGPT Next Web](https://chat-gpt-next-web.vercel.app)
 - [LlamaChat (macOS only)](https://llamachat.app/)
 - [TTS Maker](https://ttsmaker.com/zh-cn)
