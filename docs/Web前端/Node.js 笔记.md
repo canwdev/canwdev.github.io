@@ -15,7 +15,8 @@ npm config set disturl https://npmmirror.com/dist
 yarn config set registry https://registry.npmmirror.com
 yarn config set disturl https://npmmirror.com/dist
 ```
-查看是否设置成功：`npm config list`
+- 查看是否设置成功：`npm config list`
+- [[Windows 常用命令#无法加载文件 xxx.ps1，因为在此系统上禁止运行脚本]]
 
 ## node-sass 安装慢或失败
 
