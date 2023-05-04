@@ -5,7 +5,13 @@ My Obsidian Tech Vault: [Github](https://github.com/canwdev/canwdev.github.io)
 - [[AI Collection]]
 - [[Xiaomi Book 12.4 二合一]]
 
-## 常用链接
+## Web Apps
+
+- [Page Craft](https://canwdev.github.io/page-craft-vite/index.html#/)
+- [Web MediaDevices Player](https://canwdev.github.io/web-mediadevices-player/)
+- [GarageBand Piano JS](https://canwdev.github.io/garageband-piano-js/)
+
+## 常用文档
 
 - [[Linux Repository 国内镜像汇总]]
 - [[Node.js 笔记]]
