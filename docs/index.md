@@ -7,6 +7,7 @@ My Obsidian Tech Vault: [Github](https://github.com/canwdev/canwdev.github.io)
 
 ## 常用链接
 
+- [[Linux Repository 国内镜像汇总]]
 - [[Node.js 笔记]]
 - [[Windows]]
 - [[Linux 常用命令汇总]]
