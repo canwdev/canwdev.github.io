@@ -1,8 +1,11 @@
+# Canwdev's Tech Blog
+
 - My [Obsidian Tech Vault](https://github.com/canwdev/canwdev.github.io)
 - My [Github Stars](https://github.com/canwdev?tab=stars)
 
 ## 最近更新
 
+- [[摄影#索尼 A7M2 上手指南]]
 - [[局域网传文件应用推荐]]
 - [[常用注册表修改]]
 - [[AI Collection]]
