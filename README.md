@@ -1,3 +1,7 @@
+本仓库使用了模板，主要的 Obsidian 文档在 `docs` 目录内。
+
+---
+
 # Publish your Obsidian Notes
 
 (MkDocs template)
