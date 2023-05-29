@@ -39,6 +39,10 @@ markdown_extensions:
   - pymdownx.keys
   - pymdownx.mark
   - pymdownx.tilde
+  - pymdownx.highlight:
+      anchor_linenums: true
+      auto_title: true
+      linenums: true
 
   - toc:
       permalink: true
