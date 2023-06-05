@@ -34,10 +34,10 @@ New-NetNat -Name "vEthernet (NAT网络)" -InternalIPInterfaceAddressPrefix 192.1
 Remove-NetNat -name "vEthernet (NAT网络)"
 ```
 
-5. 下载：[Download | DHCP Server for Windows](https://www.dhcpserver.de/cms/download/)，解压到C盘根目录（因为后面要以服务运行）
+5. 下载：[Download | DHCP Server for Windows](https://www.dhcpserver.de/cms/download/)，解压到 `C:\dhcpsrv`（因为后面要以服务运行）
 6. 执行 `dhcpwiz.exe` 配置向导
 	1. 步骤【Network Interface cards】：选中【vEthernet (NAT网络)】网卡，点击下一步
-	2. 步骤【Configuring DHCP for Interface】：设置【IP-Pool: 192.168.251.1-254】，点击【Advanced ...】
+	2. 步骤【Configuring DHCP for Interface】：设置【IP-Pool: 192.168.254.1-254】，点击【Advanced ...】
 	3. 对话框【Advanced Configration】：设置【Subnet：255.255.255.0】；设置：【DNS Server：223.5.5.5】；【Gateways：点击Edit按钮，设置为 192.168.254.1】，点击OK，点击下一步
 	4. 步骤：【Writing the INI file】：勾选【Overwrite existing file】，点击【Write INI file】，点击下一步
 	5. 步骤：【DHCP configuration completed】：点击【Admin...】安装为Windows服务；随后点击【Install】【Start】和右侧的【Configure】即可大功告成
