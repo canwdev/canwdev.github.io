@@ -97,6 +97,18 @@ net start winnat
 
 现在你可以重新访问 192.168.0.1，如果还是有弹窗可以尝试重启。
 
+
+## Windows  10 磁盘带锁黄色三角感叹号怎么去掉
+
+[Windows10磁盘带锁黄色三角感叹号怎么去掉？Bitlocker提示等待激活的解决方法 - 薄心之心 - 博客园 (cnblogs.com)](https://www.cnblogs.com/bosins/p/15419102.html)
+
+```
+manage-bde -off c:
+```
+
+执行后，通过任务管理器可以看到磁盘使用率飙升，等待解密完成即可。
+
+
 ---
 
 - [Win11 资源管理器（文件夹）出现的菜单栏怎么隐藏？ | 竹山一叶 (zsyyblog.com)](https://zsyyblog.com/a2ad5b83.html)
