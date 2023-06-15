@@ -44,6 +44,42 @@ Remove-NetNat -name "vEthernet (NAT网络)"
 
 > 这种方式即使重启也不会丢失IP地址
 
+完整的配置文件 `dhcpsrv.ini` 如下：
+```ini
+[SETTINGS]
+IPPOOL_1=192.168.254.1-254
+IPBIND_1=192.168.254.1
+AssociateBindsToPools=1
+Trace=1
+DeleteOnRelease=0
+ExpiredLeaseTimeout=3600
+
+[GENERAL]
+LEASETIME=86400
+NODETYPE=8
+SUBNETMASK=255.255.255.0
+NEXTSERVER=192.168.254.1
+DNS_0=223.5.5.5
+ROUTER_0=192.168.254.1
+
+[DNS-SETTINGS]
+EnableDNS=0
+
+[TFTP-SETTINGS]
+EnableTFTP=0
+ROOT=C:\dhcpsrv\wwwroot
+WritePermission=0
+
+[HTTP-SETTINGS]
+EnableHTTP=0
+ROOT=C:\dhcpsrv\wwwroot
+[00-15-5D-89-01-05]
+IPADDR=192.168.254.2
+AutoConfig=06/05/2023 10:04:24
+Hostname=hyperv
+LeaseEnd=0
+```
+
 ### 方案2：使用 VMware 虚拟网卡
 
 > 注意：使用 VMware 16.2.5 build-20904516 版本验证成功，VMware 17 可能无效！
