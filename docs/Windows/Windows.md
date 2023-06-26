@@ -1,8 +1,8 @@
 
-- [[Windows 常用命令]]
+- [[Windows 脚本 + 常用命令]]
 - [[Windows 使用VHD镜像无损备份恢复系统]]
-- [[Windows UEFI 引导修复]]
-- [[常用注册表修改]]
+- [[Windows UEFI BCD 引导修复]]
+- [[Windows 注册表]]
 
 ## 镜像下载
 
