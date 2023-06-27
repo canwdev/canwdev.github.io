@@ -6,7 +6,7 @@
 4. 把 `mountedevices` 里面的内容全部删除，卸载配置单元
 5. 重启系统就会自动恢复
 
-接下来你可能需要：[[Windows UEFI 引导修复]]
+接下来你可能需要：[[Windows UEFI BCD 引导修复]]
 
 参考：
 - [1分钟解决系统迁移克隆分区后的启动问题 蓝屏 黑屏 只剩鼠标指针_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV1Jh411279E)
