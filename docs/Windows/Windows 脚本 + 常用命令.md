@@ -1,4 +1,4 @@
-## Win+R 常用命令
+## Win+R 常用运行命令
 
 - `control` 控制面板
 - `regedit` 注册表编辑器
@@ -18,7 +18,7 @@
 1. 查看 1080 端口的占用情况：`netstat -aon|findstr "1080"`
 2. 根据 PID 找到应用程序：`tasklist|findstr "9820"`
 
-## Windows 在 Powershell 安装 oh-my-posh
+## 在 Powershell 安装 oh-my-posh
 [[Powershell 如何安装 OnMyPosh]]
 
 ## 无法加载文件 xxx.ps1，因为在此系统上禁止运行脚本
@@ -27,7 +27,8 @@
 set-executionpolicy remotesigned
 ```
 
-## Win10如何删除壁纸历史记录
+
+## Win10 删除壁纸历史记录
 
 运行 regedit，定位到 `计算机\HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Wallpapers`，里面有类似 `BackgroundHistoryPath` 这样的条目，可以直接删除。
 
@@ -60,13 +61,13 @@ PS C:\Windows\system32> dism.exe /online /enable-feature /featurename:netfx3 /So
 操作成功完成。
 ```
 
-## Windows 递归修改文件夹权限为Everyone
+## Windows 递归修改文件夹权限为 Everyone
 
 ```sh
 icacls "D:\CodeArchive" /grant Everyone:M /t
 ```
 
-## 解决WIN10 1803及以后版本的蓝牙音量（绝对音量）问题
+## Win 10 1803及以后版本的蓝牙音量（绝对音量）问题
 
 ```
 1、win+r，输入regedit，打开注册表
@@ -75,11 +76,17 @@ icacls "D:\CodeArchive" /grant Everyone:M /t
 4、重启。
 ```
 
-## 把 Steam 的游戏拷贝到另一台电脑
 
-原文：https://www.zhihu.com/question/270062762/answer/351631966
+## Win 11 启动 IE 浏览器
 
-1. steamapps文件夹内，保存所有appmanifest文件，可以放入网盘或U盘，
-2. 然后把steamapps里的common文件夹压缩成分卷放入U盘，
-3. 在新电脑上安装steam，别急着启动，在steamapps里解压复原appmanifest文件的位置和common文件夹后登录即可，
-4. 出问题验证完整性。
+`IE.vbs`
+```vbs
+CreateObject("InternetExplorer.Application").Visible=true
+```
+
+## Win 10 以上系统启动传统个性化面板
+
+个性化.bat
+```bat
+start shell:::{ED834ED6-4B5A-4BfE-8F11-A626DCB6A921}
+```

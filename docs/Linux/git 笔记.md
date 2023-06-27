@@ -14,6 +14,12 @@ git config  --global core.ignorecase false
 git config --global http.sslVerify false
 ```
 
+# Silence all `safe.directory` warnings
+
+```
+git config --global --add safe.directory '*'
+```
+
 ## git 设置代理
 
 ```sh
