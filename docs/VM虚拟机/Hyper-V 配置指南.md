@@ -173,6 +173,7 @@ XP系统参考：
 ## Hyper-V 显卡直通
 
 参考：
+
 - [显卡虚拟化实现在虚拟机内玩原神](https://blog.pinkd.moe/other/2023/04/17/play-genshin-in-virtual-machine "显卡虚拟化实现在虚拟机内玩原神")
 - [Hyper-v 虚拟机 Game 尝试 | 默 (jasper1024.com)](https://jasper1024.com/jasper/ioubn7891wc/)
 - [Hyper-V显卡虚拟化 虚拟机调用满血显卡详细教程末尾有跑分_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV1XU4y1K7J7/)
