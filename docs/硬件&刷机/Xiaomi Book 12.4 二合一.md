@@ -1,6 +1,7 @@
 ## 体验
 
-- [小米Book 12.4二合一平板笔记本电脑 相机故障无法使用 解决方案](https://www.bilibili.com/read/cv23958136)
+- [小米Book 12.4二合一平板笔记本电脑 相机故障无法使用 解决方案 - 哔哩哔哩 (bilibili.com)](https://www.bilibili.com/read/cv23958136)
+- [Xiaomi Book 12.4 相机故障微软官方解决方案文档](https://learn.microsoft.com/en-us/windows/release-health/status-windows-11-22h2#3108msgdesc)
 - 经测试，此机器不支持 Surface Pro 7 的触控笔
 - 原装键盘盖在关闭状态下容易滑动，体验不佳
 
