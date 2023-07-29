@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>快捷方式 NZWHV 2023.8</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <style>
+    #app {
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    #app h1 {
+      text-align: center;
+    }
+
+    #app a {
+      color: #f44336;
+      font-weight: bold;
+      line-height: 2;
+      font-size: 20px;
+    }
+
+    #app a:visited {
+      color: #f59188;
+    }
+
+    #app h2 {
+      margin-top: 0;
+      margin-bottom: 15px;
+    }
+
+    #app .group {
+      border-radius: 10px;
+      /* background-color: rgba(255, 255, 255, 0.868); */
+      padding: 20px;
+      border: 2px solid gray;
+    }
+
+    #app .group+.group {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="app">
+    <h1>快捷方式</h1>
+
+    <div class="group">
+
+      <h2>官方链接</h2>
+      <ul>
+        <li><a href="https://onlineservices.immigration.govt.nz/" target="_blank">抢名额登录页</a></li>
+        <li><a href="https://onlineservices.immigration.govt.nz/WorkingHoliday/" target="_blank">WHV 首页(需要先登录)</a></li>
+        <li><a
+            href="https://www.immigration.govt.nz/new-zealand-visas/apply-for-a-visa/about-visa/china-working-holiday-visa"
+            target="_blank">China Working Holiday Visa</a></li>
+      </ul>
+    </div>
+
+
+    <div class="group">
+
+      <h2>表单步骤</h2>
+      <div>
+        <label for="formId" style="margin-bottom: 20px; display: block;">
+          Application ID:
+          <input type="text" id="formId" v-model="message" @blur="refreshQuery">
+        </label>
+
+        <ul v-if="message">
+          <li v-for="(item, index) in linkTable" :key="index">
+            <a :href="item.value" target="_blank">{{item.label}}</a>
+          </li>
+        </ul>
+        <div v-else>
+          请先输入 Application ID
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const { createApp, ref, computed, onMounted } = Vue
+
+    createApp({
+      setup() {
+        const message = ref('')
+        const linkTable = computed(() => {
+          const aid = message.value
+          return [
+            {
+              label: '1.Personal Details 页面',
+              value: `https://onlineservices.immigration.govt.nz/WorkingHoliday/Wizard/Personal1.aspx?ApplicationId=${aid}&IndividualType=Primary&IndividualIndex=1`
+            },
+            {
+              label: '2.Personal Identification 页面',
+              value: `https://onlineservices.immigration.govt.nz/WorkingHoliday/Wizard/Personal2.aspx?ApplicationId=${aid}&IndividualType=Primary&IndividualIndex=1`
+            },
+            {
+              label: '3.Health 页面',
+              value: `https://onlineservices.immigration.govt.nz/WorkingHoliday/Wizard/Medical1.aspx?ApplicationId=${aid}&IndividualType=Primary&IndividualIndex=1`
+            },
+            {
+              label: '4.Character 页面',
+              value: `https://onlineservices.immigration.govt.nz/WorkingHoliday/Wizard/Character.aspx?ApplicationId=${aid}&IndividualType=Primary&IndividualIndex=1`
+            },
+            {
+              label: '5.Working Holiday Specific 页面',
+              value: `https://onlineservices.immigration.govt.nz/WorkingHoliday/Wizard/WorkingHolidaySpecific.aspx?ApplicationId=${aid}&IndividualType=Primary&IndividualIndex=1`
+            },
+            {
+              label: '6.提交申请确认页面(上述完全填完才能点！)',
+              value: `https://onlineservices.immigration.govt.nz/WorkingHoliday/Application/Submit.aspx?ApplicationId=3177327`
+            },
+          ]
+        })
+
+        onMounted(() => {
+          const queryString = window.location.search;
+          if (queryString) {
+            const urlParams = new URLSearchParams(queryString);
+            const stepValue = urlParams.get('aid');
+
+            message.value = stepValue || ''
+          }
+        })
+        return {
+          message,
+          linkTable,
+          refreshQuery() {
+            window.history.replaceState(null, null, `?aid=${message.value || ''}`);
+          }
+        }
+      }
+    }).mount('#app')
+  </script>
+
+</body>
+
+</html>
