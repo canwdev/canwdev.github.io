@@ -90,3 +90,17 @@ CreateObject("InternetExplorer.Application").Visible=true
 ```bat
 start shell:::{ED834ED6-4B5A-4BfE-8F11-A626DCB6A921}
 ```
+
+## 使用 .vbs 脚本启动 exe 程序
+
+支持传参，并且不弹出 cmd 窗口
+
+```vbs
+strCommand = "cmd /c .\totalcmd\TOTALCMD64.EXE"
+
+For Each Arg In WScript.Arguments
+    strCommand = strCommand & " """ & replace(Arg, """", """""""""") & """"
+Next
+
+CreateObject("Wscript.Shell").Run strCommand, 0, false
+```
