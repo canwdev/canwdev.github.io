@@ -5,6 +5,7 @@
 
 ## 最近更新
 
+- [[AutoHotKey]]
 - [[QEMU run WindowsXP]]
 - [[使用 ffmpeg 批量截取视频封面]]
 - [[Hyper-V 配置指南]]
