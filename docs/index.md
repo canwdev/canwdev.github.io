@@ -5,6 +5,7 @@
 
 ## 最近更新
 
+- [[QEMU run WindowsXP]]
 - [[使用 ffmpeg 批量截取视频封面]]
 - [[Hyper-V 配置指南]]
 - [[Nuxt.js 高级用法]]
@@ -12,7 +13,6 @@
 - [[局域网文件传输应用推荐]]
 - [[Windows 注册表]]
 - [[AI Collection]]
-- [[Xiaomi Book 12.4 二合一]]
 
 ## Web Apps
 
