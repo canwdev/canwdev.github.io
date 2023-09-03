@@ -105,3 +105,8 @@ reboot
 - 方案2：安装补丁：kb4474419
 	- 需要启用 Windows Update 服务，部分精简系统可能安装失败
 	- 下载地址： https://www.catalog.update.microsoft.com/Search.aspx?q=kb4474419.
+
+
+---
+
+- [去虚拟化教程](https://www.bilibili.com/video/BV1Qh4y1Q7pk/)

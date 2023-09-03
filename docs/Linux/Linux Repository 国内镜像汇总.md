@@ -22,6 +22,7 @@ vim /etc/apt/sources.list
 ```
 
 Ubuntu 版本：22.04 LTS
+> 使用 `lsb_release -a` 命令查看 Ubuntu 版本
 ```properties
 # 默认注释了源码镜像以提高 apt update 速度，如有需要可自行取消注释
 deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy main restricted universe multiverse
