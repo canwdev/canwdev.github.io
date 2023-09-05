@@ -6,7 +6,7 @@
 ## 最近更新
 
 - [[AutoHotKey]]
-- [[QEMU run WindowsXP]]
+- [[QEMU]]
 - [[使用 ffmpeg 批量截取视频封面]]
 - [[Hyper-V 配置指南]]
 - [[Nuxt.js 高级用法]]
