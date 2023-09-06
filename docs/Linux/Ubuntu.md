@@ -4,8 +4,8 @@
 	- Chrome
 		- `wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb`
 		- `sudo dpkg -i ./google-chrome-stable_current_amd64.deb`
-	- Firefox
-		- https://www.mozilla.org/en-US/firefox/linux/
+	- [Firefox](https://www.mozilla.org/en-US/firefox/linux/)
+- [VS Code](https://code.visualstudio.com/download)
 - Wine 模拟器
 	- `sudo apt install wine`
 	- wine32: `sudo dpkg --add-architecture i386 && sudo apt-get update && sudo apt-get install wine32`
