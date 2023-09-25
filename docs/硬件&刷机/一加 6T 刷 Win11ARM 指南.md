@@ -1,10 +1,12 @@
-# OnePlus 6T Windows 11 on ARM 
+# OnePlus 6T 刷 Windows 11 on ARM 
 
-## 一些常识
+## 0. 一些常识
 
-- 一加官方ROM 氢氧OS的区别：氢OS（H2OS）是国内版本；氧OS（OxygenOS）是海外版，有Google服务。
-- 如何进入Fastboot：关机状态，拔掉数据线，按住【音量加、音量减、电源键】三个按键几秒钟后即可进入 Fastboot。
-- 一加 6T 是拥有 A/B 分区的设备，当前启动分区在哪个 slot 就启动那个 slot 的 boot 镜像。
+- 一加官方ROM 氢氧OS的区别
+	- 氢OS（H2OS）是国内版本
+	- 氧OS（OxygenOS）是海外版，有Google服务。
+- 如何进入Fastboot：关机状态，拔掉数据线，按住【音量加、音量减、电源键】三个按键几秒钟后即可进入 Fastboot
+- 一加 6T 是拥有 A/B 分区的设备，当前启动分区在哪个 slot 就启动那个 slot 的 boot 镜像
 - 如何进入9008救砖模式：关机状态下，按住音量加和音量减，插入数据线，可以在设备管理器的端口（COM）看到：Qualcomm HS-USB QDLoader 9008
 
 ```
@@ -21,7 +23,7 @@
 (来源于网络)
 ```
 
-## 必须先解锁
+## 1. 必须先解锁
 
 > [!WARNING] 解锁手机会抹除所有数据，因此进行此操作前请先备份！
 
@@ -30,83 +32,90 @@
 - 手机重启进入刷机模式后，电脑终端输入 `fastboot unlock bootloader` 解锁手机，按照手机提示操作
 - 解锁成功后会重启，手机数据会抹除，再次设置进入开发者选项后，可以看到【OEM解锁】选项为灰色，则表明解锁成功！
 
-## 刷入 TWRP Recovery
+## 1.1 刷入 TWRP Recovery（可选）
 
 > [!INFO] 刷入第三方Recovery、Root 或固件等操作，需要在解锁成功之后方可执行。
 
+- 安装 [Mindows](https://mindows.cn/) 工具箱，刷入Win11的同时也可以刷入 TWRP！
 - 到官网 https://dl.twrp.me/fajita/ 下载最新版本的 twrp img 镜像。
 - 安装驱动
 - 重启进入刷机模式 `reboot fastboot`，或者关机后，同时按下【电源键、音量加、音量减】三个按钮
-- 安装Mindows工具箱，刷入Win11的同时也可以刷入 TWRP！
 
-## 安装 Windows 11 ARM
+## 2. 开始安装 Windows 11 ARM
 
-强烈推荐 [Mindows](https://mindows.cn/) 工具箱自动刷入
+- 推荐使用 [Mindows](https://mindows.cn/) 工具箱自动刷入
+- 或到 [Renegade Project](https://download.renegade-project.cn/) 网站选择对应型号下载（手动刷入）
 
-或 到 [Renegade Project](https://download.renegade-project.cn/) 网站选择对应型号下载
+## ❓常见问题 · FAQ
 
-## 常见问题 · FAQ
+### win11 oobe 阶段提示：`计算机意外的重新启动或遇到错误。Windows安装无法继续。若要安装Windows，请单击“确定”重新启动计算机，然后安装系统。`
 
-### ❓win11 oobe 阶段提示：计算机意外的重新启动或遇到错误。Windows安装无法继续。若要安装Windows，请单击“确定”重新启动计算机，然后安装系统。
+- 按shift+F10出命令行窗口，输入 regedit 回车
+- 找到注册表`HKEY_LOCAL_MACHINE\SYSTEM\SETUP\STATUS\ChildCompletion`
+- 下面有SETUP.EXE,找到后双击它，将1修改为3，然后点击确定，关机注册表编辑器
+- 重新点击错误消息框的确定。电脑就会自动 重启，重新解析安装包再次进入安装系统
+- [参考](https://blog.csdn.net/qq_21583077/article/details/106146157)
 
-按shift+F10出命令行窗口，输入regedit，找到注册表`HKEY_LOCAL_MACHINE\SYSTEM\SETUP\STATUS\ChildCompletion`， 下面有SETUP.EXE,找到后双击它，将1修改为3，然后点击确定，关机注册表编辑器。重新点击错误消息框的确定。电脑就会自动 重启，重新解析安装包再次进入安装系统。参考：https://blog.csdn.net/qq_21583077/article/details/106146157?utm_source=app
+### 如何跳过 Win11 oobe 强制联网：
 
-### ❓如何跳过 Win11 oobe 强制联网：
+- 在首次启动出现联网界面时按下 Shift+F10 打开 cmd 窗口
+- 输入`OOBE\BypassNRO.cmd`并回车，此时系统会自动重启
+- 重启后就可以和以前一样离线配置。[参考视频教程](https://www.bilibili.com/video/BV1LF411578a)
 
-在首次启动出现联网界面时按下Shift+F10，输入`OOBE\BypassNRO.cmd`并回车，此时系统会自动重启，重启后就可以和以前一样离线配置。参考：https://www.bilibili.com/video/BV1LF411578a 
-
-### ❓刷入Windows 之后，Wi-Fi 在 Windows 系统下不可用
+### 刷入Windows 之后，Wi-Fi 在 Windows 系统下不可用
 
 进入 PE 后，删除所有驱动再安装，[fajita.tar.gz](https://github.com/edk2-porting/WOA-Drivers/releases/download/v2.0rc2/fajita.tar.gz)
 - 最新驱动：https://github.com/edk2-porting/WOA-Drivers/releases
 - 参考：https://forum.renegade-project.cn/t/6t-woa-wifi/1725/2
 - 可能与系统版本有关，如果不行建议更换系统版本
 
-### ❓如何切换 A/B 分区
+### 如何切换 A/B 分区
 
 在 TWRP 下：Reboot -> Slot A/B
 在 Renegade Project UEFI 下，UEFI Boot Menu -> Reboot to anther slot
-Bootloader `fastboot set_active b`
+在 fastboot 模式下执行： `fastboot set_active b`
 [[Android 常用命令#a/b 分区的设备，如何切换 ab 分区]]
 
-### ❓如何进入大容量存储模式
+### 如何进入大容量存储模式
 
-在 Renegade Project UEFI 下，Enter Simple Init -> Mass Storage 并且连接电脑，成功后可在资源管理器中直接访问手机的磁盘文件，此时可以配合 dism++ 备份分区，或导入驱动。
+- 重启手机进入 Renegade Project UEFI 
+- 选择 Enter Simple Init -> Mass Storage 并且连接电脑
+- 稍等片刻，成功后可在资源管理器中直接访问手机的磁盘
+- 此时可以配合 Mindows工具箱刷入 Windows 镜像，Dism++ 备份分区，或导入驱动
 
-### ❓在 Win 系统中，容易死机并进入 Qualcomm Crash Dump
+### 在 Win 系统中容易死机并进入 Qualcomm Crash Dump
 
 禁用蜂窝网络功能，具体操作如下：
+- 下载一个 Devcon.exe (64位) [Devcon 下载](https://www.lab-z.com/dddevcon/)
+- 放在 `C:\Windows\System32\` 下
+- 用管理员权限在cmd行执行以下命令：
 ```
-需要下载一个 Devcon.exe (64位)，放在 C:\Windows\System32\ 下，才能使用脚本禁用蜂窝网络。
-再用记事本把
-
-devcon disable *DEV_02F1*  
-
-保存xx.bat 用管理员权限运行一次就可以了。
+devcon disable *DEV_02F1*`
 ```
-- Devcon 下载：https://www.lab-z.com/dddevcon/
-- 参考：https://www.bilibili.com/video/BV1iT4y1Q7yh
+- [参考视频教程](https://www.bilibili.com/video/BV1iT4y1Q7yh)
 
 > [!WARNING] 提示
 > 即便是禁用了蜂窝网络，在开启 WiFi 的情况下也容易出现 Qualcomm Crash Dump，最好还是关闭 WiFi，使用另一台Android 设备 USB 共享网络上网，以保证系统稳定性
 
-### ❓如何关闭休眠
+### 如何关闭休眠
 
 管理员权限终端执行：`powercfg -h off`
 
-### ❓一加 6T 在 Win11 系统里如何充电？
+### 一加 6T 在 Win11 系统里如何充电？
 
-使用 Lumia 5V3A 充电头可以直接充电，我使用绿联USB hub 再接一个电脑usb充电线也可进行缓慢充电。
+使用 5V3A 充电头可以直接充电，我使用绿联 USB hub 再接一根数据线连接电脑也可进行缓慢充电。
 
-### ❓如何激活Win11系统或切换系统为专业版
+### 如何激活 Win11 系统
 
 使用 `HEU_KMS_Activator_v24.1.0.exe`，内置了激活和切换系统版本。
 
-### ❓已经刷入 Win11，如何在不影响 Win 系统的前提下重刷 Android 系统
+### 如何双系统
+
+> 已经刷入 Win11，如何在不影响 Win 系统的前提下重刷 Android 系统
 
 重启到 TWRP，格式化 data，刷入新系统，参考 [这个教程](https://renegade-project.cn/#/zh/devices/sdm845/fajita/status) 复制 Android 系统的 ab 分区，然后用 Mindows 工具箱重新刷入 UEFI 即可。
 
-### ❓一加6T怎么备份 boot.img
+### 一加 6T 怎么备份 boot.img
 
 > 由 ChatGPT 回答
 

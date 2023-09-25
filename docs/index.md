@@ -5,6 +5,7 @@
 
 ## 最近更新
 
+- [[LG G8X]]
 - [[FE前端技术栈]]
 - [[Ubuntu Server 安装 TigerVNC + Xfce4 桌面环境]]
 - [[AutoHotKey]]
