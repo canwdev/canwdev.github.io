@@ -48,7 +48,7 @@ compact /compactos:always
 ```
 
 ## Win10/11 端口占用
-Win10/11 端口占用无法绑定，产生这个问题的原因是安装了 wsl2 或 hyper-v
+Win10/11 端口占用无法绑定，产生这个问题的原因是安装了 wsl2 或 Hyper-V
 参考：
 - https://github.com/Fndroid/clash_for_windows_pkg/issues/671
 - https://www.v2ex.com/t/835798
