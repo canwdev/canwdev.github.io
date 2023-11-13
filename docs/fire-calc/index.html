@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+        name="viewport">
+  <meta content="ie=edge" http-equiv="X-UA-Compatible">
+  <title>FIRE Calc</title>
+  <script src="./lib/vue.3.3.8.global.min.js"></script>
+  <script src="./lib/echarts.5.4.3.min.js"></script>
+  <script src="./lib/moment.2.29.4.min.js"></script>
+  <script src="./hooks/use-local-storage.js"></script>
+  <script src="./hooks/utils.js"></script>
+  <style>
+    #app {
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    #app a {
+      color: #f44336;
+      font-weight: bold;
+      line-height: 2;
+      font-size: 20px;
+    }
+
+    #app a:visited {
+      color: #f59188;
+    }
+
+    #app .group {
+      border-radius: 10px;
+      /* background-color: rgba(255, 255, 255, 0.868); */
+      padding: 20px;
+      border: 2px solid rgb(128, 128, 128);
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-gap: 10px;
+    }
+
+    .group-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-gap: 10px;
+    }
+    .group-grid + .group-grid{
+      border-top: 1px dashed gray;
+      padding-top: 15px;
+    }
+
+    #app .group + .group {
+      margin-top: 10px;
+    }
+
+    label {
+      display: block;
+      width: 100%;
+      color: gray;
+      font-size: 14px;
+    }
+
+    input[type="number"],
+    input[type="text"] {
+      width: 100%;
+      padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-family: monospace;
+    }
+
+    .chart-area {
+      width: 100%;
+      height: 500px;
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+  <div class="group">
+    <div class="group-grid">
+      <label :for="item.key" :key="item.key" v-for="(item) in formItems">
+        {{ item.label || formatLabel(item.key) }}: <br v-if="item.type === 'checkbox'">
+        <input :id="item.key" :type="item.type" v-model="formData[item.key]">
+      </label>
+    </div>
+    <div class="group-grid">
+      <label :for="item.key" :key="item.key" v-for="(item) in resultItems">
+        {{ item.label || formatLabel(item.key) }}:
+        <input :id="item.key" :type="item.type" :value="item.value" disabled>
+      </label>
+    </div>
+
+  </div>
+
+  <div class="group">
+    <div class="chart-area" id="mainChart"></div>
+  </div>
+</div>
+<script>
+  const {createApp, ref, reactive, computed, onMounted, onUnmounted, shallowRef, watch} = Vue
+
+  createApp({
+    setup() {
+      const stepData = ref([])
+
+      const formData = useLocalStorageObjectReactive('fire_calc_form_data', {
+        currentValue: 0, // 当前资产
+        monthlySave: 3000, // 每月存入款
+        isTargetMode: false, // 是否为目标存款模式
+        iterationMonths: 12, // 迭代月数
+        targetValue: 1000000, // 目标存款
+        annualInterestRate: 0.025, // 年化利率
+        yearEndAwards: 0, // 年终奖
+      })
+
+      const formItems = computed(() => {
+        return [
+          {label: '当前资产', key: 'currentValue', type: 'number'},
+          {label: '月存入', key: 'monthlySave', type: 'number'},
+          {label: '是否为目标存款模式', key: 'isTargetMode', type: 'checkbox'},
+          formData.isTargetMode ?
+            {label: '目标资产', key: 'targetValue', type: 'number'} :
+            {label: '迭代月数', key: 'iterationMonths', type: 'number'},
+          {label: '年利率', key: 'annualInterestRate', type: 'number'},
+          {label: '年终奖', key: 'yearEndAwards', type: 'number'},
+        ].filter(Boolean)
+      })
+
+
+      const resultValue = computed(() => {
+        let result = formData.currentValue
+        stepData.value = []
+        stepData.value.push({
+          label: moment().format('YYYY-MM-DD'),
+          value: result
+        })
+
+        let iterationMonths = formData.iterationMonths
+        if (formData.isTargetMode) {
+          // iterationMonths = (formData.targetValue - formData.currentValue) / formData.monthlySave
+          iterationMonths = +Infinity // 使用真实计算模式
+        }
+
+        for (let i = 0; i < iterationMonths; i++) {
+          const count = i + 1
+
+          const dateMoment = moment().add(count, 'months')
+          // 年底更新一次利息
+          const isDecember = dateMoment.month() === 11; // 判断月份是否为12月，月份从0开始计数
+          if (isDecember) {
+            result += result * formData.annualInterestRate || 0
+            if (formData.yearEndAwards) {
+              result += formData.yearEndAwards
+            }
+          }
+          result += formData.monthlySave || 0
+          stepData.value.push({
+            label: `${dateMoment.format('YYYY-MM-DD')} (${count})`,
+            value: result,
+            dateMoment,
+            isDecember
+          })
+
+          if (formData.isTargetMode && result >= formData.targetValue) {
+            break
+          }
+        }
+        return result
+      })
+      watch(resultValue, () => {
+        updateChart()
+      })
+
+      const resultItems = computed(() => {
+        const result = resultValue.value
+        const resultMonths = stepData.value.length - 1
+        const increasedValue = result - formData.currentValue
+        const increasedPercent = ((increasedValue / result) * 100).toFixed(2) + '%'
+
+        const piYearly = result * formData.annualInterestRate
+        const piMonthly = piYearly / 12
+        const piDaily = piMonthly / 30
+
+        return [
+          {label: '结果资产', key: 'resultValue', value: result.toFixed(2), type: 'number'},
+          {
+            label: '结果时间',
+            key: 'resultTimes',
+            value: `${resultMonths}个月 = ${convertMonthsToYearsAndMonths(resultMonths)} | ${stepData.value[stepData.value.length - 1]?.label}`,
+            type: 'text'
+          },
+          {
+            label: '被动收入',
+            key: 'yearPassiveIncome',
+            value: `年收 ${piYearly.toFixed(2)} | 月收 ${piMonthly.toFixed(2)} | 日收 ${piDaily.toFixed(2)}`,
+            type: 'text'
+          },
+          {label: '增长值', key: 'increasedValue', value: increasedValue.toFixed(2), type: 'number'},
+          {label: '增长百分比', key: 'increasedPercent', value: increasedPercent, type: 'text'},
+        ].filter(Boolean)
+      })
+
+      function handleResize() {
+        if (echartsInstance.value) {
+          echartsInstance.value.resize()
+        }
+      }
+
+      onMounted(() => {
+        initCharts()
+        updateChart()
+        window.addEventListener('resize', handleResize)
+
+      })
+      onUnmounted(() => {
+        echartsInstance.value && echartsInstance.value.dispose()
+        window.removeEventListener('resize', handleResize)
+      })
+
+      const echartsInstance = shallowRef()
+      const initCharts = () => {
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('mainChart'));
+        // 绘制图表
+        myChart.setOption({
+          title: {
+            text: '预测图表'
+          },
+          legend: {},
+          tooltip: {
+            trigger: 'axis',
+            valueFormatter: (value) => value.toFixed(2),
+            axisPointer: {
+              type: 'cross',
+              label: {
+                backgroundColor: 'rgba(133,133,133,0.8)',
+              },
+            },
+          },
+          grid: {
+            top: '10%',
+            left: '1%',
+            right: '2.5%',
+            bottom: 0,
+            containLabel: true,
+          },
+          xAxis: {
+            // name: 'Months',
+            type: 'category',
+            boundaryGap: false,
+            data: [], // x轴数据
+            splitLine: {
+              show: true,
+              lineStyle: {
+                type: 'dashed',
+              },
+            },
+          },
+          yAxis: {
+            // name: 'Value',
+            type: 'value',
+            minInterval: 1,
+            axisPointer: {
+              snap: true,
+            },
+            splitLine: {
+              show: true,
+              lineStyle: {
+                type: 'dashed',
+              },
+            },
+          },
+          series: [
+            {
+              type: 'line',
+              symbol: 'circle',
+              symbolSize: 5,
+              name: 'Value',
+              itemStyle: {
+                color: '#FF9800',
+              },
+              smooth: true,
+              areaStyle: {
+                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                  {
+                    offset: 0,
+                    color: 'rgba(255,152,0,0.4)',
+                  },
+                  {
+                    offset: 1,
+                    color: 'rgba(255,255,255,0)',
+                  },
+                ]),
+              },
+              data: []
+            }
+          ]
+        });
+
+        echartsInstance.value = myChart
+      }
+
+      const updateChart = () => {
+        // 刷新 Echarts 数据
+        const list = stepData.value || []
+        echartsInstance.value.setOption({
+          xAxis: {
+            data: list.map((i) => i.label),
+          },
+          series: [
+            {
+              data: list.map((i) => i.value),
+              markPoint: {
+                data: [
+                  {
+                    type: 'max',
+                  },
+                  {
+                    type: 'min',
+                  },
+                ]
+              }
+            },
+          ],
+        })
+      }
+
+      return {
+        formItems,
+        resultItems,
+        formData,
+        formatLabel,
+        resultValue,
+      }
+    }
+  }).mount('#app')
+</script>
+</body>
+</html>
