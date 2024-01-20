@@ -5,7 +5,9 @@
 
 ## 最近更新
 
-- [[LG G8X]]
+- [[Windows 设备如何在使用 Android 手机 USB 共享上网的情况下，在局域网进行远程桌面连接]]
+- [[Win11 修改]] | [[RDP 使用空密码登录]]
+- [[LG G8X]] | [[一加 6T 刷 Win11ARM 指南]]
 - [[FE前端技术栈]]
 - [[Ubuntu Server 安装 TigerVNC + Xfce4 桌面环境]]
 - [[AutoHotKey]]

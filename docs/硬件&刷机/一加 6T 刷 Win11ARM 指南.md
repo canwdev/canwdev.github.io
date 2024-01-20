@@ -23,13 +23,13 @@
 (来源于网络)
 ```
 
-## 1. 必须先解锁
+## 1. 必须先解锁 & 抹掉所有数据
 
 > [!WARNING] 解锁手机会抹除所有数据，因此进行此操作前请先备份！
 
 - 开启开发者模式：设置 - 关于手机 - 狂点版本号（开启开发者模式）- 返回 - 系统 - 开发者选项 - 打开【OEM 解锁】开关 - 打开【USB调试】开关
 - 电脑终端输入 `adb shell` 然后 `reboot fastboot` 重启到刷机模式
-- 手机重启进入刷机模式后，电脑终端输入 `fastboot unlock bootloader` 解锁手机，按照手机提示操作
+- 手机重启进入刷机模式后，电脑终端输入 `fastboot unlock bootloader`(或 `fastboot flashing unlock`) 解锁手机，按照手机提示操作
 - 解锁成功后会重启，手机数据会抹除，再次设置进入开发者选项后，可以看到【OEM解锁】选项为灰色，则表明解锁成功！
 
 ## 1.1 刷入 TWRP Recovery（可选）
@@ -132,3 +132,13 @@ devcon disable *DEV_02F1*`
 - [设备支持状态](https://www.kdocs.cn/l/cjI6xbkJFxs2?f=201)
 - [Windows设备支持状态](https://renegade-project.cn/#/zh/windows/state-frame.html)
 - [一加6T刷postmarketOS](https://www.cnblogs.com/hupo376787/p/16461892.html)
+
+## 2024.01.20 更新
+
+最近我又重装了一加6T 的 WoA，以下是一些经验。
+
+- 推荐使用 `[Luo]22635.2915.231204_A64FRE_ZH-CN.wim` 的精简版镜像
+- ⚠️⚠️⚠️警告：不要更新可选更新中的高通System驱动，否则会立即 Qualcomm Crash Dump，并且重启也会无限进入，只能重刷系统
+- 由于高通无线驱动不稳定，尽量不要开启 WLAN 上网，否则极其容易 Crash，建议初次进入系统立即关闭 WLAN
+- [[Windows 设备如何在使用 Android 手机 USB 共享上网的情况下，在局域网进行远程桌面连接]]
+- [[RDP 使用空密码登录]]
