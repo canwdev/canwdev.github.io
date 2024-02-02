@@ -27,6 +27,21 @@ type = tcp
 local_ip = 127.0.0.1
 local_port = 3389
 remote_port = 13389
+
+[ssh]
+type = tcp
+local_ip = 127.0.0.1
+local_port = 22
+remote_port = 2222
+# use_encryption = true
+# use_compression = false
+
+[syncthing]
+type = tcp
+local_ip = 127.0.0.1
+local_port = 22000
+remote_port = 26667
+
 ```
 
 - 然后在服务端启动服务：`.\frps.exe -c .\frps.ini`

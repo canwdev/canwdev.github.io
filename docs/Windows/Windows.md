@@ -2,7 +2,7 @@
 - [[Windows 脚本 + 常用命令]]
 - [[Windows 使用VHD镜像无损备份恢复系统]]
 - [[Windows UEFI BCD 引导修复]]
-- [[Windows 注册表]]
+- [[Windows 注册表修改]]
 
 ## 镜像下载
 
@@ -68,15 +68,6 @@ netsh int ipv4 set dynamic tcp start=49152 num=16384
 net stop winnat
 net start winnat
 ```
-
-## 删除 Win11 小组件
-
-参考 [不喜欢Windows 11的小组件功能？直接命令行彻底删除 - 蓝点网 (landiannews.com)](https://www.landiannews.com/archives/95616.html)
-
-1.  打开管理员模式的命令提示符，然后执行下面的命令
-2.  `winget uninstall MicrosoftWindows.Client.WebExperience_cw5n1h2txyewy`
-3.  该操作可能需要联网，如果报错那就再执行一次
-4. 或可以直接使用 Dism++ 删除 Appx 包
 
 
 ## 消除【这些文件可能对你的计算机有害】对话框

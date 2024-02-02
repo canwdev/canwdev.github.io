@@ -5,8 +5,8 @@
 
 ## 最近更新
 
-- [[Windows 设备如何在使用 Android 手机 USB 共享上网的情况下，在局域网进行远程桌面连接]]
-- [[Win11 修改]] | [[RDP 使用空密码登录]]
+- [[Windows 设备如何在使用 Android 手机 USB 共享上网的情况下，在局域网进行远程桌面连接(RDP)]]
+- [[Windows 更新的相关设置]] | [[Win11 修改]] | [[RDP 使用空密码登录]]
 - [[LG G8X]] | [[一加 6T 刷 Win11ARM 指南]]
 - [[FE前端技术栈]]
 - [[Ubuntu Server 安装 TigerVNC + Xfce4 桌面环境]]
@@ -17,7 +17,7 @@
 - [[Nuxt.js 高级用法]]
 - [[摄影#索尼 A7M2 上手指南]]
 - [[局域网文件传输应用推荐]]
-- [[Windows 注册表]]
+- [[Windows 注册表修改]]
 - [[AI Collection]]
 
 ## Web Apps
