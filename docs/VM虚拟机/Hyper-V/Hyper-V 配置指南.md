@@ -80,11 +80,7 @@ Hostname=hyperv
 LeaseEnd=0
 ```
 
-20240202 更新：
-- 也可以配合 [Tftpd64](https://pjo2.github.io/tftpd64/) 的 DHCP 功能使用
-- [Hyper-V创建net模式的固定ip(可访问外网)](https://blog.csdn.net/qq_46150411/article/details/122253886)
-- [Hyper-V NAT 网络设置固定 IP / DHCP](https://www.cnblogs.com/wswind/p/hyper-v-nat-static-ip-or-dhcp.html)
-
+20240202 更新：[[Hyper-V NAT+DHCP 网络配置]]
 ### 方案2：使用 VMware 虚拟网卡
 
 > 注意：使用 VMware 16.2.5 build-20904516 版本验证成功，VMware 17 可能无效！
