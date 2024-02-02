@@ -140,5 +140,5 @@ devcon disable *DEV_02F1*`
 - 推荐使用 `[Luo]22635.2915.231204_A64FRE_ZH-CN.wim` 的精简版镜像
 - ⚠️⚠️⚠️警告：不要更新可选更新中的高通System驱动，否则会立即 Qualcomm Crash Dump，并且重启也会无限进入，只能重刷系统
 - 由于高通无线驱动不稳定，尽量不要开启 WLAN 上网，否则极其容易 Crash，建议初次进入系统立即关闭 WLAN
-- [[Windows 设备如何在使用 Android 手机 USB 共享上网的情况下，在局域网进行远程桌面连接]]
+- [[Windows 设备如何在使用 Android 手机 USB 共享上网的情况下，在局域网进行远程桌面连接(RDP)]]
 - [[RDP 使用空密码登录]]

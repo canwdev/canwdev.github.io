@@ -24,7 +24,7 @@ IPv4 Address: 192.168.254.1
 IPv4 Subnet Mask: 255.255.255.0
 ```
 
-4. 使 “NAT网络” 具有防火墙网络转发功能
+4. 使 “NAT网络” 具有NAT网络转发功能（必要，否则无法上网）
 
 ```bat
 # 启用
@@ -79,6 +79,11 @@ AutoConfig=06/05/2023 10:04:24
 Hostname=hyperv
 LeaseEnd=0
 ```
+
+20240202 更新：
+- 也可以配合 [Tftpd64](https://pjo2.github.io/tftpd64/) 的 DHCP 功能使用
+- [Hyper-V创建net模式的固定ip(可访问外网)](https://blog.csdn.net/qq_46150411/article/details/122253886)
+- [Hyper-V NAT 网络设置固定 IP / DHCP](https://www.cnblogs.com/wswind/p/hyper-v-nat-static-ip-or-dhcp.html)
 
 ### 方案2：使用 VMware 虚拟网卡
 
