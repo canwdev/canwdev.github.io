@@ -1,7 +1,7 @@
 - [[Windows#Win10/11 端口占用]]
 ## Hyper-V 固定虚拟机网络 IP 地址
 
-### 方案1：DHCP Server for Windows （推荐）
+### 方案1：DHCP Server for Windows（推荐）
 
 以管理员身份启动PowerShell ，执行以下命令
 
