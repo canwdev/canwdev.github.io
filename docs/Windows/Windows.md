@@ -6,7 +6,8 @@
 
 ## 镜像下载
 
-- [uupdump](https://uupdump.net/)
+- [uupdump](https://uupdump.net/) 
+	- 不推荐精简系统组件的选项，安装好后没有应用商店，没有defender管理app，无法关闭windows defender
 - [msdn itellyou](https://msdn.itellyou.cn/)
 - [https://latest10.win/](https://latest10.win/)
 - [WindowsSimplify](https://github.com/WhatTheBlock/WindowsSimplify)

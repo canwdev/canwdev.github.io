@@ -11,6 +11,9 @@ $ifindex = Get-NetAdapter -Name "vEthernet (NAT_DHCP)" | Select-Object -ExpandPr
 New-NetIPAddress -IPAddress 192.168.56.1 -PrefixLength 24 -InterfaceIndex $ifindex
 # 创建nat网络
 New-NetNat -Name NAT -InternalIPInterfaceAddressPrefix 192.168.56.0/24
+
+# !! 如若往后需要禁用NAT功能, 则执行, 当前不执行
+# Remove-NetNat -name "NAT"
 ```
 
 ## 2. 使用 tftpd64 配置该虚拟交换机的 DHCP 服务器
