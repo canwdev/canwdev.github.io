@@ -15,17 +15,6 @@
 - [不忘初心](https://www.pc521.net/)
 - [修系统](https://www.xiuxitong.com/)
 
-## Win11 跳过OOBE联网
-在 oobe 界面按 shift+f10，弹出cmd，输入 `oobe\BypassNRO.cmd` 系统重启后就不用联网了。
-
-## Win11 应用商店
-[kinkim/InstallMicrosoftStoreOnLTSC: InstallMicrosoftStoreOnLTSC2019 (github.com)](https://github.com/kinkim/InstallMicrosoftStoreOnLTSC)
-
-## 还原 Win11 新建文本菜单
-```shell
-reg.exe add "HKCU\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32" /f /ve
-```
-
 ## Windows 常用路径
 - 家目录：`%HOMEPATH%`
 - 系统盘：`%HOMEDRIVE%`
