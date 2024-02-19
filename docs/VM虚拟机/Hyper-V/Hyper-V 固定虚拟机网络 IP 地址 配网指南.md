@@ -1,4 +1,5 @@
 - [[Windows#Win10/11 端口占用]]
+- 推荐使用我开发的 [Simple Hyper-V](https://github.com/canwdev/winform-tools?tab=readme-ov-file#simple-hyper-v-%E7%AE%A1%E7%90%86%E5%99%A8) 小工具进行设置，更方便
 ## Hyper-V 固定虚拟机网络 IP 地址
 
 ### 方案1：DHCP Server for Windows（推荐）
