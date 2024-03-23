@@ -9,11 +9,15 @@
 - Wine 模拟器
 	- `sudo apt install wine`
 	- wine32: `sudo dpkg --add-architecture i386 && sudo apt-get update && sudo apt-get install wine32`
+- 中文字体
+	- 思源黑体 `sudo apt install fonts-noto-cjk fonts-noto-cjk-extra`
+	- [fonts-wqy-microhei](http://packages.ubuntu.com/trusty/fonts-wqy-microhei) -「文泉驛微米黑」
+	- [fonts-wqy-zenhei](http://packages.ubuntu.com/trusty/fonts-wqy-zenhei) -「文泉驛正黑體」
 
 ## Wine 中文乱码解决
 
 - [参考](https://juejin.cn/post/6844903917742981128)
-1. 首先确保系统语言为中文 [[Ubuntu#Ubuntu 终端下修改语言]]
+1. 首先确保系统语言为中文 [[Ubuntu 实用软件#Ubuntu 终端下修改语言]]
 3. 复制 Windows 系统中的 **msyh.ttc** **simsun.ttc** （位于 `C:\Windows\Fonts\`）到 wine 的字体目录（位于 `~/.wine/drive_c/windows/Fonts/`） 
 4. 创建一个 `font.reg`，填写以下内容：
 ```reg

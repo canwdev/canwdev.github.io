@@ -5,7 +5,8 @@
 
 ## 最近更新
 
-- Hyper-V
+- Hyper-V / wsl2
+	- [[wsl2 wslg 配置并开启远程桌面(xrdp)]]
 	- [[Hyper-V 固定虚拟机网络 IP 地址 配网指南]]
 - Windows on ARM
 	- [[LG G8X]]
