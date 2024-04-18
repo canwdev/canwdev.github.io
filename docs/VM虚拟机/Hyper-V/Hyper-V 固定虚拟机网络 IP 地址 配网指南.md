@@ -68,6 +68,7 @@ LeaseEnd=0
 ```
 
 参考
+- [[Windows 通过 New-NetNat 给其他网卡共享网络]]
 - [Win10在Hyper-v环境使用nat转发网络 | 鸭哥笔记 (duckgle.in)](https://duckgle.in/posts/Win10%E5%9C%A8Hyper-v%E7%8E%AF%E5%A2%83%E4%BD%BF%E7%94%A8nat%E8%BD%AC%E5%8F%91%E7%BD%91%E7%BB%9C/)
 - [Hyper-V创建net模式的固定ip(可访问外网)](https://blog.csdn.net/qq_46150411/article/details/122253886)
 - [Hyper-V NAT 网络设置固定 IP / DHCP](https://www.cnblogs.com/wswind/p/hyper-v-nat-static-ip-or-dhcp.html)
