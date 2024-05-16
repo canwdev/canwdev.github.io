@@ -14,7 +14,7 @@ git config  --global core.ignorecase false
 git config --global http.sslVerify false
 ```
 
-# Silence all `safe.directory` warnings
+## Silence all `safe.directory` warnings
 
 ```
 git config --global --add safe.directory '*'
@@ -271,3 +271,13 @@ git commit --date="March 31 20:00:00 2021 +0800" -am "update"
 - [git-config(1)](https://www.kernel.org/pub/software/scm/git/docs/git-config.html)
 - [git-remote(1)](https://www.kernel.org/pub/software/scm/git/docs/git-remote.html)
 - [git-branch(1)](https://www.kernel.org/pub/software/scm/git/docs/git-branch.html)
+
+## 在Windows下使用git给文件赋予Linux可执行权限
+
+```
+# 添加执行权限
+git update-index --chmod=+x abc.sh
+
+# 取消执行权限则为
+git update-index --chmod=-x abc.sh
+```
