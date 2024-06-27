@@ -4,6 +4,7 @@
 	1. 注册账户（需要护照、工作）
 	2. 邮寄实体卡（挂号信，地址里填写手机号）
 	3. 入金1050新元，领取15新元奖励（工商银行 同名/1类卡/柜面注册：购汇 -> 跨境汇款）
+	4. 改地址 https://youtu.be/p7SF72nmqmw?feature=shared&t=719
 - 开通360账户、保留GSA账户、关掉SSA
 	- [新加坡华侨银行OCBC如何低成本使用？](https://www.youtube.com/watch?v=eZfWnoIG-ew&t=292s)
 	- SSA账户：6个月余额为0，会自动关闭账户
