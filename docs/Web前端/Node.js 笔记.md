@@ -8,14 +8,14 @@
 ```sh
 # 手动设置 npm npmmirror 镜像源（原淘宝镜像源）
 npm config set registry https://registry.npmmirror.com
-npm config set disturl https://npmmirror.com/dist
-```
-```sh
+
 # 手动设置 yarn npmmirror 镜像源（原淘宝镜像源）
 yarn config set registry https://registry.npmmirror.com
-yarn config set disturl https://npmmirror.com/dist
+
+# 查看是否设置成功
+npm config list
 ```
-- 查看是否设置成功：`npm config list`
+
 - [[Windows 脚本 + 常用命令#无法加载文件 xxx.ps1，因为在此系统上禁止运行脚本]]
 
 ## node-sass 安装慢或失败
