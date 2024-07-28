@@ -21,7 +21,7 @@
 	- [[FE前端技术栈]]
 	- [[Ubuntu Server 安装 TigerVNC + Xfce4 桌面环境]]
 	- [[AutoHotKey]]
-	- [[QEMU]]
+	- [[qemu-windows]]
 	- [[使用 ffmpeg 批量截取视频封面]]
 	- [[Nuxt.js 高级用法]]
 	- [[摄影#索尼 A7M2 上手指南]]
