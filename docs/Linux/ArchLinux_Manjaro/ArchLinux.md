@@ -1,12 +1,16 @@
 
-使用 pacman 安装的软件包，Manjaro 同样适用。
+- 使用 pacman 安装的软件包，Arch/Manjaro 同样适用
+- [[Linux 镜像源#Manjaro Linux]]
 
-## 资源链接
-
-- [TUNA Arch Linux 软件仓库镜像](https://mirrors.tuna.tsinghua.edu.cn/help/archlinux/)
-- [TUNA ArchlinuxCN 镜像](https://mirrors.tuna.tsinghua.edu.cn/help/archlinuxcn/)
-- [AlternativeTo](https://alternativeto.net/)
-
+自用安装命令：
+```zsh
+pacman -Syy
+pacman -S \
+  vim neofetch htop tmux net-tools \
+  git nodejs npm docker \
+  keepassxc seahorse \
+  nginx
+```
 ## pacman 命令
 
 - `pacman -Syu` = 执行全面系统更新
@@ -15,6 +19,7 @@
 - `pacman -Sy <package>` = 安装 包 之前更新源
 - `pacman -R <package>` = 移除 包
 - `pacman -Rc <package>` = 移除 包 及其依赖项
+- `pamac` TODO
 
 ## 办公创作
 
@@ -28,9 +33,9 @@
 
 ## 字体
 
-- `wqy-microhei wqy-bitmapfont wqy-zenhei` = 文泉驿字体系列
 - `noto-fonts-emoji` = 表情符号
 - `noto-fonts-cjk` Google Noto CJK 字体
+- `wqy-microhei wqy-bitmapfont wqy-zenhei` = 文泉驿字体系列
 
 ## 输入法
 
@@ -67,3 +72,4 @@
 - `nginx`
 - `jdk8-openjdk`
 - `ghex` = 十六进制查看器
+- `docker`

@@ -34,7 +34,7 @@ sudo pacman -S neofetch
 
 一键更新所有软件包（包括Linux内核）：`sudo pacman -Syu`
 
-[[ArchLinux 实用软件]]
+[[ArchLinux]]
 
 ### 字体
 
