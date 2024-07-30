@@ -29,7 +29,7 @@ deb http://mirrors.tuna.tsinghua.edu.cn/termux stable main
 
 最后 `pkg update`
 
-## Termux 安装 on-my-zsh
+## on-my-zsh
 
 ```sh
 apt install zsh

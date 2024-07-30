@@ -1,14 +1,8 @@
-系统环境：Ubuntu 22.04.2 LTS
-```
-root@hyperv:~/.vnc# lsb_release -a
-No LSB modules are available.
-Distributor ID: Ubuntu
-Description:    Ubuntu 22.04.2 LTS
-Release:        22.04
-Codename:       jammy
-```
+> 系统环境：Ubuntu 24.04 LTS
 
-安装Xfce4桌面环境：
+## 安装环境
+
+安装Xfce4桌面环境（安装很慢，请耐心等待）
 ```bash
 sudo apt update
 sudo apt install xfce4 xfce4-goodies
@@ -16,8 +10,10 @@ sudo apt install xfce4 xfce4-goodies
 
 安装TigerVNC Server
 ```bash
-sudo apt install tigervnc-standalone-server
+sudo apt install tigervnc-standalone-server tigervnc-common
 ```
+
+## 配置 VNC
 
 配置vnc密码
 ```bash
@@ -28,6 +24,7 @@ vncpasswd
 
 编辑启动配置
 ```bash
+mkdir -p ~/.vnc
 vim ~/.vnc/xstartup
 ```
 填入以下内容：
@@ -52,7 +49,8 @@ geometry=1920x1080
 dpi=96
 ```
 
-启动 VNC 服务器
+## 启动 VNC 服务器
+
 ```bash
 # 注意：只有将-localhost选项的值设置为no时，才允许远程连接到VNC服务器
 # 外网服务器不建议使用  -localhost no 参数，可使用 ssh 端口转发功能访问。
@@ -70,18 +68,25 @@ vncserver -kill :1
 
 使用 `vncviewer` 客户端连接 VNC 服务器
 
-- Ubuntu系统，`sudo apt install tigervnc-viewer`
-- Windows系统，[下载tigervnc客户端](https://sourceforge.net/projects/tigervnc/files/stable/1.12.0/vncviewer64-1.12.0.exe/download)
+- Ubuntu 客户端，`sudo apt install tigervnc-viewer`
+- Windows 客户端：[tigervnc viewer](https://sourceforge.net/projects/tigervnc/) (比 realvnc 体验更好)
 
 连接地址：`server_ip:5901`，使用 `ip a` 命令查看服务器ip
 
-安装为系统服务（请勿使用root用户）：
+如果要让外部网络访问，请使用端口转发（[[ssh 笔记#端口转发]]）：
+
+```bash
+ssh -L 5901:127.0.0.1:5901 -N -f -l username remote_server_ip
+```
+
+## 安装为系统服务（请勿使用root用户）
+
 编辑启动配置
 ```bash
 sudo vim /etc/systemd/system/vncserver@.service
 ```
 填入以下内容：
-```
+```sh
 [Unit]
 Description=Remote desktop service (VNC)
 After=syslog.target network.target
@@ -111,7 +116,35 @@ sudo systemctl enable vncserver@1.service
 ```
 ## 参考
 
-- [[ssh 笔记#端口转发]] `ssh -L 5901:127.0.0.1:5901 -N -f -l username remote_server_ip`
+
 - https://www.myfreax.com/how-to-install-and-configure-vnc-on-ubuntu-22-04/
 - https://vegastack.com/tutorials/how-to-install-and-configure-vnc-on-ubuntu-22-04/
 - https://www.inktea.eu.org/2021/49123.html
+- [[setup-vnc]]
+
+## 安装 XRDP
+
+安装 xrdp
+```bash
+sudo apt install xrdp
+```
+
+你需要创建或修改 `~/.xsession` 文件，以便 XRDP 知道使用 XFCE 作为桌面环境。运行以下命令：
+```bash
+echo xfce4-session > ~/.xsession
+```
+
+确保 xrdp 服务正在运行并已设置为开机自启：
+```bash
+sudo systemctl enable xrdp
+sudo systemctl start xrdp
+```
+
+配置防火墙（如果适用）
+```bash
+sudo ufw allow 3389
+```
+
+在 Windows 启动 `mstsc.exe`，连接 IP 地址即可
+
+> 注意：xrdp 不可和 vncserver 一起使用，否则连接不上，如果启动了 vncserver，请使用 `vncserver -kill :1` 命令关闭！

@@ -40,7 +40,7 @@
 
 ## 常用文档
 
-- [[Linux Repository 国内镜像汇总]]
+- [[Linux 镜像源]]
 - [[Node.js 笔记]]
 - [[Windows]]
 - [[Linux 常用命令汇总]]

@@ -19,26 +19,9 @@ KDE 是一款桌面环境，UI类似于 Windows。
 
 ## 日常环境配置
 
-### 软件源
+### pacman 镜像源
 
-设置软件源可加快下载速度。
-
-在“软件更新”中，点击菜单-首选项，将【官方软件库】的使用镜像改成 China，然后刷新镜像列表。
-
-也可以使用命令行的方式设置软件源：
-
-编辑 /etc/pacman.d/mirrorlist， 在文件的最顶端添加：
-
-```
-Server = https://mirrors.tuna.tsinghua.edu.cn/archlinux/$repo/os/$arch
-```
-
-更新软件包缓存：
-
-```sh
-sudo pacman -Syy
-```
-
+[[Linux 镜像源#Manjaro Linux]]
 ### pacman 包管理器
 
 到[官方文档](https://wiki.archlinux.org/index.php/pacman#Removing_packages)看了一下基本操作，感觉非常简单，安装速度比 apt 快多了。
@@ -103,3 +86,21 @@ XMODIFIERS=@im=fcitx
 - 设置镜像：`yay --aururl "https://aur.tuna.tsinghua.edu.cn" --save`
 - `yay -P -g`
 - 然后就可以安装 AUR 软件了，不需要 `sudo`，如：`yay -S plymouth`
+
+### VNC 远程
+
+- [[setup-vnc]]
+
+### Wayland
+
+要检查您的Linux桌面环境是否正在使用Wayland，可以通过以下几种方法进行确认：
+
+1. **检查环境变量**：
+   在终端中运行以下命令：
+   ```bash
+   echo $XDG_SESSION_TYPE
+   ```
+   如果输出是 `wayland`，那么您正在使用Wayland。如果输出是 `x11`，那么您使用的是X11。
+
+2. **查看登录会话**：
+   如果您使用的是图形界面，可以查看当前会话的类型，通常可以在登录屏幕上选择会话类型，选择Wayland或X11。
