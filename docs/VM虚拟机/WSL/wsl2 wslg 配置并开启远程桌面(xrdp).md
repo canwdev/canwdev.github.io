@@ -2,7 +2,7 @@
 
 1. 推荐到微软应用商店下载最新的Ubuntu发行版（ubuntu22.04），自带wslg功能，[wsl官方文档](https://learn.microsoft.com/en-us/windows/wsl/tutorials/gui-apps) 下载的包可能不支持wslg
 2. 按照提示升级wsl内核到最新
-3. 进入系统后，修改镜像源 [[Linux Repository 国内镜像汇总]]
+3. 进入系统后，修改镜像源 [[Linux 镜像源]]
 4. `sudo apt update && sudo apt upgrade`
 5. 进行最精简的测试 `sudo apt install x11-apps`
 6. 运行其中一个命令，检查窗口是否成功开启 `xcalc`, `xclock`, `xeyes`

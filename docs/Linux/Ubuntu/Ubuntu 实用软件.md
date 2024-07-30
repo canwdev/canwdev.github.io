@@ -1,18 +1,65 @@
+
+## 常用
+
+- [[Linux 镜像源#Ubuntu]]
+- 查看发行版
+	- `lsb_release -a`
+	- `hostnamectl`
+	- `cat /etc/issue`
+
 ##  Ubuntu 实用软件
 
 - 浏览器
 	- Chrome
 		- `wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb`
 		- `sudo dpkg -i ./google-chrome-stable_current_amd64.deb`
+		- 如果以上命令安装失败，请执行 `sudo apt install -f` 后再重复执行上一行的命令
 	- [Firefox](https://www.mozilla.org/en-US/firefox/linux/)
 - [VS Code](https://code.visualstudio.com/download)
 - Wine 模拟器
 	- `sudo apt install wine`
 	- wine32: `sudo dpkg --add-architecture i386 && sudo apt-get update && sudo apt-get install wine32`
-- 中文字体
-	- 思源黑体 `sudo apt install fonts-noto-cjk fonts-noto-cjk-extra`
-	- [fonts-wqy-microhei](http://packages.ubuntu.com/trusty/fonts-wqy-microhei) -「文泉驛微米黑」
-	- [fonts-wqy-zenhei](http://packages.ubuntu.com/trusty/fonts-wqy-zenhei) -「文泉驛正黑體」
+- [[Ubuntu Server 安装 TigerVNC + Xfce4 桌面环境]]
+
+### 字体
+
+- 思源黑体 `sudo apt install fonts-noto-cjk fonts-noto-cjk-extra`
+- 颜文字 `sudo apt install fonts-noto-color-emoji`
+- [fonts-wqy-microhei](http://packages.ubuntu.com/trusty/fonts-wqy-microhei) -「文泉驛微米黑」
+- [fonts-wqy-zenhei](http://packages.ubuntu.com/trusty/fonts-wqy-zenhei) -「文泉驛正黑體」
+### oh-my-zsh
+
+Ubuntu 上安装 Oh My Zsh 的步骤
+
+1. **安装 Zsh**:
+```bash
+sudo apt update
+sudo apt install zsh
+```
+
+2. **更改默认 Shell**（可选）:
+```bash
+chsh -s $(which zsh)
+```
+
+3. **安装 Oh My Zsh**（使用 curl）:
+```bash
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+```
+
+4. **打开配置文件**:
+```bash
+nano ~/.zshrc
+```
+修改主题 [主题预览](https://github.com/ohmyzsh/ohmyzsh/wiki/Themes)
+- `robbyrussell` 默认主题
+- `agnoster` 美观但需要字体支持
+- `ys` 轻量级且信息齐全，包含 Git 状态信息
+- `bira` 提供更丰富的信息，适合日常使用
+```bash
+ZSH_THEME="ys"
+```
+重新进入终端即可生效。
 
 ## Wine 中文乱码解决
 
