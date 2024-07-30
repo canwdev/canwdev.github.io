@@ -6,6 +6,26 @@
 - [[Docker笔记#Docker Hub 镜像配置]]
 - [[安装 Python#TUNA pypi 镜像使用帮助]]
 
+
+## Debian
+
+- USTC [repository file generator](https://mirrors.ustc.edu.cn/repogen/)
+
+Debian (/etc/apt/sources.list): 
+Debian GNU/Linux 12 (bookworm)
+```bash
+deb https://mirrors.ustc.edu.cn/debian/ bookworm main contrib non-free non-free-firmware
+deb-src https://mirrors.ustc.edu.cn/debian/ bookworm main contrib non-free non-free-firmware
+
+deb https://mirrors.ustc.edu.cn/debian/ bookworm-updates main contrib non-free non-free-firmware
+deb-src https://mirrors.ustc.edu.cn/debian/ bookworm-updates main contrib non-free non-free-firmware
+
+deb https://mirrors.ustc.edu.cn/debian/ bookworm-backports main contrib non-free non-free-firmware
+deb-src https://mirrors.ustc.edu.cn/debian/ bookworm-backports main contrib non-free non-free-firmware
+
+deb https://mirrors.ustc.edu.cn/debian-security/ bookworm-security main contrib non-free non-free-firmware
+deb-src https://mirrors.ustc.edu.cn/debian-security/ bookworm-security main contrib non-free non-free-firmware
+```
 ## Ubuntu 
 
 - 清华大学 https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/
@@ -72,3 +92,6 @@ Server = https://mirrors.tuna.tsinghua.edu.cn/archlinux/$repo/os/$arch
 ```sh
 sudo pacman -Syy
 ```
+
+- [TUNA Arch Linux 软件仓库镜像](https://mirrors.tuna.tsinghua.edu.cn/help/archlinux/)
+- [TUNA ArchlinuxCN 镜像](https://mirrors.tuna.tsinghua.edu.cn/help/archlinuxcn/)

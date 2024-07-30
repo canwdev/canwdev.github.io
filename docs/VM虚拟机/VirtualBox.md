@@ -46,3 +46,6 @@ sudo mount -t vboxsf LinuxZone -o rw,dmode=777,gid=user,uid=user /mnt/LinuxZone1
 
 这样就可以完成挂载。
 
+## 备注
+
+- 在开启了 Hyper-V 的主机，不建议设置硬件加速的半虚拟化接口为 Hyper-V，否则运行可能会更慢（保持默认即可）
