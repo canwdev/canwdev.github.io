@@ -69,7 +69,10 @@ vncserver -kill :1
 使用 `vncviewer` 客户端连接 VNC 服务器
 
 - Ubuntu 客户端，`sudo apt install tigervnc-viewer`
-- Windows 客户端：[tigervnc viewer](https://sourceforge.net/projects/tigervnc/) (比 realvnc 体验更好)
+- Windows 客户端
+	- [tigervnc viewer](https://sourceforge.net/projects/tigervnc/) (比 realvnc 体验更好)
+	- [UltraVNC](https://uvnc.com/downloads/ultravnc.html)
+	- [Download TightVNC](https://www.tightvnc.com/download.php)
 
 连接地址：`server_ip:5901`，使用 `ip a` 命令查看服务器ip
 
@@ -120,9 +123,14 @@ sudo systemctl enable vncserver@1.service
 - https://www.myfreax.com/how-to-install-and-configure-vnc-on-ubuntu-22-04/
 - https://vegastack.com/tutorials/how-to-install-and-configure-vnc-on-ubuntu-22-04/
 - https://www.inktea.eu.org/2021/49123.html
+- [Ubuntu 24.04 LTS : VNC サーバーの設定 : Server World](https://www.server-world.info/query?os=Ubuntu_24.04&p=desktop&f=6)
 - [[setup-vnc]]
 
+---
 ## 安装 XRDP
+
+- 推荐使用一键安装脚本：[xRDP Installation Script (Free)](https://www.c-nergy.be/products.html)
+- 以下是手动安装教程：
 
 安装 xrdp
 ```bash
@@ -148,3 +156,19 @@ sudo ufw allow 3389
 在 Windows 启动 `mstsc.exe`，连接 IP 地址即可
 
 > 注意：xrdp 不可和 vncserver 一起使用，否则连接不上，如果启动了 vncserver，请使用 `vncserver -kill :1` 命令关闭！
+
+
+## 使用 MobaXterm 的 X11 Server 连接
+
+首先使用 MobaXterm 的 ssh 连接到 Linux 服务器，然后执行以下命令
+
+~/startwm.sh
+```bash
+#!/bin/sh
+# https://www.server-world.info/query?os=Ubuntu_24.04&p=desktop&f=7
+dbus-launch --exit-with-session /usr/bin/startxfce4
+```
+
+## 总结
+
+使用上述方法都会有各种各样的问题，比如 VSCode 的 `gnome-keyring` 失效，以及部分软件在 VNC, XRDP, X11 Server 下不可用。。。所以如果要使用 GUI 软件，最好还是使用实体机

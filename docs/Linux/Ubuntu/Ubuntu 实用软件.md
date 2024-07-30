@@ -20,6 +20,19 @@
 	- `sudo apt install wine`
 	- wine32: `sudo dpkg --add-architecture i386 && sudo apt-get update && sudo apt-get install wine32`
 - [[Ubuntu Server 安装 TigerVNC + Xfce4 桌面环境]]
+- 密码管理：`gnome-keyring` `seahorse` `keepassxc`
+
+自用安装命令：
+```bash
+apt update
+apt upgrade
+apt install \
+  zsh vim neofetch htop tmux curl wget net-tools \
+  git nodejs npm docker.io \
+  keepassxc seahorse \
+  nginx openssh-server tigervnc-standalone-server tigervnc-common \
+  fonts-noto-cjk fonts-noto-cjk-extra fonts-noto-color-emoji
+```
 
 ### 字体
 
