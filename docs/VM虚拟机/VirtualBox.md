@@ -46,6 +46,13 @@ sudo mount -t vboxsf LinuxZone -o rw,dmode=777,gid=user,uid=user /mnt/LinuxZone1
 
 这样就可以完成挂载。
 
+## 将 VHDX 转换为 VDI
+
+首先需要安装 [qemu](https://www.qemu.org/download/) 从而使用其内置的 `qemu-img` 转换工具，然后执行命令：
+```bash
+qemu-img convert -f vhdx -O vdi input.vhdx output.vdi`
+```
+
 ## 备注
 
 - 在开启了 Hyper-V 的主机，不建议设置硬件加速的半虚拟化接口为 Hyper-V，否则运行可能会更慢（保持默认即可）
