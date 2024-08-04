@@ -32,7 +32,7 @@
 ## Web Apps
 
 - [Page Craft](https://canwdev.github.io/page-craft-vite/index.html#/)
-	- 类 Minecraft 网页快速设计生成工具
+	- 类 **Minecraft** 网页快速设计生成工具
 - [Web MediaDevices Player](https://canwdev.github.io/web-mediadevices-player/)
 	- 用于播放系统【视频/音频】输入设备的网页应用
 - [GarageBand Piano JS](https://canwdev.github.io/garageband-piano-js/)
@@ -44,5 +44,5 @@
 - [[Node.js 笔记]]
 - [[Windows]]
 - [[Linux 常用命令汇总]]
-- 👈在左侧目录探索更多
+- 👈在==左侧==目录探索更多
 
