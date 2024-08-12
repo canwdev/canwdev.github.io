@@ -1,37 +1,40 @@
 - [[Windows#Win10/11 端口占用]]
 - 推荐使用我开发的 [Simple Hyper-V](https://github.com/canwdev/winform-tools?tab=readme-ov-file#simple-hyper-v-%E7%AE%A1%E7%90%86%E5%99%A8) 小工具进行设置，更方便
-## Hyper-V 固定虚拟机网络 IP 地址
+## Hyper-V 固定虚拟机网络 IP 地址并开启 DHCP
 
 ### 方案1：DHCP Server for Windows（推荐）
 
 以管理员身份启动PowerShell ，执行以下命令
 
 ```powershell
-# 创建虚拟交换机，名为“NAT_DHCP”
-New-VMSwitch -SwitchName "NAT_DHCP" -SwitchType Internal
+# 创建虚拟交换机，名为“DHCP_SWITCH”
+New-VMSwitch -SwitchName "DHCP_SWITCH" -SwitchType Internal
+
 # 获取虚拟交换机的ifindex，并赋值到变量中
-$ifindex = Get-NetAdapter -Name "vEthernet (NAT_DHCP)" | Select-Object -ExpandProperty 'ifIndex'
-# 在虚拟交换机上设置固定IP，用于网关IP
+$ifindex = Get-NetAdapter -Name "vEthernet (DHCP_SWITCH)" | Select-Object -ExpandProperty 'ifIndex'
+
+# 在虚拟交换机上设置固定IP，用于网关IP（注意IP地址不要和已有的网卡冲突！）
 New-NetIPAddress -IPAddress 192.168.56.1 -PrefixLength 24 -InterfaceIndex $ifindex
 
 # 创建NAT网络（必要，否则无法上网）
 New-NetNat -Name NAT -InternalIPInterfaceAddressPrefix 192.168.56.0/24
 
-# !! 如若往后需要禁用NAT功能, 则执行, 当前不执行
+# 如果以后需要禁用NAT功能，则删除NAT，当前无需执行
 # Remove-NetNat -name "NAT"
 ```
 
 5. 下载：[Download | DHCP Server for Windows](https://www.dhcpserver.de/cms/download/)，解压到 `C:\dhcpsrv`（因为后面要以服务运行）
 6. 执行 `dhcpwiz.exe` 配置向导
-	1. 步骤【Network Interface cards】：选中【vEthernet (NAT_DHCP)】网卡，点击下一步
-	2. 步骤【Configuring DHCP for Interface】：设置【IP-Pool: 192.168.56.1-254】，点击【Advanced ...】
-	3. 对话框【Advanced Configration】：设置【Subnet：255.255.255.0】；设置：【DNS Server：223.5.5.5】；【Gateways：点击Edit按钮，设置为 192.168.56.1】，点击OK，点击下一步
-	4. 步骤：【Writing the INI file】：勾选【Overwrite existing file】，点击【Write INI file】，点击下一步
-	5. 步骤：【DHCP configuration completed】：点击【Admin...】安装为Windows服务；随后点击【Install】【Start】和右侧的【Configure】即可大功告成
+	1. 标题【Network Interface cards】：选中 `vEthernet (DHCP_SWITCH)` 网卡，点击下一步
+	2. 步骤【Supported Protocols】 这一步不用管，直接跳过
+	3. 步骤【Configuring DHCP for Interface】：设置【IP-Pool: `192.168.56.1`-`254`】，点击【Advanced ...】
+	4. 对话框【Advanced Configration】：设置【Subnet：`255.255.255.0`】；设置：【DNS Server：`223.5.5.5`】；【Gateways：点击Edit按钮，设置为 `192.168.56.1`】，点击OK，点击下一步
+	5. 步骤【Writing the INI file】：勾选【Overwrite existing file】，点击【Write INI file】，点击下一步
+	6. 步骤【DHCP configuration completed】：点击【Admin...】安装为Windows服务；随后点击【Install】【Start】和右侧的防火墙【Configure】即可大功告成
 
 > 这种方式即使重启也不会丢失IP地址
 
-完整的配置文件 `dhcpsrv.ini` 如下：
+完整的配置文件 `dhcpsrv.ini` 如下，可以直接复制并覆盖，然后再启动服务。
 ```ini
 [SETTINGS]
 IPPOOL_1=192.168.56.1-254
@@ -60,11 +63,7 @@ WritePermission=0
 [HTTP-SETTINGS]
 EnableHTTP=0
 ROOT=C:\dhcpsrv\wwwroot
-[00-15-5D-89-01-05]
-IPADDR=192.168.56.2
-AutoConfig=06/05/2023 10:04:24
-Hostname=hyperv
-LeaseEnd=0
+
 ```
 
 参考
