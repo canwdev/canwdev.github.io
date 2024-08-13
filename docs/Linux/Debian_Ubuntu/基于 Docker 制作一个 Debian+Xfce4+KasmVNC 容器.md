@@ -9,7 +9,7 @@ mkdir app && cd app
 wget https://github.com/kasmtech/KasmVNC/releases/download/v1.3.1/kasmvncserver_bookworm_1.3.1_amd64.deb
 ```
 3. 编写 Dockerfile 以及启动脚本
-Dockerfile
+Dockerfile:
 ```Dockerfile
 # 使用官方的 Debian 12 基础镜像
 FROM debian:12
