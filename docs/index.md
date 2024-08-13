@@ -5,6 +5,10 @@
 
 ## 最近更新
 
+- Linux
+	- [[Comparison]]
+	- [[Debian]]
+	- [[基于 Docker 制作一个 Debian+Xfce4+KasmVNC 容器]]
 - Hyper-V / wsl2
 	- [[wsl2 wslg 配置并开启远程桌面(xrdp)]]
 	- [[Hyper-V 固定虚拟机网络 IP 地址 配网指南]]

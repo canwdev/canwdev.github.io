@@ -1,5 +1,5 @@
-> 系统环境：Ubuntu 24.04 LTS
-
+- 推荐查看 [[基于 Docker 制作一个 Debian+Xfce4+KasmVNC 容器]]
+- 系统环境：Ubuntu 24.04 LTS
 ## 安装环境
 
 安装Xfce4桌面环境（安装很慢，请耐心等待）

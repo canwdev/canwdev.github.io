@@ -63,7 +63,7 @@ docker run --name daemon_dave -d ubuntu /bin/sh -c "while true; do echo hello wo
 打开shell交互式任务：
 
 ```
-sudo docker exec -t -i daemon_dave /bin/bash
+sudo docker exec -it daemon_dave /bin/bash
 ```
 
 > -t -i 标志为我们的进程创建了可交互的 TTY

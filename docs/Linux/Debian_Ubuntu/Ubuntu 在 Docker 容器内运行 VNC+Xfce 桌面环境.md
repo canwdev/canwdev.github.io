@@ -1,4 +1,6 @@
-使用 Docker 容器启动一个 基于 VNC 的 Ubuntu 桌面环境！
+
+- 推荐自己build镜像！[[基于 Docker 制作一个 Debian+Xfce4+KasmVNC 容器]]
+- 使用 Docker 容器启动一个 基于 VNC 的 Ubuntu 桌面环境！
 ## 步骤
 
 ```sh
