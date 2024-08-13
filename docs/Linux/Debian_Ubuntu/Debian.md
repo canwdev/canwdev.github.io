@@ -7,6 +7,7 @@
 	- `cat /etc/issue`
 	- `lsb_release -a` (Ubuntu专用)
 - [Debian 12 Bookworm : Download : Server World](https://www.server-world.info/en/note?os=Debian_12&p=download)
+	- 服务器版镜像，tuna镜像站 [debian-live-12.6.0-amd64-standard.iso](https://mirrors.tuna.tsinghua.edu.cn/debian-cd/current-live/amd64/iso-hybrid/debian-live-12.6.0-amd64-standard.iso)
 
 ##  实用软件
 
@@ -28,11 +29,12 @@
 apt update
 apt upgrade
 apt install \
-  zsh vim neofetch htop tmux curl wget net-tools \
+  zsh vim neofetch htop tmux curl wget net-tools p7zip-full \
   git nodejs npm docker.io \
-  keepassxc seahorse \
-  nginx openssh-server tigervnc-standalone-server tigervnc-common \
-  fonts-noto-cjk fonts-noto-cjk-extra fonts-noto-color-emoji
+  nginx openssh-server \
+  tigervnc-standalone-server tigervnc-common \
+  fonts-noto-cjk fonts-noto-cjk-extra fonts-noto-color-emoji \
+  keepassxc seahorse
 ```
 
 ### 字体
@@ -63,7 +65,7 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/too
 
 4. **打开配置文件**:
 ```bash
-nano ~/.zshrc
+vim ~/.zshrc
 ```
 修改主题 [主题预览](https://github.com/ohmyzsh/ohmyzsh/wiki/Themes)
 - `robbyrussell` 默认主题
