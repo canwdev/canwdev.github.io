@@ -16,13 +16,13 @@
 	- [Vicuna](https://vicuna.lmsys.org/) is a model created by fine-tuning LLaMA on user-shared conversations collected from ShareGPT. Preliminary testing suggests it achieves more than 90% of the quality of ChatGPT and Google Bard
 - AI图像生成
 	- [DALL·E](https://labs.openai.com)
-	- Stable Diffusion
-		- [Stable Diffusion web UI](https://github.com/AUTOMATIC1111/stable-diffusion-webui/)
-			- [AI绘画指南 stable diffusion webui （SD webui）如何设置与使用](https://www.tjsky.net/tutorial/488)
+	- [[Stable Diffusion]]
+	- Flux.1
 	- Midjourney
 - 语音合成
-	- Azure TTS
+	- Azure TTS（推荐）
 		- https://speech.microsoft.com/portal/8011b92d505e40668728881234c3708a/voicegallery
+	- ChatTTS
 	- (VITS)[https://github.com/jaywalnut310/vits]
 	- (二次元)语音合成
 			- https://www.bilibili.com/video/BV1jY4y1c7JF
