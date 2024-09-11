@@ -9,7 +9,7 @@
 - [uupdump](https://uupdump.net/) 
 	- 不推荐精简系统组件的选项，安装好后没有应用商店，没有defender管理app，无法关闭windows defender
 - [msdn itellyou](https://msdn.itellyou.cn/)
-- [https://latest10.win/](https://latest10.win/)
+- [HelloWindows.cn - 精校 完整 极致 Windows系统下载仓储站](https://hellowindows.cn/)
 - [WindowsSimplify](https://github.com/WhatTheBlock/WindowsSimplify)
 - [系统 - 果核剥壳](https://www.ghxi.com/category/all/system)
 - [不忘初心](https://www.pc521.net/)
