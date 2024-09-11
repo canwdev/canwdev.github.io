@@ -59,7 +59,12 @@ docker import filename.tar 新容器名字
 ## 清理（慎用）
 
 ```bash
-## 清理容器：
+# 删除容器
+docker rm 容器名
+
+# 强制删除运行中的容器
+docker rm -f 容器名
+
 
 # 清除已停止的容器
 docker container prune
@@ -72,7 +77,8 @@ docker rm `docker ps -a | grep Exited | awk '{print $1}'`
 ```
 
 ```bash
-## 清理镜像：
+# 删除镜像
+docker rmi 镜像名
 
 # 删除名称或标签为`<none>`的镜像：
 docker rmi -f `docker images | grep '<none>' | awk '{print $3}'`

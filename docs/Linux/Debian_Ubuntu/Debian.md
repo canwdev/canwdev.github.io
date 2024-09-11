@@ -30,7 +30,7 @@ apt update
 apt upgrade
 apt install \
   zsh vim neofetch htop tmux curl wget net-tools p7zip-full \
-  git nodejs npm docker.io \
+  git nodejs npm docker.io docker-compose \
   nginx openssh-server \
   tigervnc-standalone-server tigervnc-common \
   fonts-noto-cjk fonts-noto-cjk-extra fonts-noto-color-emoji \
