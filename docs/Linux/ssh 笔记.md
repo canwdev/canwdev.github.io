@@ -27,6 +27,19 @@ ssh user@example.com -p 8022
 ssh -i ~/.ssh/id_rsa100 user@example.com
 ```
 
+## ssh 允许 root 登录
+
+```
+# vim /etc/ssh/sshd_config
+PermitRootLogin yes
+```
+
+### 禁用密码登录
+
+```
+# vim /etc/ssh/sshd_config
+PasswordAuthentication no
+```
 
 ## 使用非对称密钥连接 ssh 服务器
 
@@ -90,13 +103,6 @@ ClientAliveCountMax 86400
 
 # 重启 sshd 服务
 sudo systemctl restart sshd
-```
-
-## ssh 允许 root 登录
-
-```
-# /etc/ssh/sshd_config
-PermitRootLogin yes
 ```
 
 ## ssh config 配置文件

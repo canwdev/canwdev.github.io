@@ -2,15 +2,26 @@
 - 使用 pacman 安装的软件包，Arch/Manjaro 同样适用
 - [[Linux 镜像源#Manjaro Linux]]
 
-自用安装命令：
+## 安装并启用ssh
+
+```zsh
+sudo pacman -S openssh
+sudo systemctl start sshd
+sudo systemctl enable sshd
+```
+然后参考 [[ssh 笔记#ssh 允许 root 登录]]
+
+### 自用安装命令
+
 ```zsh
 pacman -Syy
 pacman -S \
-  vim neofetch htop tmux net-tools \
+  vim fastfetch htop tmux curl wget net-tools p7zip \
   git nodejs npm docker \
+  nginx zsh \
   keepassxc seahorse \
-  nginx
 ```
+- [[Debian#oh-my-zsh]]
 ## pacman 命令
 
 - `pacman -Syu` = 执行全面系统更新
