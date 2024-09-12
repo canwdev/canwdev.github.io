@@ -1,4 +1,12 @@
-参考：[2021.02. Arch Linux 安装小记](https://zhuanlan.zhihu.com/p/348370646)
+参考：
+- [2021.02. Arch Linux 安装小记](https://zhuanlan.zhihu.com/p/348370646)
+- [安装指南 - Arch Linux 中文维基](https://wiki.archlinuxcn.org/wiki/%E5%AE%89%E8%A3%85%E6%8C%87%E5%8D%97)
+
+如果您觉得用命令行安装过于繁琐，可以试试官方的安装脚本 `archinstall`。详情可参见 [archinstall](https://wiki.archlinuxcn.org/wiki/Archinstall "Archinstall")。
+
+```zsh
+archinstall
+```
 
 ## 1. 准备安装
 
