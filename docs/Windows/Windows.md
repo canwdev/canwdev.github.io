@@ -3,20 +3,26 @@
 - [[Windows 使用VHD镜像无损备份恢复系统]]
 - [[Windows UEFI BCD 引导修复]]
 - [[Windows 注册表修改]]
+- [[RDP 远程桌面连接]]
 
-## 镜像下载
+## Windows 镜像下载
 
-- [uupdump](https://uupdump.net/) 
-	- 不推荐精简系统组件的选项，安装好后没有应用商店，没有defender管理app，无法关闭windows defender
-- [msdn itellyou](https://msdn.itellyou.cn/)
-- [HelloWindows.cn - 精校 完整 极致 Windows系统下载仓储站](https://hellowindows.cn/)
-- 其他
+- 原版系统
+	- [uupdump](https://uupdump.net/) 
+		- 不推荐精简系统组件的选项，安装好后没有应用商店，没有defender管理app，无法关闭windows defender
+	- [msdn itellyou](https://msdn.itellyou.cn/)
+	- [HelloWindows.cn - 精校 完整 极致 Windows系统下载仓储站](https://hellowindows.cn/)
+- 修改系统
 	- [系统 - 果核剥壳](https://www.ghxi.com/category/all/system)
 	- [小鱼儿yr系统](https://www.yrxitong.com/h-col-129.html)
 	- [修系统](https://www.xiuxitong.com/)
 	- [不忘初心系统博客-精简版系统官网](https://www.pc528.net/)
 	- [WindowsSimplify](https://github.com/WhatTheBlock/WindowsSimplify)
 	- [tiny10 和 tiny11 23H2 的 Windows DD 镜像 | 秋水逸冰](https://teddysun.com/709.html)
+- 系统封装
+	- [装系统会更丝滑吗？教你封装一个独特的Windows镜像_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV1544y1d7VX/)
+	- [NTLite Download](https://www.ntlite.com/download/)
+	- [ES5下载_ES_ES5S_Easy Sysprep_系统封装工具 - 小鱼儿yr系统](https://www.yrxitong.com/h-nd-1116.html)
 
 ## Windows 常用路径
 - 家目录：`%HOMEPATH%`
