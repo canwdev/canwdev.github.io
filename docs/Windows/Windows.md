@@ -10,10 +10,13 @@
 	- 不推荐精简系统组件的选项，安装好后没有应用商店，没有defender管理app，无法关闭windows defender
 - [msdn itellyou](https://msdn.itellyou.cn/)
 - [HelloWindows.cn - 精校 完整 极致 Windows系统下载仓储站](https://hellowindows.cn/)
-- [WindowsSimplify](https://github.com/WhatTheBlock/WindowsSimplify)
-- [系统 - 果核剥壳](https://www.ghxi.com/category/all/system)
-- [不忘初心](https://www.pc521.net/)
-- [修系统](https://www.xiuxitong.com/)
+- 其他
+	- [系统 - 果核剥壳](https://www.ghxi.com/category/all/system)
+	- [小鱼儿yr系统](https://www.yrxitong.com/h-col-129.html)
+	- [修系统](https://www.xiuxitong.com/)
+	- [不忘初心系统博客-精简版系统官网](https://www.pc528.net/)
+	- [WindowsSimplify](https://github.com/WhatTheBlock/WindowsSimplify)
+	- [tiny10 和 tiny11 23H2 的 Windows DD 镜像 | 秋水逸冰](https://teddysun.com/709.html)
 
 ## Windows 常用路径
 - 家目录：`%HOMEPATH%`

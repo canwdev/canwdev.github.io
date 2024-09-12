@@ -20,7 +20,7 @@
 	- [[Windows 通过 New-NetNat 给其他网卡共享网络]]
 	- [[Windows 更新的相关设置]]
 	- [[Win11 修改]]
-	- [[RDP 使用空密码登录]]
+	- [[RDP 远程桌面连接]]
 - 未分类
 	- [[FE前端技术栈]]
 	- [[Ubuntu Server 安装 TigerVNC + Xfce4 桌面环境]]
