@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>三体运动模拟</title>
+  <style>
+    html,body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+    .t3-body {
+      width: 100%;
+      height: 100%;
+    }
+    .t3-body canvas {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+<!--https://www.less-bug.com/-->
+<!--https://blog.eczn.me/b/three-body-emulator/-->
+<div class="t3-body">
+  <canvas id="myCanvas"></canvas>
+</div>
+<script>
+  const G = 6.67408e+2;
+  class Star {
+    constructor(x, y, vx, vy, radius, mass, color) {
+      this.x = x;
+      this.y = y;
+      this.radius = radius;
+      this.mass = mass;
+      this.color = color;
+      this.vx = vx;
+      this.vy = vy;
+    }
+
+    update(dt, stars) {
+      let ax = 0, ay = 0;
+      for (let other of stars) {
+        if (other !== this) {
+          const dx = other.x - this.x;
+          const dy = other.y - this.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          const force = (G * this.mass * other.mass) / (distance * distance);
+          const angle = Math.atan2(dy, dx);
+          ax += force * Math.cos(angle) / this.mass;
+          ay += force * Math.sin(angle) / this.mass;
+        }
+      }
+      this.vx += ax * dt;
+      this.vy += ay * dt;
+      this.x += this.vx * dt;
+      this.y += this.vy * dt;
+    }
+
+    draw(ctx) {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
+      ctx.fillStyle = `rgb(${this.color[0]}, ${this.color[1]}, ${this.color[2]})`;
+      ctx.fill();
+    }
+  }
+
+  class Canvas {
+    constructor(element) {
+      this.element = element;
+      this.ctx = element.getContext('2d');
+      this.stars = [];
+      this.cameraX = 0;
+      this.cameraY = 0;
+      this.cameraScale = 1;
+
+      this.maxLifeTimer = 0;
+      this.startTimer = 0;
+      this.counter = 0;
+    }
+
+    addStar(star) {
+      this.stars.push(star);
+    }
+
+    resizeCanvas() {
+      this.element.width = this.element.parentElement.offsetWidth;
+      this.element.height = this.element.parentElement.offsetHeight;
+    }
+
+    updateCamera() {
+      const centerX = this.element.width / 2;
+      const centerY = this.element.height / 2;
+      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+      for (let star of this.stars) {
+        minX = Math.min(minX, star.x);
+        minY = Math.min(minY, star.y);
+        maxX = Math.max(maxX, star.x);
+        maxY = Math.max(maxY, star.y);
+      }
+      const width = maxX - minX;
+      const height = maxY - minY;
+      this.cameraScale = Math.min(this.element.width / width, this.element.height / height) * 0.8;
+      this.cameraX = centerX - (minX + maxX) / 2 * this.cameraScale;
+      this.cameraY = centerY - (minY + maxY) / 2 * this.cameraScale;
+    }
+
+    update(dt) {
+      for (let star of this.stars) {
+        star.update(dt, this.stars);
+      }
+      this.updateCamera();
+    }
+
+    draw() {
+      this.ctx.clearRect(0, 0, this.element.width, this.element.height);
+      this.ctx.save();
+
+      const step = this.cameraScale * 10;
+      if (step < 1) {
+        this.reset();
+        return;
+      }
+      this.ctx.beginPath();
+      for (let i = 0; i < this.element.width; i += step) {
+        this.ctx.moveTo(i, 0);
+        this.ctx.lineTo(i, this.element.height);
+
+      }
+      for (let i = 0; i < this.element.height; i += step) {
+        this.ctx.moveTo(0, i);
+        this.ctx.lineTo(this.element.width, i);
+      }
+      this.ctx.strokeStyle = 'rgba(224, 232, 246, 0.5)';
+      this.ctx.stroke();
+
+
+      this.ctx.translate(this.cameraX, this.cameraY);
+      this.ctx.scale(this.cameraScale, this.cameraScale);
+      this.drawConnections();
+      for (let star of this.stars) {
+        star.draw(this.ctx);
+      }
+      this.ctx.restore();
+      this.drawTimer();
+
+    }
+
+    drawTimer() {
+      this.ctx.font = '16px Monospace';
+      this.ctx.fillStyle = 'rgba(10, 0.1, 0.1, 0.5)';
+      this.maxLifeTimer = Math.max(this.maxLifeTimer, this.startTimer);
+      this.ctx.fillText(`MAX_TIME: ${this.maxLifeTimer.toFixed(2)}`, 5, 20);
+      this.ctx.fillText(`COUNTER: ${this.counter}`, 5, 20 + 20);
+
+    }
+
+    drawConnections(dash = true) {
+      this.ctx.beginPath();
+      for (let i = 0; i < this.stars.length; i++) {
+        const star1 = this.stars[i];
+        for (let j = i + 1; j < this.stars.length; j++) {
+          const star2 = this.stars[j];
+          const dx = star2.x - star1.x;
+          const dy = star2.y - star1.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          if (distance < 200 * this.cameraScale) {
+            this.ctx.beginPath();
+            this.ctx.moveTo(star1.x, star1.y);
+            this.ctx.lineTo(star2.x, star2.y);
+            this.ctx.strokeStyle = `rgba(${star1.color[0]}, ${star1.color[1]}, ${star1.color[2]}, 0.5)`;
+            if (dash) {
+              this.ctx.setLineDash([5, 5]);
+            }
+            this.ctx.stroke();
+            if (dash) {
+              this.ctx.setLineDash([]);
+            }
+          }
+        }
+      }
+
+      this.ctx.closePath();
+    }
+
+    mainLoop(timestamp) {
+      const dt = (timestamp - (this.mainLoop.lastTimestamp || timestamp)) / 1000;
+      this.mainLoop.lastTimestamp = timestamp;
+      this.update(dt);
+      this.draw();
+      this.startTimer += dt;
+      requestAnimationFrame(this.mainLoop.bind(this));
+    }
+
+    start() {
+      this.resizeCanvas();
+      window.addEventListener('resize', this.resizeCanvas.bind(this));
+      const stars = [];
+      const radius = 5;
+      const mass = 100;
+      const centerX = 0;
+      const centerY = 0;
+      const radius2 = 100;
+
+      for (let i = 0; i < 3; i++) {
+        const angle = i * 2 * Math.PI / 3 + Math.random() * 0.1;
+        const x = centerX + radius2 * Math.cos(angle);
+        const y = centerY + radius2 * Math.sin(angle);
+        const vx = -radius2 * Math.sin(angle) * 0.1;
+        const vy = radius2 * Math.cos(angle) * 0.1;
+        const color = [
+          Math.floor(Math.random() * 256),
+          Math.floor(Math.random() * 256),
+          Math.floor(Math.random() * 256)
+        ];
+        const star = new Star(x, y, vx, vy, radius, mass, color);
+        this.addStar(star);
+        stars.push(star);
+      }
+
+      this.updateCamera();
+      requestAnimationFrame(this.mainLoop.bind(this));
+    }
+
+    reset() {
+      this.element.width = 0;
+      this.element.height = 0;
+      this.stars = [];
+      this.cameraX = 0;
+      this.cameraY = 0;
+      this.cameraScale = 1;
+      this.start();
+      this.counter++;
+      this.startTimer = 0;
+    }
+
+  }
+
+  const canvas = new Canvas(document.getElementById('myCanvas'));
+  canvas.start();
+</script>
+</body>
+</html>
