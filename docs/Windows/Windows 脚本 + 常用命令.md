@@ -105,6 +105,27 @@ Next
 CreateObject("Wscript.Shell").Run strCommand, 0, false
 ```
 
+## 关闭屏幕的 WinAPI
+
+[source](https://kkocdko.site/post/201901160028)
+```c
+#include <windows.h>
+int main() {
+  PostMessage(HWND_BROADCAST, WM_SYSCOMMAND, SC_MONITORPOWER, 2);
+  return 0;
+}
+```
+
+## 重置 Windows 图标缓存
+
+[source](https://kkocdko.site/post/201811031827)
+```bat
+fltmc>nul||cd/d %~dp0&&mshta vbscript:CreateObject("Shell.Application").ShellExecute("%~nx0","%1","","runas",1)(window.close)&&exit
+taskkill /f /im explorer.exe
+rd /s /q %userprofile%\AppData\Local\Microsoft\Windows\Explorer
+start "" explorer.exe
+```
+
 ---
 
 - [[RDP 远程桌面连接#修改默认 RDP 端口号]]
