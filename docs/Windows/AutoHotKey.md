@@ -1,5 +1,6 @@
 - [中文文档](https://wyagd001.github.io/zh-cn/docs/index.htm)
 - 推荐使用 VSCode 配合 AutoHotkey Plus 插件进行编辑
+- [[修改狼派 A89 CIY 小键盘区按键映射（AHK脚本）]]
 
 ```ahk
 ; https://wyagd001.github.io/zh-cn/docs/lib/Send.htm
