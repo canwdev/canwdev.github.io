@@ -1,5 +1,7 @@
 ## 参考
 
+![[esplay_LiiGuang.jpg]]
+
 - [ESPlay Micro微型开源游戏掌机（精修版2.0） - 嘉立创EDA开源硬件平台 (oshwhub.com)](https://oshwhub.com/LiiGuang/esplay-micro-V2#P6)
 - [开源掌机 ESPLAY V0.3 游戏机 - 嘉立创EDA开源硬件平台 (oshwhub.com)](https://oshwhub.com/zxp1107/esplay_copy_copy_copy#P6)
 
