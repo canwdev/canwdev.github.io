@@ -19,6 +19,7 @@
 	- [不忘初心系统博客-精简版系统官网](https://www.pc528.net/)
 	- [WindowsSimplify](https://github.com/WhatTheBlock/WindowsSimplify)
 	- [tiny10 和 tiny11 23H2 的 Windows DD 镜像 | 秋水逸冰](https://teddysun.com/709.html)
+	- [windowsxlite](https://windowsxlite.com/)
 - 系统封装
 	- [装系统会更丝滑吗？教你封装一个独特的Windows镜像_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV1544y1d7VX/)
 	- [NTLite Download](https://www.ntlite.com/download/)
@@ -102,3 +103,4 @@ manage-bde -off c:
 ---
 
 - [Win11 资源管理器（文件夹）出现的菜单栏怎么隐藏？ | 竹山一叶 (zsyyblog.com)](https://zsyyblog.com/a2ad5b83.html)
+- [[Hyper-V 固定虚拟机网络 IP 地址 配网指南]]
