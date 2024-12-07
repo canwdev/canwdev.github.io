@@ -1,3 +1,6 @@
+
+> [!INFO]
+> 注意：本文件不再更新，最新内容请跳转：[ESPlay Micro 制作记](https://github.com/canwdev/ESPlay/blob/master/esplay-docs/ESPlay%20Micro%20%E5%88%B6%E4%BD%9C%E8%AE%B0.md)
 ## 参考
 
 ![[esplay_LiiGuang.jpg]]
