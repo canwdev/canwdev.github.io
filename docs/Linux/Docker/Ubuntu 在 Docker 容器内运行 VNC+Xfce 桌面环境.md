@@ -1,5 +1,7 @@
 
-- 推荐自己build镜像！[[基于 Docker 制作一个 Debian+Xfce4+KasmVNC 容器]]
+- 推荐使用：
+	- [debian-vnc-xfce Docker 源文件](https://github.com/canwdev/docker-services/tree/master/debian-vnc-xfce)
+	- [[基于 Docker 制作一个 Debian+Xfce4+KasmVNC 容器]]
 - 使用 Docker 容器启动一个 基于 VNC 的 Ubuntu 桌面环境！
 
 ```sh
