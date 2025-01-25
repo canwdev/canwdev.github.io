@@ -87,4 +87,7 @@ docker rmi -f `docker images | grep '<none>' | awk '{print $3}'`
 # -a 一并清除所有未被使用的镜像和悬空镜像
 # -f 用以强制删除，不提示信息
 docker system prune
+
+# 清除（-a 所有）构建缓存
+docker builder prune -a
 ```
