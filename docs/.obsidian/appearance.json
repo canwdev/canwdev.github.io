@@ -1,5 +1,8 @@
 {
   "accentColor": "#2196f3",
   "theme": "system",
-  "cssTheme": ""
+  "cssTheme": "",
+  "enabledCssSnippets": [
+    "heading"
+  ]
 }
