@@ -20,25 +20,29 @@ Restart your PC
 ## 使用 [RemoteApp](https://github.com/kimmknight/remoteapptool) 连接 Windows 虚拟机
 
 - [How to系列：从远程桌面进化到最简单地使用RemoteApp - KazakiriWorks (nishikino-maki.com)](https://nishikino-maki.com/archives/Easy-to-RemoteApp.html)
-配合 [RetroBar](https://github.com/dremin/RetroBar) + Claunch 使用体验感更佳
+配合 [RetroBar](https://github.com/dremin/RetroBar) + [Claunch](https://forest.watch.impress.co.jp/library/software/claunch/) 使用体验感更佳
 
-以下是 RetroBar.rdp 示例，优化了一些参数，如果设置 `drivestoredirect:s:*` 将映射所有硬盘到远程桌面会话中
+以下是 `RetroBar.rdp` 示例，优化了一些参数
+- 设置 `drivestoredirect:s:*` 将映射所有硬盘到远程桌面会话中
+- `full address:s:hyper02` 设置主机名为 `hyper02` 也可以改为 `IP:端口号`
+- `camerastoredirect:s:*` 允许摄像头重定向，方便视频会议，如果要禁用，删除 `*` 号
+- 完整的配置可以参考 [Supported RDP properties | Microsoft Learn](https://learn.microsoft.com/en-us/azure/virtual-desktop/rdp-properties)
 ```rdp
+alternate full address:s:hyper02
+full address:s:hyper02
+remoteapplicationname:s:RetroBar
+remoteapplicationprogram:s:||RetroBar
 allow desktop composition:i:1
 allow font smoothing:i:1
-alternate full address:s:hyper02
 alternate shell:s:rdpinit.exe
 devicestoredirect:s:*
 disableremoteappcapscheck:i:1
 drivestoredirect:s:
-full address:s:hyper02
 prompt for credentials on client:i:1
 promptcredentialonce:i:0
 redirectcomports:i:1
 redirectdrives:i:1
 remoteapplicationmode:i:1
-remoteapplicationname:s:RetroBar
-remoteapplicationprogram:s:||RetroBar
 span monitors:i:1
 use multimon:i:1
 audiocapturemode:i:1
