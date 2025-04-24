@@ -17,8 +17,18 @@ HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\PriorityControl
 3.  该操作可能需要联网，如果报错那就再执行一次
 4. 或可以直接使用 Dism++ 删除 Appx 包
 
-## Win11 跳过OOBE联网
-在 oobe 界面按 shift+f10，弹出cmd，输入 `oobe\BypassNRO.cmd` 系统重启后就不用联网了。
+## Win11 OOBE 跳过联网
+
+多种方法：
+1. 在 oobe 界面按 shift+f10，弹出cmd，输入 `oobe\BypassNRO.cmd` 系统重启后就不用联网了。
+2. 输入邮箱 `no@thankyou.com`
+3. cmd 输入命令 `start ms-cxh:localonly`
+
+BypassNRO.cmd 的有效代码如下：
+```
+reg add HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\OOBE /v BypassNRO /t REG_DWORD /d 1 /f
+shutdown /r /t 0
+```
 
 ## Win11 应用商店
 [kinkim/InstallMicrosoftStoreOnLTSC: InstallMicrosoftStoreOnLTSC2019 (github.com)](https://github.com/kinkim/InstallMicrosoftStoreOnLTSC)
