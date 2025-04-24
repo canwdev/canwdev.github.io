@@ -25,6 +25,8 @@
 	- [NTLite Download](https://www.ntlite.com/download/)
 	- [ES5下载_ES_ES5S_Easy Sysprep_系统封装工具 - 小鱼儿yr系统](https://www.yrxitong.com/h-nd-1116.html)
 
+> [[Win11 修改#Win11 跳过OOBE联网]]
+
 ## Windows 常用路径
 - 家目录：`%HOMEPATH%`
 - 系统盘：`%HOMEDRIVE%`
