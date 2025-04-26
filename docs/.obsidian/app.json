@@ -1,5 +1,6 @@
 {
   "alwaysUpdateLinks": true,
   "attachmentFolderPath": "./assets",
-  "showLineNumber": false
+  "showLineNumber": false,
+  "showUnsupportedFiles": true
 }
