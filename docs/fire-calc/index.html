@@ -86,7 +86,7 @@
 
     .chart-area {
       width: 100%;
-      height: 500px;
+      height: 570px;
     }
   </style>
 </head>
@@ -181,8 +181,8 @@
           for (let i = 0; i < iterationMonths; i++) {
             const count = i + 1
 
-            // 防止死循环
-            if (count > 1200) {
+            // 防止死循环，最多迭代1000年
+            if (count > 12 * 1000) {
               break
             }
 
@@ -368,7 +368,7 @@ ${p1.marker}
                 type: 'line',
                 symbol: 'circle',
                 symbolSize: 5,
-                name: 'Value',
+                name: '资产',
                 itemStyle: {
                   color: '#FF9800',
                 },
@@ -387,7 +387,24 @@ ${p1.marker}
                 },
                 data: []
               }
-            ]
+            ],
+            grid: {
+              left: '6%',
+              right: '4%',
+              bottom: '70px',
+              // containLabel: true,
+            },
+            dataZoom: [
+              {
+                type: 'inside',
+                zoomOnMouseWheel: true, //滚轮是否触发缩放
+                moveOnMouseMove: false, //鼠标滚轮触发滚动
+                moveOnMouseWheel: false,
+              },
+              {
+                type: 'slider', //滑动条
+              },
+            ],
           });
 
           echartsInstance.value = myChart
