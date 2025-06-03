@@ -55,7 +55,7 @@
 
     .group-grid--v2 {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
       grid-gap: 10px;
     }
 
@@ -106,6 +106,7 @@
       <div class="group-grid group-grid--v2">
         <label :for="item.key" :key="item.key" v-for="(item) in resultItems">
           {{ item.label || formatLabel(item.key) }}
+          <template v-if="item.tips">({{item.tips}})</template>
           <input :id="item.key" :type="item.type" :value="item.value" disabled>
         </label>
       </div>
@@ -243,20 +244,29 @@
           } = getPassiveIncome(result)
 
           return [
-            { label: '结果资产', key: 'resultValue', value: `${numberWithCommas(result, 2)} | ${numberToChineseMoney(result)}`, type: 'text' },
+            {
+              label: '结果资产', key: 'resultValue', value: `${numberWithCommas(result, 2)}`,
+              tips: numberToChineseMoney(result),
+              type: 'text'
+            },
             {
               label: '结果时间',
               key: 'resultTimes',
-              value: `${resultMonths}个月 = ${convertMonthsToYearsAndMonths(resultMonths)} | ${stepData.value[stepData.value.length - 1]?.label}`,
+              value: `${stepData.value[stepData.value.length - 1]?.label} (${convertMonthsToYearsAndMonths(resultMonths)})`,
+              tips: `${resultMonths}个月`,
               type: 'text'
             },
             {
               label: '被动收入',
               key: 'yearPassiveIncome',
-              value: `年收 ${numberWithCommas(piYearly, 2)} | 月收 ${numberWithCommas(piMonthly, 2)} | 日收 ${numberWithCommas(piDaily, 2)}`,
+              value: `年收 ${numberWithCommas(piYearly, 2)} · 月收 ${numberWithCommas(piMonthly, 2)} · 日收 ${numberWithCommas(piDaily, 2)}`,
               type: 'text'
             },
-            { label: '增长值', key: 'increasedValue', value: `${numberWithCommas(increasedValue)} | ${numberToChineseMoney(increasedValue)}`, type: 'text' },
+            {
+              label: '增长值', key: 'increasedValue', value: `${numberWithCommas(increasedValue)}`,
+              tips: numberToChineseMoney(increasedValue),
+              type: 'text'
+            },
             { label: '增长百分比', key: 'increasedPercent', value: increasedPercent, type: 'text' },
             { label: '年龄', key: 'resultAge', value: resultAge + '岁', type: 'text' },
           ].filter(Boolean)

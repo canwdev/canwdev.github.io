@@ -50,10 +50,15 @@ function numberToChineseMoney(n) {
   return head + s.replace(/(零.)*零元/, '元').replace(/(零.)+/g, '零').replace(/^整$/, '零元整');
 }
 
-// https://stackoverflow.com/a/2901298
-function numberWithCommas(x, toFixedNum) {
-  if (toFixedNum && !Number.isNaN(x)) {
-    x = parseFloat(Number(x).toFixed(toFixedNum))
+function numberWithCommas(num, decimalPlaces = 2) {
+  const numStr = Number(num).toFixed(decimalPlaces); // 将数值转换为字符串并控制小数点位数
+  const [integerPart, fractionalPart] = numStr.split('.'); // 分割整数和小数部分
+
+  const formattedIntegerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ','); // 使用正则表达式将整数部分用逗号分隔
+
+  if (fractionalPart) {
+    return `${formattedIntegerPart}.${fractionalPart}`; // 如果有小数部分，则将整数和小数部分连接起来
+  } else {
+    return formattedIntegerPart; // 否则只返回整数部分
   }
-  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
