@@ -12,6 +12,7 @@
 		- 不推荐精简系统组件的选项，安装好后没有应用商店，没有defender管理app，无法关闭windows defender
 	- [msdn itellyou](https://msdn.itellyou.cn/)
 	- [HelloWindows.cn - 精校 完整 极致 Windows系统下载仓储站](https://hellowindows.cn/)
+	- [MSDN原版系统,纯净镜像,MSDN ISO下载 - 我的MSDN](https://www.imsdn.cn/)
 - 修改系统
 	- [系统 - 果核剥壳](https://www.ghxi.com/category/all/system)
 	- [小鱼儿yr系统](https://www.yrxitong.com/h-col-129.html)
