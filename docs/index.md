@@ -1,6 +1,6 @@
 # Canwdev's Tech Blog
 
-- My [Obsidian Tech Vault](https://github.com/canwdev/canwdev.github.io)
+- My [Obsidian Vault](https://github.com/canwdev/canwdev.github.io)
 - My [Github Stars](https://github.com/canwdev?tab=stars)
 
 ## 最近更新
@@ -21,6 +21,7 @@
 	- [[Windows 更新的相关设置]]
 	- [[Win11 修改]]
 	- [[RDP 远程桌面连接]]
+	- [[Windows 脚本 + 常用命令#无法加载文件 xxx.ps1，因为在此系统上禁止运行脚本]]
 - 未分类
 	- [[Excel 技巧]]
 	- [[FE前端技术栈]]
@@ -32,7 +33,7 @@
 	- [[qemu-windows]]
 	- [[使用 ffmpeg 批量截取视频封面]]
 	- [[摄影#索尼 A7M2 上手指南]]
-	- [[局域网文件传输应用推荐]]
+	- [[局域网文件传输工具]]
 	- [[Windows 注册表修改]]
 	- [[AI]]
 
@@ -51,6 +52,9 @@
 - [[Node.js 笔记]]
 - [[Windows]]
 - [[Linux 常用命令汇总]]
+
+---
+
 - 👈在==左侧==目录探索更多
 
 <iframe src="./fire-calc/index.html"></iframe>
