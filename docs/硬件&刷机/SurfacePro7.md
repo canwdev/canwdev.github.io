@@ -15,4 +15,5 @@
 ### Surface Pro 7 贴膜后触屏不灵敏的问题
 
 需要用手接触 Surface 的金属边框，插充电器也可解决这个问题。
-不贴膜或买质量更好的膜也许能解决这个问题。[1](https://www.reddit.com/r/Surface/comments/dofx5s/tempered_glass_touch_issues_surface_pro_7/?tl=zh-hans)
+不贴膜或买质量更好的膜也许能解决这个问题。[1](https://www.reddit.com/r/Surface/comments/dofx5s/tempered_glass_touch_issues_surface_pro_7/?tl=zh-hans) [2](https://www.reddit.com/r/Surface/comments/6rx8y4/touch_screen_unresponsive_with_screen_protector/)
+
