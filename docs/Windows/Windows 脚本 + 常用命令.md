@@ -22,11 +22,11 @@
 [[Powershell 如何安装 OnMyPosh]]
 
 ## 无法加载文件 xxx.ps1，因为在此系统上禁止运行脚本
+
 使用管理权限运行命令：
 ```sh
 set-executionpolicy remotesigned
 ```
-
 
 ## Win10 删除壁纸历史记录
 
