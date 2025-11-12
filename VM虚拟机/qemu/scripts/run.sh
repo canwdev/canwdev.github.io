@@ -1,0 +1,14 @@
+qemu-system-x86_64 \
+-drive file=win7.qcow2,format=qcow2,if=virtio \
+-drive file=virtio-win-0.1.173.iso,media=cdrom \
+-machine q35 \
+-m 2048M \
+-accel kvm \
+-cpu Nehalem \
+-smp 4 \
+-accel tcg \
+-device vmware-svga,vgamem_mb=128 \
+-device ac97 \
+-usb -device usb-mouse -usb -device usb-tablet \
+-net user -net nic,model=e1000 \
+-no-fd-bootchk
