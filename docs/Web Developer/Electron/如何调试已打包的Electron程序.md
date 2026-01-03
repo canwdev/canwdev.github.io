@@ -61,3 +61,5 @@ asar.createPackage('./app', 'app.asar')
 ```bash
 asar pack ./app app.asar
 ```
+
+>  提示：如果把 `app.asar` 重命名为 `app.asar.unpacked`，也许可以在 electron 程序启动时自动加载解包后的脚本，而不用重新打包验证。
