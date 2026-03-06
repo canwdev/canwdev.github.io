@@ -155,6 +155,40 @@
             border-radius: 10px;
             font-size: 10px;
         }
+
+        /* CSS 代码生成 */
+        .code-container {
+            position: relative;
+            background: #2d2d2d;
+            padding: 20px;
+            border-radius: 8px;
+            color: #f8f8f2;
+            font-family: 'Courier New', Courier, monospace;
+            margin-top: 15px;
+        }
+
+        .code-container pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #555;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .copy-btn:hover {
+            background: #777;
+        }
     </style>
 </head>
 
@@ -192,6 +226,14 @@
                 <div id="gridPreview" class="grid-preview"></div>
             </div>
             <div class="target-info" id="targetInfo"></div>
+        </div>
+
+        <div class="card" id="cssCard" style="display:none;">
+            <h2>4. CSS 代码生成</h2>
+            <div class="code-container">
+                <button class="copy-btn" onclick="copyCss()">复制</button>
+                <pre id="cssCode"></pre>
+            </div>
         </div>
     </div>
 
@@ -285,6 +327,43 @@
             });
 
             document.getElementById('targetInfo').innerText = `* 模拟容器总宽度: ${(result.gridCount * result.unitWidth + (result.gridCount - 1) * gap).toFixed(2)}px (基于目标总像素计算)`;
+
+            // 生成并显示 CSS 代码
+            generateAndShowCss(result, gap);
+        }
+
+        function generateAndShowCss(result, gap) {
+            const cssCard = document.getElementById('cssCard');
+            const cssCodeEl = document.getElementById('cssCode');
+            cssCard.style.display = 'block';
+
+            let css = `.grid-container {
+    display: grid;
+    grid-template-columns: repeat(${result.gridCount}, 1fr);
+    gap: ${gap}px;
+}
+
+`;
+            result.details.forEach((item, index) => {
+                css += `.item-${index + 1} {
+    grid-column: span ${item.span};
+}
+
+`;
+            });
+
+            cssCodeEl.textContent = css.trim();
+        }
+
+        function copyCss() {
+            const cssCode = document.getElementById('cssCode').textContent;
+            navigator.clipboard.writeText(cssCode).then(() => {
+                const copyBtn = document.querySelector('.copy-btn');
+                copyBtn.textContent = '已复制!';
+                setTimeout(() => {
+                    copyBtn.textContent = '复制';
+                }, 2000);
+            });
         }
 
         // 初始化执行一次
