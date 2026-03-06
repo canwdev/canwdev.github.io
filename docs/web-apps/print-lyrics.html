@@ -3,6 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
+  <meta name="description" content="在线歌词排版工具，支持自定义字体、字号、多列布局，可导出为高清图片或直接打印，适用于歌词本制作。">
   <title>歌词排版工具</title>
   <style>
     :root {
@@ -137,6 +138,45 @@
       color: #94a3b8;
       text-align: center;
     }
+
+    .btn-print {
+      background: #3b82f6;
+      color: white;
+    }
+
+    /* 打印样式 */
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+        margin: 0;
+      }
+
+      .container {
+        display: block;
+      }
+
+      .sidebar,
+      .page-info {
+        display: none !important;
+      }
+
+      #preview-container {
+        gap: 0;
+        padding: 0;
+      }
+
+      .page-wrapper {
+        page-break-after: always;
+      }
+
+      canvas {
+        box-shadow: none;
+        border: none;
+        width: 100% !important;
+        max-width: 100%;
+      }
+    }
   </style>
 </head>
 
@@ -196,6 +236,7 @@
       <div class="btn-stack">
         <!-- <button class="btn-main" onclick="generate()">✅ 应用并重新生成</button> -->
         <button class="btn-export" onclick="downloadAll()">💾 导出所有图片</button>
+        <button class="btn-print" onclick="window.print()">🖨️ 打印</button>
       </div>
     </aside>
 
