@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="自己开发的网页工具" />
+  <meta name="theme-color" content="#3498db">
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <title>网页工具合集</title>
+  <style>
+    /* 全局样式 */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    a {
+      color: #3498db;
+      text-decoration: none;
+    }
+
+    .container {
+      max-width: 1200px;
+      width: 100%;
+      background-color: rgba(255, 255, 255, 0.9);
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      padding: 30px;
+      margin: 50px auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .header h1 {
+      color: #333;
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+
+    .header p {
+      color: #666;
+      font-size: 1.1rem;
+    }
+
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .tool-card {
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      position: relative;
+    }
+
+    .tool-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .tool-card .tool-card-link {
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      padding: 20px;
+    }
+
+    .tool-card-content {
+      flex-grow: 1;
+    }
+
+    .tool-card h3 {
+      color: #2c3e50;
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+    }
+
+    .tool-card p {
+      color: #7f8c8d;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .tool-card .icon {
+      font-size: 2.5rem;
+      margin-bottom: 15px;
+      color: #3498db;
+    }
+
+    .tool-card .source-link {
+      color: #7f8c8d;
+      text-decoration: none;
+      font-size: 0.9rem;
+      position: absolute;
+      top: 8px;
+      right: 16px;
+    }
+
+    /* 响应式设计 */
+    @media (max-width: 768px) {
+      body {
+        padding: 0;
+      }
+
+      .container {
+        border-radius: 0;
+        padding: 20px;
+        margin: 0 auto;
+      }
+
+      .header h1 {
+        font-size: 2rem;
+      }
+
+      .tools-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>网页工具合集</h1>
+      <p>自己开发的网页工具 - <a href="https://github.com/canwdev">Github</a></p>
+    </div>
+    <div class="tools-grid" id="toolsGrid"></div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      // 工具数据数组
+      const toolsData = [
+        {
+          name: "图片拼版工具",
+          description: "用于打印贴纸",
+          url: "print-images.html",
+          icon: "🌅",
+        },
+        {
+          name: "歌词排版工具",
+          description: "用于打印歌词",
+          url: "print-lyrics.html",
+          icon: "📖",
+        },
+        {
+          name: "电池快速放电工具",
+          description: "毒蘑菇性能测试",
+          url: "battery-dmg.html",
+          icon: "🔋",
+        },
+        {
+          name: "Always On Screen",
+          description: "屏幕常亮看板",
+          url: "always-on-screen.html",
+          icon: "💡",
+          source: "https://github.com/canwdev/always-on-screen",
+        },
+        {
+          name: "Fire Calc",
+          description: "提前退休计算器",
+          url: "fire-calc.html",
+          icon: "🔥",
+          source: "https://github.com/canwdev/fire-calc",
+        },
+        {
+          name: "CSS Grid Calc",
+          description: "CSS Grid 栅格配置可视化分析器",
+          url: "grid-calc.html",
+          icon: "📐",
+        },
+        {
+          name: "Web MediaDevices Player",
+          description: "网页版 HDMI 采集卡",
+          url: "https://canwdev.github.io/web-mediadevices-player/",
+          icon: "📺",
+          source: "https://github.com/canwdev/web-mediadevices-player",
+        },
+        {
+          name: "PageCraft",
+          description: "网页开发效率工具",
+          url: "https://canwdev.github.io/page-craft-vite/index.html",
+          icon: "🛠️",
+          source: "https://github.com/canwdev/page-craft-vite",
+        },
+        {
+          name: "GarageBand Piano JS",
+          description: "网页版钢琴",
+          url: "https://canwdev.github.io/garageband-piano-js/",
+          icon: "🎹",
+          source: "https://github.com/canwdev/garageband-piano-js",
+        },
+        // {
+        //   name: "三体运动模拟",
+        //   description: "来自 Less Bug",
+        //   url: "3b.html",
+        //   icon: "🌌",
+        //   source: "https://www.less-bug.com/",
+        // },
+      ];
+
+      const toolsGrid = document.getElementById("toolsGrid");
+
+      // 动态生成工具卡片
+      toolsData.forEach((tool, index) => {
+        const toolCardHTML = `
+          <div class="tool-card">
+            <a class="tool-card-link" href="${tool.url}">
+              <div class="tool-card-content">
+                <div class="icon">${tool.icon}</div>
+                <h3>${tool.name}</h3>
+                <p>${tool.description}</p>
+              </div>
+              </a>
+              ${tool.source ? `<a class="source-link" href="${tool.source}" target="_blank" rel="noopener noreferrer">🔗Source</a>` : ""}
+          </div>
+        `;
+        toolsGrid.innerHTML += toolCardHTML;
+      });
+    });
+  </script>
+</body>
+
+</html>
