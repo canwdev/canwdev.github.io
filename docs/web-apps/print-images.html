@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <title>图片拼版工具</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --bg: #f1f5f9;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg);
+      margin: 0;
+      padding: 20px;
+      color: #1e293b;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 350px 1fr;
+      gap: 30px;
+    }
+
+    /* 左侧控制栏 */
+    .sidebar {
+      background: white;
+      padding: 25px;
+      border-radius: 16px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      height: fit-content;
+      position: sticky;
+      top: 20px;
+      border: 1px solid #e2e8f0;
+    }
+
+    h2 {
+      margin-top: 0;
+      font-size: 1.3rem;
+      color: #0f172a;
+      border-bottom: 2px solid var(--bg);
+      padding-bottom: 15px;
+      margin-bottom: 20px;
+    }
+
+    .control-group {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #475569;
+    }
+
+    select,
+    input[type="number"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      box-sizing: border-box;
+      font-size: 14px;
+    }
+
+    input[type="number"]:focus,
+    select:focus {
+      outline: 2px solid #93c5fd;
+      border-color: var(--primary);
+    }
+
+    /* 颜色选择器样式 */
+    .color-picker-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 5px 10px;
+    }
+
+    input[type="color"] {
+      border: none;
+      width: 40px;
+      height: 30px;
+      cursor: pointer;
+      background: none;
+      padding: 0;
+    }
+
+    #color-hex {
+      font-family: monospace;
+      font-size: 14px;
+      color: #64748b;
+    }
+
+    .btn-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 25px;
+    }
+
+    button {
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-main {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-main:hover {
+      background: #1d4ed8;
+    }
+
+    .btn-export {
+      background: #059669;
+      color: white;
+    }
+
+    .btn-export:hover {
+      background: #047857;
+    }
+
+    .btn-clear {
+      background: #f1f5f9;
+      color: #64748b;
+      margin-top: 10px;
+    }
+
+    .btn-clear:hover {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    /* 右侧预览区 */
+    .main-content {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    #drop-zone {
+      background: white;
+      border: 2px dashed #cbd5e1;
+      border-radius: 16px;
+      padding: 40px;
+      text-align: center;
+      color: #64748b;
+      cursor: pointer;
+      transition: 0.3s;
+      border: 2px dashed #cbd5e1;
+    }
+
+    #drop-zone.hover {
+      border-color: var(--primary);
+      background: #eff6ff;
+      color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+    }
+
+    #drop-zone p {
+      margin: 5px 0;
+    }
+
+    #preview-container {
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+      align-items: center;
+      padding-bottom: 50px;
+    }
+
+    .page-wrapper {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    canvas {
+      background: white;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+      max-width: 100%;
+      height: auto;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
+    }
+
+    .page-info {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-top: 10px;
+      font-weight: 600;
+      background: #e2e8f0;
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+
+    /* 响应式 */
+    @media (max-width: 900px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <aside class="sidebar">
+      <h2>⚙️ 拼版参数设置</h2>
+
+      <div class="control-group">
+        <label>纸张尺寸</label>
+        <select id="paper-size">
+          <option value="210,297,300">A4 (210x297mm) [300 DPI]</option>
+          <option value="102,152,300">4x6 英寸 (照片) [300 DPI]</option>
+          <option value="127,178,300">5x7 英寸 [300 DPI]</option>
+          <option value="297,420,300">A3 [300 DPI]</option>
+          <option value="210,297,150">A4 (低清预览) [150 DPI]</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label>纸张页边距 Padding (<span id="page-padding-val">10</span> mm)</label>
+        <input type="range" id="page-padding" value="10" min="0" max="100" step="1" style="width: 100%;">
+      </div>
+
+      <div class="control-group">
+        <label>图片间距 Spacing (<span id="img-margin-val">5</span> mm)</label>
+        <input type="range" id="img-margin" value="5" min="0" max="100" step="1" style="width: 100%;">
+      </div>
+
+      <div class="control-group">
+        <label>单张图片宽度 (<span id="img-width-val">50</span> mm)</label>
+        <input type="range" id="img-width" value="50" min="5" max="200" step="1" style="width: 100%;">
+      </div>
+
+      <div style="border-top:1px solid #e2e8f0; margin: 25px 0;"></div>
+
+      <div class="control-group">
+        <label>图片边框颜色 (Border)</label>
+        <div class="color-picker-wrapper">
+          <input type="color" id="border-color" value="#cccccc">
+          <span id="color-hex">#cccccc</span>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label>边框透明度 (<span id="border-opacity-val">50</span>%)</label>
+        <input type="range" id="border-opacity" value="50" min="0" max="100" style="width: 100%;">
+      </div>
+
+      <div class="control-group">
+        <label>边框粗细 (<span id="border-weight-val">0.2</span> mm)</label>
+        <input type="range" id="border-weight" value="0.2" min="0" max="10" step="0.1" style="width: 100%;">
+      </div>
+
+      <div class="control-group" style="display: flex; align-items: center; gap: 8px; margin-bottom: 25px;">
+        <input type="checkbox" id="transparent-stroke" style="width: 16px; height: 16px; margin: 0; cursor: pointer;">
+        <label for="transparent-stroke" style="margin: 0; display: inline; cursor: pointer;">适应透明图片边缘描边</label>
+      </div>
+
+      <div class="btn-stack">
+        <!-- <button class="btn-main" onclick="renderPages()">✅ 应用设置 / 重新生成</button> -->
+        <button class="btn-export" onclick="downloadAll()">💾 导出所有 PNG 图片</button>
+        <button class="btn-clear" onclick="clearImages()">🗑️ 清空图片</button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <div id="drop-zone">
+        <p style="font-size: 2.5rem; margin-bottom: 10px;">📤</p>
+        <p style="font-size: 16px; font-weight: 600; color: #1e293b;">拖拽图片到这里</p>
+        <p style="font-size: 14px;">或点击此处选择文件</p>
+        <input type="file" id="file-input" multiple accept="image/*" style="display: none;">
+      </div>
+      <div id="preview-container"></div>
+    </main>
+  </div>
+
+  <script>
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+    const previewContainer = document.getElementById('preview-container');
+    const colorInput = document.getElementById('border-color');
+    const colorHexDisplay = document.getElementById('color-hex');
+
+    let uploadedImages = [];
+
+    // --- 初始化与事件监听 ---
+
+    // 节流/防抖机制 (修改参数后300ms自动重新生成)
+    let renderTimeout = null;
+    function autoRender() {
+      if (renderTimeout) clearTimeout(renderTimeout);
+      renderTimeout = setTimeout(() => {
+        renderPages();
+      }, 300);
+    }
+
+    // 监听所有左侧参数输入/更改事件
+    document.querySelectorAll('.sidebar input, .sidebar select').forEach(el => {
+      el.addEventListener('input', autoRender);
+      el.addEventListener('change', autoRender);
+    });
+
+    // 同步显示颜色哈希值
+    colorInput.addEventListener('input', (e) => colorHexDisplay.innerText = e.target.value.toUpperCase());
+
+    // 同步显示所有滑动条数值
+    document.querySelectorAll('.sidebar input[type="range"]').forEach(slider => {
+      const valDisplay = document.getElementById(slider.id + '-val');
+      if (valDisplay) {
+        slider.addEventListener('input', (e) => valDisplay.innerText = e.target.value);
+      }
+    });
+
+    // 上传区域事件
+    dropZone.onclick = () => fileInput.click();
+    fileInput.onchange = (e) => handleFiles(e.target.files);
+    dropZone.ondragover = (e) => { e.preventDefault(); dropZone.classList.add('hover'); };
+    dropZone.ondragleave = () => dropZone.classList.remove('hover');
+    dropZone.ondrop = (e) => { e.preventDefault(); dropZone.classList.remove('hover'); handleFiles(e.dataTransfer.files); };
+
+    // 处理文件输入
+    function handleFiles(files) {
+      if (files.length === 0) return;
+
+      // 显示加载状态（简单处理）
+      dropZone.querySelector('p:nth-child(2)').innerText = `正在加载 ${files.length} 张图片...`;
+
+      const promises = Array.from(files).filter(f => f.type.startsWith('image/')).map(file => {
+        return new Promise(resolve => {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => resolve(img);
+            img.src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        });
+      });
+
+      Promise.all(promises).then(imgs => {
+        uploadedImages = [...uploadedImages, ...imgs];
+        // 恢复上传术语
+        dropZone.querySelector('p:nth-child(2)').innerText = `拖拽图片到这里`;
+        renderPages();
+      });
+    }
+
+    // 清空
+    function clearImages() {
+      uploadedImages = [];
+      previewContainer.innerHTML = '';
+      fileInput.value = ''; // 复位 file input
+    }
+
+    // --- 核心渲染与布局逻辑 (修复边框) ---
+    function renderPages() {
+      previewContainer.innerHTML = '';
+      if (uploadedImages.length === 0) return;
+
+      // 1. 获取并解析参数
+      const paperParam = document.getElementById('paper-size').value.split(',');
+      const pW_mm = parseFloat(paperParam[0]);
+      const pH_mm = parseFloat(paperParam[1]);
+      const dpi = parseFloat(paperParam[2]);
+
+      const pagePadding_mm = parseFloat(document.getElementById('page-padding').value) || 0;
+      const imgMargin_mm = parseFloat(document.getElementById('img-margin').value) || 0;
+      const targetImgW_mm = parseFloat(document.getElementById('img-width').value) || 50;
+
+      const borderColor = document.getElementById('border-color').value;
+      const borderWeight_mm = parseFloat(document.getElementById('border-weight').value) || 0;
+      const useTransparentStroke = document.getElementById('transparent-stroke').checked;
+      const borderOpacity = parseInt(document.getElementById('border-opacity').value) / 100;
+
+      // 2. 单位转换函数: 毫米 -> 像素 (px = mm * dpi / 25.4)
+      const mmToPx = (mm) => (mm * dpi) / 25.4;
+
+      // 计算像素级参数
+      const canvasW = Math.round(mmToPx(pW_mm));
+      const canvasH = Math.round(mmToPx(pH_mm));
+      const pagePadding = Math.round(mmToPx(pagePadding_mm));
+      const imgMargin = Math.round(mmToPx(imgMargin_mm));
+      const targetW = Math.round(mmToPx(targetImgW_mm));
+      const bWeight = mmToPx(borderWeight_mm); // 边框不需要 Round，Canvas 支持亚像素
+
+      // 3. 初始化第一页
+      let pageCount = 0;
+      let { canvas, ctx } = createNewPageCanvas(canvasW, canvasH);
+
+      // 初始绘图游标位置（从页边距开始）
+      let cursorX = pagePadding;
+      let cursorY = pagePadding;
+      let rowMaxHeight = 0; // 记录当前行中最高图片的高度，用于换行计算
+
+      // 4. 迭代图片进行绘制
+      uploadedImages.forEach((img) => {
+        // 计算图片缩放后的高度（保持原始比例）
+        const ratio = img.height / img.width;
+        const targetH = Math.round(targetW * ratio);
+
+        // --- 布局检查 ---
+
+        // A. 换行检查：当前 X + 图片宽 > (纸宽 - 右边距)
+        if (cursorX + targetW > canvasW - pagePadding) {
+          cursorX = pagePadding; // 回到左侧
+          cursorY += rowMaxHeight + imgMargin; // 下移一行
+          rowMaxHeight = 0; // 重置行最高
+        }
+
+        // B. 分页检查：当前 Y + 图片高 > (纸高 - 下边距)
+        // 注意：这里使用了一个阈值(1px)防止因浮点数误差导致的意外分页
+        if (cursorY + targetH > canvasH - pagePadding + 1) {
+          // 创建新页面
+          ({ canvas, ctx } = createNewPageCanvas(canvasW, canvasH));
+          cursorX = pagePadding;
+          cursorY = pagePadding;
+          rowMaxHeight = 0;
+        }
+
+        // --- 核心绘制部分 (已修复) ---
+
+        if (bWeight > 0 && useTransparentStroke) {
+          // 透明图片沿内容边缘描边
+          const offCanvas = document.createElement('canvas');
+          offCanvas.width = targetW;
+          offCanvas.height = targetH;
+          const offCtx = offCanvas.getContext('2d');
+          offCtx.drawImage(img, 0, 0, targetW, targetH);
+          offCtx.globalCompositeOperation = 'source-in';
+          offCtx.fillStyle = borderColor;
+          offCtx.fillRect(0, 0, targetW, targetH);
+
+          // 为了防止多次描边叠加使半透明变回不透明，我们创建一层描边专属画布
+          const strokeCanvas = document.createElement('canvas');
+          strokeCanvas.width = targetW + bWeight * 2;
+          strokeCanvas.height = targetH + bWeight * 2;
+          const strokeCtx = strokeCanvas.getContext('2d');
+
+          // 通过多角度偏移绘制剪影，形成描边效果
+          const steps = 36; // 增加步数使边缘更平滑
+          for (let i = 0; i < steps; i++) {
+            const angle = (i * Math.PI * 2) / steps;
+            const dx = Math.cos(angle) * bWeight;
+            const dy = Math.sin(angle) * bWeight;
+            strokeCtx.drawImage(offCanvas, bWeight + dx, bWeight + dy);
+          }
+
+          // 一次性应用透明度并绘制到主画布上
+          ctx.save();
+          ctx.globalAlpha = borderOpacity;
+          ctx.drawImage(strokeCanvas, cursorX - bWeight, cursorY - bWeight);
+          ctx.restore();
+
+          // 在描边上方绘制原图
+          ctx.drawImage(img, cursorX, cursorY, targetW, targetH);
+
+        } else {
+          // 原常规逻辑：矩形外框
+          // 1. 绘制图片主体
+          ctx.drawImage(img, cursorX, cursorY, targetW, targetH);
+
+          // 2. 绘制矩形边框 (使用原生 Stroke API)
+          if (bWeight > 0) {
+            ctx.save();
+            ctx.globalAlpha = borderOpacity;
+            ctx.lineWidth = bWeight;
+            ctx.strokeStyle = borderColor;
+
+            // Canvas 的 stroke 是居中描边。为了不改变图片尺寸，
+            // 我们需要将描边路径向内偏移线宽的一半，实现"内描边"效果。
+            const halfBW = bWeight / 2;
+            ctx.strokeRect(
+              cursorX + halfBW,
+              cursorY + halfBW,
+              targetW - bWeight,
+              targetH - bWeight
+            );
+            ctx.restore();
+          }
+        }
+
+        // --- 更新游标 ---
+        rowMaxHeight = Math.max(rowMaxHeight, targetH);
+        cursorX += targetW + imgMargin; // X 游标右移，准备绘制下一张
+      });
+
+      // 内部函数：创建 Canvas 并添加到 DOM
+      function createNewPageCanvas(w, h) {
+        pageCount++;
+        const wrapper = document.createElement('div');
+        wrapper.className = 'page-wrapper';
+
+        const cvs = document.createElement('canvas');
+        cvs.width = w;
+        cvs.height = h;
+        // CSS 控制预览显示大小，防止高 DPI 下预览过大
+        // cvs.style.width = pW_mm > pH_mm ? "600px" : "450px";
+        cvs.style.width = "600px";
+
+        const info = document.createElement('div');
+        info.className = 'page-info';
+        info.innerText = `第 ${pageCount} 页 (${pW_mm}x${pH_mm}mm, ${dpi} DPI)`;
+
+        wrapper.appendChild(cvs);
+        wrapper.appendChild(info);
+        previewContainer.appendChild(wrapper);
+
+        return { canvas: cvs, ctx: cvs.getContext('2d') };
+      }
+    }
+
+    // --- 导出功能 ---
+    function downloadAll() {
+      const canvases = previewContainer.querySelectorAll('canvas');
+      if (canvases.length === 0) return alert('请先上传图片。');
+
+      const timestamp = new Date().getTime();
+      canvases.forEach((canvas, index) => {
+        const link = document.createElement('a');
+        link.download = `print_layout_${timestamp}_page${index + 1}.png`;
+        // 使用最高质量导出
+        link.href = canvas.toDataURL('image/png', 1.0);
+        link.click();
+      });
+    }
+  </script>
+
+</body>
+
+</html>

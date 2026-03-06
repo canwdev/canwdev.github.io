@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <title>歌词排版工具</title>
+  <style>
+    :root {
+      --primary: #6366f1;
+      --bg: #f1f5f9;
+    }
+
+    body {
+      font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: var(--bg);
+      margin: 0;
+      padding: 20px;
+      color: #1e293b;
+    }
+
+    .container {
+      max-width: 1200px;
+      /* 调大容器宽度 */
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 350px 1fr;
+      /* 回到第一版的比例 */
+      gap: 30px;
+    }
+
+    /* 左侧控制栏 */
+    .sidebar {
+      background: white;
+      padding: 25px;
+      border-radius: 16px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      height: fit-content;
+      position: sticky;
+      top: 20px;
+      border: 1px solid #e2e8f0;
+    }
+
+    h2 {
+      margin-top: 0;
+      font-size: 1.3rem;
+      border-bottom: 2px solid #f1f5f9;
+      padding-bottom: 15px;
+      margin-bottom: 20px;
+    }
+
+    .control-group {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #475569;
+    }
+
+    select,
+    input,
+    textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      box-sizing: border-box;
+      font-size: 14px;
+    }
+
+    textarea {
+      height: 150px;
+      resize: vertical;
+    }
+
+    .btn-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .btn-main {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-font {
+      background: #e2e8f0;
+      color: #475569;
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+
+    .btn-export {
+      background: #059669;
+      color: white;
+    }
+
+    /* 右侧预览区 */
+    #preview-container {
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+      align-items: center;
+      /* 保持纸张居中 */
+    }
+
+    .page-wrapper {
+      position: relative;
+    }
+
+    canvas {
+      display: block;
+      /* 宽度由 JS 动态控制，确保预览够大 */
+      max-width: 100%;
+      height: auto;
+      background: white;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2);
+    }
+
+    .page-info {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #94a3b8;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <aside class="sidebar">
+      <h2>⚙️ 排版参数</h2>
+
+      <div class="control-group">
+        <label>歌词内容</label>
+        <textarea id="lyrics-input">在此输入或粘贴歌词...</textarea>
+      </div>
+
+      <div class="control-group">
+        <label>字体设置</label>
+        <button class="btn-font" id="load-fonts">点此获取系统本地字体列表</button>
+        <select id="font-family">
+          <option value="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">通用黑体 (默认)</option>
+          <option value="'Songti SC', STSong, SimSun, serif">通用宋体 (衬线)</option>
+          <!-- <option value="serif">系统衬线 (Serif)</option> -->
+          <!-- <option value="sans-serif">系统无衬线 (Sans-serif)</option> -->
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label>纸张尺寸</label>
+        <select id="paper-size">
+          <option value="210,297,300">A4 (210x297mm)</option>
+          <option value="148,210,300">A5 (148x210mm)</option>
+          <option value="102,152,300">6寸照片 (102x152mm)</option>
+        </select>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div class="control-group">
+          <label>字号 (pt)</label>
+          <input type="number" id="font-size" value="12">
+        </div>
+        <div class="control-group">
+          <label>边距 (mm)</label>
+          <input type="number" id="padding" value="15">
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div class="control-group">
+          <label>列数</label>
+          <input type="number" id="cols" value="2">
+        </div>
+        <div class="control-group">
+          <label>行间距</label>
+          <input type="number" id="line-height" value="1.6" step="0.1">
+        </div>
+      </div>
+
+      <div class="btn-stack">
+        <!-- <button class="btn-main" onclick="generate()">✅ 应用并重新生成</button> -->
+        <button class="btn-export" onclick="downloadAll()">💾 导出所有图片</button>
+      </div>
+    </aside>
+
+    <main id="preview-container">
+    </main>
+  </div>
+
+  <script>
+    // 1. 本地字体 API 获取
+    const fontBtn = document.getElementById('load-fonts');
+    const fontSelect = document.getElementById('font-family');
+
+    fontBtn.onclick = async () => {
+      if (!window.queryLocalFonts) {
+        alert('您的浏览器暂不支持本地字体访问 API，请手动输入或使用默认字体。');
+        return;
+      }
+      try {
+        const fonts = await window.queryLocalFonts();
+        fontSelect.innerHTML = ''; // 清空
+        // 简单去重并排序
+        const sortedFonts = Array.from(new Set(fonts.map(f => f.fullName))).sort();
+        sortedFonts.forEach(font => {
+          const option = document.createElement('option');
+          option.value = `"${font}"`;
+          option.textContent = font;
+          fontSelect.appendChild(option);
+        });
+        fontBtn.innerText = `已加载 ${sortedFonts.length} 种字体`;
+      } catch (err) {
+        console.error(err);
+        alert('无法访问字体列表，请检查权限设置。');
+      }
+    };
+
+    // 2. 核心逻辑
+    const mmToPx = (mm, dpi) => (mm * dpi) / 25.4;
+
+    function generate() {
+      const container = document.getElementById('preview-container');
+      container.innerHTML = '';
+
+      const lyrics = document.getElementById('lyrics-input').value.split('\n');
+      const [pW_mm, pH_mm, dpi] = document.getElementById('paper-size').value.split(',').map(Number);
+      const padding_mm = parseFloat(document.getElementById('padding').value);
+      const fontSize_pt = parseFloat(document.getElementById('font-size').value);
+      const colCount = parseInt(document.getElementById('cols').value);
+      const lineHeightMult = parseFloat(document.getElementById('line-height').value);
+      const fontFamily = fontSelect.value;
+
+      const canvasW = Math.round(mmToPx(pW_mm, dpi));
+      const canvasH = Math.round(mmToPx(pH_mm, dpi));
+      const padding = mmToPx(padding_mm, dpi);
+      const fontSize = (fontSize_pt * dpi) / 72;
+      const lineHeight = fontSize * lineHeightMult;
+      const colGap = mmToPx(10, dpi); // 固定 10mm 列间距
+
+      const colW = (canvasW - (padding * 2) - (colGap * (colCount - 1))) / colCount;
+
+      let currentPage = 1;
+      let { canvas, ctx } = createPage(canvasW, canvasH, pW_mm, pH_mm, currentPage);
+
+      let currentCol = 0;
+      let x = padding;
+      let y = padding + fontSize;
+
+      lyrics.forEach(line => {
+        if (line.trim() === '') {
+          y += lineHeight * 0.5;
+        } else {
+          // 换列检查
+          if (y > canvasH - padding) {
+            currentCol++;
+            if (currentCol >= colCount) {
+              currentPage++;
+              ({ canvas, ctx } = createPage(canvasW, canvasH, pW_mm, pH_mm, currentPage));
+              currentCol = 0;
+              x = padding;
+              y = padding + fontSize;
+            } else {
+              x = padding + (colW + colGap) * currentCol;
+              y = padding + fontSize;
+            }
+          }
+
+          ctx.font = `${fontSize}px ${fontFamily}`;
+          ctx.fillStyle = '#1e293b';
+          ctx.fillText(line.trim(), x, y, colW);
+          y += lineHeight;
+        }
+      });
+    }
+
+    function createPage(w, h, mmW, mmH, num) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'page-wrapper';
+
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+
+      /** * 调大预览宽度：
+       * 无论原始纸张多大，预览时在右侧展示 900px 宽度
+       * 这样 A4 纵向排版在屏幕上会非常大，方便检查。
+       */
+      canvas.style.width = '800px';
+
+      const info = document.createElement('div');
+      info.className = 'page-info';
+      info.innerText = `第 ${num} 页 (${mmW}x${mmH}mm)`;
+
+      wrapper.appendChild(canvas);
+      wrapper.appendChild(info);
+      document.getElementById('preview-container').appendChild(wrapper);
+
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = "white";
+      ctx.fillRect(0, 0, w, h);
+      return { canvas, ctx };
+    }
+
+    function downloadAll() {
+      const canvases = document.querySelectorAll('canvas');
+      canvases.forEach((cv, i) => {
+        const link = document.createElement('a');
+        link.download = `page_${i + 1}.png`;
+        link.href = cv.toDataURL('image/png', 1.0);
+        link.click();
+      });
+    }
+
+    window.onload = generate;
+
+    // 监听参数修改，300ms防抖自动重新生成
+    let generateTimeout;
+    function debouncedGenerate() {
+      clearTimeout(generateTimeout);
+      generateTimeout = setTimeout(generate, 300);
+    }
+
+    document.querySelectorAll('.sidebar input, .sidebar select, .sidebar textarea').forEach(el => {
+      el.addEventListener('input', debouncedGenerate);
+    });
+  </script>
+</body>
+
+</html>
