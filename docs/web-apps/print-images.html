@@ -3,6 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
+  <meta name="description" content="在线图片拼版工具，支持多张图片自动排版到 A4/照片纸上，自定义纸张尺寸、间距、边框，适用于贴纸和照片批量打印。">
   <title>图片拼版工具</title>
   <style>
     :root {
@@ -139,6 +140,15 @@
       background: #047857;
     }
 
+    .btn-print {
+      background: #3b82f6;
+      color: white;
+    }
+
+    .btn-print:hover {
+      background: #2563eb;
+    }
+
     .btn-clear {
       background: #f1f5f9;
       color: #64748b;
@@ -228,6 +238,41 @@
         position: static;
       }
     }
+
+    /* 打印样式 */
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+        margin: 0;
+      }
+
+      .container {
+        display: block;
+      }
+
+      .sidebar,
+      #drop-zone,
+      .page-info {
+        display: none !important;
+      }
+
+      #preview-container {
+        gap: 0;
+        padding: 0;
+      }
+
+      .page-wrapper {
+        page-break-after: always;
+      }
+
+      canvas {
+        box-shadow: none;
+        border: none;
+        width: 100% !important;
+        max-width: 100%;
+      }
+    }
   </style>
 </head>
 
@@ -291,6 +336,7 @@
       <div class="btn-stack">
         <!-- <button class="btn-main" onclick="renderPages()">✅ 应用设置 / 重新生成</button> -->
         <button class="btn-export" onclick="downloadAll()">💾 导出所有 PNG 图片</button>
+        <button class="btn-print" onclick="window.print()">🖨️ 打印</button>
         <button class="btn-clear" onclick="clearImages()">🗑️ 清空图片</button>
       </div>
     </aside>
