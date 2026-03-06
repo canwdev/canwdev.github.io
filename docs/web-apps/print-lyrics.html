@@ -32,8 +32,8 @@
     /* 左侧控制栏 */
     .sidebar {
       background: white;
-      padding: 25px;
-      border-radius: 16px;
+      padding: 14px;
+      border-radius: 12px;
       box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
       height: fit-content;
       position: sticky;
@@ -41,55 +41,56 @@
       border: 1px solid #e2e8f0;
     }
 
-    h2 {
+    .sidebar h2 {
       margin-top: 0;
-      font-size: 1.3rem;
+      font-size: 1.15rem;
       border-bottom: 2px solid #f1f5f9;
-      padding-bottom: 15px;
-      margin-bottom: 20px;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
     }
 
-    .control-group {
-      margin-bottom: 18px;
+    .sidebar .control-group {
+      margin-bottom: 10px;
     }
 
-    label {
+    .sidebar label {
       display: block;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 600;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
       color: #475569;
     }
 
-    select,
-    input,
-    textarea {
+    .sidebar select,
+    .sidebar input,
+    .sidebar textarea {
       width: 100%;
-      padding: 10px;
+      padding: 6px 8px;
       border: 1px solid #cbd5e1;
-      border-radius: 8px;
+      border-radius: 6px;
       box-sizing: border-box;
-      font-size: 14px;
+      font-size: 13px;
     }
 
-    textarea {
-      height: 150px;
+    .sidebar textarea {
+      height: 120px;
       resize: vertical;
     }
 
     .btn-stack {
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      margin-top: 20px;
+      gap: 8px;
+      margin-top: 14px;
     }
 
-    button {
-      padding: 12px;
+    .sidebar button {
+      padding: 6px 12px;
       border: none;
-      border-radius: 8px;
+      border-radius: 6px;
       cursor: pointer;
       font-weight: 600;
+      font-size: 13px;
       transition: all 0.2s;
     }
 
@@ -102,7 +103,7 @@
       background: #e2e8f0;
       color: #475569;
       font-size: 12px;
-      margin-bottom: 10px;
+      margin-bottom: 6px;
     }
 
     .btn-export {
@@ -211,7 +212,7 @@
         </select>
       </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
         <div class="control-group">
           <label>字号 (pt)</label>
           <input type="number" id="font-size" value="12">
@@ -222,7 +223,7 @@
         </div>
       </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
         <div class="control-group">
           <label>列数</label>
           <input type="number" id="cols" value="2">

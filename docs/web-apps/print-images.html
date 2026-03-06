@@ -30,40 +30,42 @@
     /* 左侧控制栏 */
     .sidebar {
       background: white;
-      padding: 25px;
-      border-radius: 16px;
+      padding: 14px;
+      border-radius: 12px;
       box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
       height: fit-content;
       position: sticky;
       top: 20px;
       border: 1px solid #e2e8f0;
+      max-height: 90vh;
+      overflow-y: auto;
     }
 
-    h2 {
+    .sidebar h2 {
       margin-top: 0;
-      font-size: 1.3rem;
+      font-size: 1.15rem;
       color: #0f172a;
       border-bottom: 2px solid var(--bg);
-      padding-bottom: 15px;
-      margin-bottom: 20px;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
     }
 
-    .control-group {
-      margin-bottom: 18px;
+    .sidebar .control-group {
+      margin-bottom: 10px;
     }
 
-    label {
+    .sidebar label {
       display: block;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 600;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
       color: #475569;
     }
 
-    select,
-    input[type="number"] {
+    .sidebar select,
+    .sidebar input[type="number"] {
       width: 100%;
-      padding: 10px;
+      padding: 6px 8px;
       border: 1px solid #cbd5e1;
       border-radius: 8px;
       box-sizing: border-box;
@@ -76,14 +78,22 @@
       border-color: var(--primary);
     }
 
+    .range-with-num {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .range-with-num input[type="range"] { flex: 1; min-width: 0; }
+    .range-with-num input[type="number"] { width: 5.2em; flex-shrink: 0; }
+
     /* 颜色选择器样式 */
     .color-picker-wrapper {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       border: 1px solid #cbd5e1;
-      border-radius: 8px;
-      padding: 5px 10px;
+      border-radius: 6px;
+      padding: 4px 8px;
     }
 
     input[type="color"] {
@@ -104,22 +114,23 @@
     .btn-stack {
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      margin-top: 25px;
+      gap: 8px;
+      margin-top: 14px;
     }
 
-    button {
-      padding: 12px;
+    .sidebar button {
+      height: 32px;
+      padding: 6px 12px;
       border: none;
-      border-radius: 8px;
+      border-radius: 6px;
       cursor: pointer;
       font-weight: 600;
-      font-size: 14px;
+      font-size: 13px;
       transition: all 0.2s;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 6px;
     }
 
     .btn-main {
@@ -174,7 +185,7 @@
     #drop-zone {
       background: white;
       border: 2px dashed #cbd5e1;
-      border-radius: 16px;
+      border-radius: 12px;
       padding: 40px;
       text-align: center;
       color: #64748b;
@@ -215,7 +226,6 @@
       max-width: 100%;
       height: auto;
       border: 1px solid #e2e8f0;
-      border-radius: 4px;
     }
 
     .page-info {
@@ -223,9 +233,9 @@
       color: #94a3b8;
       margin-top: 10px;
       font-weight: 600;
-      background: #e2e8f0;
-      padding: 2px 8px;
-      border-radius: 10px;
+      background: #ffffff;
+      padding: 2px 15px;
+      border-radius: 50px;
     }
 
     /* 响应式 */
@@ -294,21 +304,40 @@
       </div>
 
       <div class="control-group">
-        <label>纸张页边距 Padding (<span id="page-padding-val">10</span> mm)</label>
-        <input type="range" id="page-padding" value="10" min="0" max="100" step="1" style="width: 100%;">
+        <label>纸张页边距 Padding (mm)</label>
+        <div class="range-with-num">
+          <input type="range" id="page-padding" value="10" min="0" max="100" step="0.1">
+          <input type="number" min="0" max="100" step="0.1" value="10">
+        </div>
       </div>
 
       <div class="control-group">
-        <label>图片间距 Spacing (<span id="img-margin-val">5</span> mm)</label>
-        <input type="range" id="img-margin" value="5" min="0" max="100" step="1" style="width: 100%;">
+        <label>图片间距 Spacing (mm)</label>
+        <div class="range-with-num">
+          <input type="range" id="img-margin" value="5" min="0" max="100" step="0.1">
+          <input type="number" min="0" max="100" step="0.1" value="5">
+        </div>
       </div>
 
       <div class="control-group">
-        <label>单张图片宽度 (<span id="img-width-val">50</span> mm)</label>
-        <input type="range" id="img-width" value="50" min="5" max="200" step="1" style="width: 100%;">
+        <label>单张图片宽度 (mm)</label>
+        <div class="range-with-num">
+          <input type="range" id="img-width" value="50" min="1" max="200" step="0.1">
+          <input type="number" min="1" max="200" step="0.1" value="50">
+        </div>
       </div>
 
-      <div style="border-top:1px solid #e2e8f0; margin: 25px 0;"></div>
+      <div class="control-group">
+        <label for="auto-fit-pages">自适应最大页数</label>
+
+        <div class="range-with-num">
+          <input type="number" id="auto-fit-pages" value="1" min="1" step="1" style="flex: 1;">
+          <button class="btn-main" onclick="autoFit()" style="width: 150px;" >适应宽度</button>
+        </div>
+      </div>
+
+
+      <div style="border-top:1px solid #e2e8f0; margin: 12px 0;"></div>
 
       <div class="control-group">
         <label>图片边框颜色 (Border)</label>
@@ -319,16 +348,22 @@
       </div>
 
       <div class="control-group">
-        <label>边框透明度 (<span id="border-opacity-val">50</span>%)</label>
-        <input type="range" id="border-opacity" value="50" min="0" max="100" style="width: 100%;">
+        <label>边框透明度 (%)</label>
+        <div class="range-with-num">
+          <input type="range" id="border-opacity" value="50" min="0" max="100" step="1">
+          <input type="number" min="0" max="100" step="1" value="50">
+        </div>
       </div>
 
       <div class="control-group">
-        <label>边框粗细 (<span id="border-weight-val">0.2</span> mm)</label>
-        <input type="range" id="border-weight" value="0.2" min="0" max="10" step="0.1" style="width: 100%;">
+        <label>边框粗细 (mm)</label>
+        <div class="range-with-num">
+          <input type="range" id="border-weight" value="0.2" min="0" max="10" step="0.1">
+          <input type="number" min="0" max="10" step="0.1" value="0.2">
+        </div>
       </div>
 
-      <div class="control-group" style="display: flex; align-items: center; gap: 8px; margin-bottom: 25px;">
+      <div class="control-group" style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
         <input type="checkbox" id="transparent-stroke" style="width: 16px; height: 16px; margin: 0; cursor: pointer;">
         <label for="transparent-stroke" style="margin: 0; display: inline; cursor: pointer;">适应透明图片边缘描边</label>
       </div>
@@ -381,12 +416,20 @@
     // 同步显示颜色哈希值
     colorInput.addEventListener('input', (e) => colorHexDisplay.innerText = e.target.value.toUpperCase());
 
-    // 同步显示所有滑动条数值
-    document.querySelectorAll('.sidebar input[type="range"]').forEach(slider => {
-      const valDisplay = document.getElementById(slider.id + '-val');
-      if (valDisplay) {
-        slider.addEventListener('input', (e) => valDisplay.innerText = e.target.value);
-      }
+    // 滑动条与右侧数字框双向同步
+    document.querySelectorAll('.range-with-num').forEach(wrap => {
+      const range = wrap.querySelector('input[type="range"]');
+      const num = wrap.querySelector('input[type="number"]');
+      if (!range || !num) return;
+      const sync = () => { num.value = range.value; };
+      const fromNum = () => {
+        const v = parseFloat(num.value);
+        if (!isNaN(v)) range.value = Math.min(range.max, Math.max(range.min, v));
+      };
+      range.addEventListener('input', sync);
+      num.addEventListener('input', fromNum);
+      num.addEventListener('change', () => { fromNum(); sync(); });
+      sync();
     });
 
     // 上传区域事件
@@ -395,6 +438,7 @@
     dropZone.ondragover = (e) => { e.preventDefault(); dropZone.classList.add('hover'); };
     dropZone.ondragleave = () => dropZone.classList.remove('hover');
     dropZone.ondrop = (e) => { e.preventDefault(); dropZone.classList.remove('hover'); handleFiles(e.dataTransfer.files); };
+
 
     // 处理文件输入
     function handleFiles(files) {
@@ -585,6 +629,105 @@
 
         return { canvas: cvs, ctx: cvs.getContext('2d') };
       }
+    }
+
+    // --- 一键自适应：在 N 页内填满图片并最大化单张图片宽度（页边距不变） ---
+    function autoFit() {
+      if (uploadedImages.length === 0) {
+        alert('请先上传图片。');
+        return;
+      }
+      const N = parseInt(document.getElementById('auto-fit-pages').value, 10) || 1;
+      if (N < 1) {
+        alert('请设置至少 1 页。');
+        return;
+      }
+
+      const paperParam = document.getElementById('paper-size').value.split(',');
+      const pW_mm = parseFloat(paperParam[0]);
+      const pH_mm = parseFloat(paperParam[1]);
+      const dpi = parseFloat(paperParam[2]);
+      const pagePadding_mm = parseFloat(document.getElementById('page-padding').value) || 0;
+      const contentW_mm = pW_mm - 2 * pagePadding_mm;
+      const contentH_mm = pH_mm - 2 * pagePadding_mm;
+      if (contentW_mm <= 0 || contentH_mm <= 0) {
+        alert('页边距过大，无可用内容区域。');
+        return;
+      }
+
+      const mmToPx = (mm) => (mm * dpi) / 25.4;
+      const canvasW = Math.round(mmToPx(pW_mm));
+      const canvasH = Math.round(mmToPx(pH_mm));
+      const pagePadding = Math.round(mmToPx(pagePadding_mm));
+
+      // 与 renderPages 一致的布局模拟，返回所需页数
+      function countPages(targetImgW_mm, imgMargin_mm) {
+        const imgMargin = Math.round(mmToPx(imgMargin_mm));
+        const targetW = Math.round(mmToPx(targetImgW_mm));
+        let cursorX = pagePadding;
+        let cursorY = pagePadding;
+        let rowMaxHeight = 0;
+        let pageCount = 1;
+        for (const img of uploadedImages) {
+          const ratio = img.height / img.width;
+          const targetH = Math.round(targetW * ratio);
+          if (cursorX + targetW > canvasW - pagePadding) {
+            cursorX = pagePadding;
+            cursorY += rowMaxHeight + imgMargin;
+            rowMaxHeight = 0;
+          }
+          if (cursorY + targetH > canvasH - pagePadding + 1) {
+            pageCount++;
+            cursorX = pagePadding;
+            cursorY = pagePadding;
+            rowMaxHeight = 0;
+          }
+          rowMaxHeight = Math.max(rowMaxHeight, targetH);
+          cursorX += targetW + imgMargin;
+        }
+        return pageCount;
+      }
+
+      // 使用当前界面上的图片间距，只调整宽度
+      const imgMargin_mm = parseFloat(document.getElementById('img-margin').value) || 0;
+      let lowW = 1;
+      let highW = Math.floor(contentW_mm * 10) / 10;
+      const tolerance = 0.5;
+
+      if (countPages(lowW, imgMargin_mm) > N) {
+        alert(`当前图片数量在 ${N} 页内无法放下（即使用最小宽度 ${lowW}mm）。请增加页数或减少图片。`);
+        return;
+      }
+
+      while (highW - lowW > tolerance) {
+        const midW = (lowW + highW) / 2;
+        if (countPages(midW, imgMargin_mm) <= N) {
+          lowW = midW;
+        } else {
+          highW = midW;
+        }
+      }
+      // 向下取整避免四舍五入后超出 N 页；再校验一次，若不满足则微减
+      let bestW_mm = Math.floor(lowW * 10) / 10;
+      while (countPages(bestW_mm, imgMargin_mm) > N && bestW_mm >= 5) {
+        bestW_mm = Math.round((bestW_mm - 0.1) * 10) / 10;
+      }
+
+      const imgWidthInput = document.getElementById('img-width');
+      const imgWidthNum = imgWidthInput.closest('.range-with-num')?.querySelector('input[type="number"]');
+      imgWidthInput.value = bestW_mm;
+      if (imgWidthNum) imgWidthNum.value = bestW_mm;
+      // 用控件实际回读值再校验（避免 range step/浮点导致比 37.8 略大而多出一页）
+      let actualMm = parseFloat(imgWidthInput.value) || bestW_mm;
+      while (countPages(actualMm, imgMargin_mm) > N && bestW_mm >= 5) {
+        bestW_mm = Math.round((bestW_mm - 0.1) * 10) / 10;
+        imgWidthInput.value = bestW_mm;
+        if (imgWidthNum) imgWidthNum.value = bestW_mm;
+        actualMm = parseFloat(imgWidthInput.value) || bestW_mm;
+      }
+      if (imgWidthNum) imgWidthNum.value = actualMm;
+
+      renderPages();
     }
 
     // --- 导出功能 ---
