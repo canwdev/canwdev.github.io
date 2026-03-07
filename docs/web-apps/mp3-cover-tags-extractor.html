@@ -99,6 +99,22 @@
             box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
         }
 
+        .outline-btn {
+            background: white;
+            color: var(--text);
+            border: 1px solid #cbd5e1;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .outline-btn:hover {
+            background: #f8faff;
+            border-color: #94a3b8;
+        }
+
         /* 列表项 */
         #list {
             margin-top: 20px;
@@ -116,8 +132,8 @@
         }
 
         .item .preview {
-            width: 44px;
-            height: 44px;
+            width: 128px;
+            height: 128px;
             border-radius: 8px;
             background: #f1f5f9;
             margin-right: 15px;
@@ -127,11 +143,13 @@
             justify-content: center;
             font-size: 10px;
             color: var(--sub);
+            flex-shrink: 0;
         }
 
         .item-info {
             flex: 1;
             min-width: 0;
+            padding-right: 15px;
         }
 
         .item-name {
@@ -146,6 +164,28 @@
             font-size: 12px;
             color: var(--primary);
             font-weight: 500;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .item-btn {
+            background: #f1f5f9;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: var(--text);
+            cursor: pointer;
+            transition: 0.2s;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .item-btn:hover {
+            background: #e2e8f0;
         }
 
         @keyframes fadeIn {
@@ -182,7 +222,10 @@
 
         <div class="actions" id="actionsBar">
             <span style="font-weight: 600; font-size: 14px;">待下载文件列表</span>
-            <button class="dl-btn" id="dlBtn">打包下载 ZIP</button>
+            <div style="display: flex; gap: 10px;">
+                <button class="outline-btn" id="clearBtn">清空列表</button>
+                <button class="dl-btn" id="dlBtn">打包下载 ZIP</button>
+            </div>
         </div>
 
         <div id="list"></div>
@@ -195,6 +238,9 @@
         const list = $('list');
         const actionsBar = $('actionsBar');
         const dlBtn = $('dlBtn');
+        const clearBtn = $('clearBtn');
+
+        let currentZip = new JSZip();
 
         dropZone.onclick = () => fileInput.click();
 
@@ -212,21 +258,27 @@
         async function handleFiles(files) {
             if (!files.length) return;
 
-            list.innerHTML = '';
             actionsBar.classList.add('visible');
-            const zip = new JSZip();
 
-            const tasks = Array.from(files).map(file => processFile(file, zip));
+            const tasks = Array.from(files).map(file => processFile(file, currentZip));
             await Promise.all(tasks);
-
-            dlBtn.onclick = async () => {
-                const content = await zip.generateAsync({ type: "blob" });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(content);
-                link.download = `music_meta_export_${Date.now()}.zip`;
-                link.click();
-            };
         }
+
+        dlBtn.onclick = async () => {
+            if (Object.keys(currentZip.files).length === 0) return;
+            const content = await currentZip.generateAsync({ type: "blob" });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(content);
+            link.download = `music_meta_export_${Date.now()}.zip`;
+            link.click();
+        };
+
+        clearBtn.onclick = () => {
+            list.innerHTML = '';
+            currentZip = new JSZip();
+            actionsBar.classList.remove('visible');
+            fileInput.value = '';
+        };
 
         function processFile(file, zip) {
             return new Promise((resolve) => {
@@ -242,10 +294,16 @@
                         const cleanMeta = { ...tags };
                         delete cleanMeta.picture; // 关键：移除封面对象
                         delete cleanMeta.APIC; // 关键：移除封面对象
-                        zip.file(`${baseName}.json`, JSON.stringify(cleanMeta, null, 4));
+                        const jsonString = JSON.stringify(cleanMeta, null, 4);
+                        zip.file(`${baseName}.json`, jsonString);
+
+                        const jsonBlob = new Blob([jsonString], { type: "application/json" });
+                        const jsonUrl = URL.createObjectURL(jsonBlob);
 
                         // --- 2. 封面提取逻辑 ---
                         let coverDataUrl = null;
+                        let coverBlobUrl = null;
+                        let coverExt = 'jpg';
                         if (tags.picture) {
                             const { data, format } = tags.picture;
                             const uint8Array = new Uint8Array(data);
@@ -257,11 +315,19 @@
                             coverDataUrl = `data:${format};base64,${base64}`;
 
                             // 同时也保存一份原始图片文件在 ZIP 里方便直观查看
-                            const ext = format.split('/')[1] || 'jpg';
-                            zip.file(`${baseName}-cover.${ext}`, uint8Array);
+                            coverExt = format.split('/')[1] || 'jpg';
+                            zip.file(`${baseName}-cover.${coverExt}`, uint8Array);
+
+                            const coverBlob = new Blob([uint8Array], { type: format });
+                            coverBlobUrl = URL.createObjectURL(coverBlob);
                         }
 
-                        updateUI(itemUI, "处理成功", coverDataUrl);
+                        updateUI(itemUI, "处理成功", coverDataUrl, false, {
+                            jsonUrl: jsonUrl,
+                            coverUrl: coverBlobUrl,
+                            baseName: baseName,
+                            coverExt: coverExt
+                        });
                         resolve();
                     },
                     onError: (err) => {
@@ -281,13 +347,16 @@
                 <div class="item-name">${name}</div>
                 <div class="item-status">解析中...</div>
             </div>
+            <div class="item-actions"></div>
         `;
             return div;
         }
 
-        function updateUI(el, status, coverUrl, isError = false) {
+        function updateUI(el, status, coverUrl, isError = false, downloadData = null) {
             const statusEl = el.querySelector('.item-status');
             const previewEl = el.querySelector('.preview');
+            const actionsEl = el.querySelector('.item-actions');
+
             statusEl.innerText = status;
             if (isError) statusEl.style.color = '#f43f5e';
             else statusEl.style.color = '#10b981';
@@ -296,6 +365,14 @@
                 previewEl.innerHTML = `<img src="${coverUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">`;
             } else {
                 previewEl.innerText = '无封面';
+            }
+
+            if (downloadData && !isError) {
+                let html = `<a class="item-btn" href="${downloadData.jsonUrl}" download="${downloadData.baseName}.json">JSON</a>`;
+                if (downloadData.coverUrl) {
+                    html += `<a class="item-btn" href="${downloadData.coverUrl}" download="${downloadData.baseName}-cover.${downloadData.coverExt}">封面</a>`;
+                }
+                actionsEl.innerHTML = html;
             }
         }
     </script>
