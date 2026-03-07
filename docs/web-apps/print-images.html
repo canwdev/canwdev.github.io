@@ -411,6 +411,53 @@
 
     let uploadedImages = [];
 
+    // --- 配置保存与读取 ---
+    const configKeys = [
+      'paper-size', 'page-padding', 'img-margin', 'img-width',
+      'auto-fit-pages', 'img-copies', 'border-color',
+      'border-opacity', 'border-weight', 'transparent-stroke'
+    ];
+
+    function saveConfig() {
+      const config = {};
+      configKeys.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          config[id] = el.type === 'checkbox' ? el.checked : el.value;
+        }
+      });
+      localStorage.setItem('print-images-config', JSON.stringify(config));
+    }
+
+    function loadConfig() {
+      const savedConfig = localStorage.getItem('print-images-config');
+      if (savedConfig) {
+        try {
+          const config = JSON.parse(savedConfig);
+          configKeys.forEach(id => {
+            if (config[id] !== undefined) {
+              const el = document.getElementById(id);
+              if (el) {
+                if (el.type === 'checkbox') {
+                  el.checked = config[id];
+                } else {
+                  el.value = config[id];
+                }
+              }
+            }
+          });
+          if (config['border-color']) {
+            colorHexDisplay.innerText = config['border-color'].toUpperCase();
+          }
+        } catch (e) {
+          console.error("加载配置失败", e);
+        }
+      }
+    }
+
+    // 初始化读取配置
+    loadConfig();
+
     // --- 初始化与事件监听 ---
 
     // 节流/防抖机制 (修改参数后300ms自动重新生成)
@@ -447,12 +494,34 @@
       sync();
     });
 
-    // 上传区域事件
+    // 上传区域事件 (修改为全视口拖拽)
     dropZone.onclick = () => fileInput.click();
     fileInput.onchange = (e) => handleFiles(e.target.files);
-    dropZone.ondragover = (e) => { e.preventDefault(); dropZone.classList.add('hover'); };
-    dropZone.ondragleave = () => dropZone.classList.remove('hover');
-    dropZone.ondrop = (e) => { e.preventDefault(); dropZone.classList.remove('hover'); handleFiles(e.dataTransfer.files); };
+
+    let dragCounter = 0;
+    document.addEventListener('dragenter', (e) => {
+      e.preventDefault();
+      dragCounter++;
+      dropZone.classList.add('hover');
+    });
+    document.addEventListener('dragleave', (e) => {
+      e.preventDefault();
+      dragCounter--;
+      if (dragCounter === 0) {
+        dropZone.classList.remove('hover');
+      }
+    });
+    document.addEventListener('dragover', (e) => {
+      e.preventDefault();
+    });
+    document.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dragCounter = 0;
+      dropZone.classList.remove('hover');
+      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        handleFiles(e.dataTransfer.files);
+      }
+    });
 
 
     // 处理文件输入
@@ -491,6 +560,7 @@
 
     // --- 核心渲染与布局逻辑 (修复边框) ---
     function renderPages() {
+      saveConfig();
       previewContainer.innerHTML = '';
       if (uploadedImages.length === 0) return;
 
