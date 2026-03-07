@@ -83,8 +83,16 @@
       align-items: center;
       gap: 6px;
     }
-    .range-with-num input[type="range"] { flex: 1; min-width: 0; }
-    .range-with-num input[type="number"] { width: 5.2em; flex-shrink: 0; }
+
+    .range-with-num input[type="range"] {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .range-with-num input[type="number"] {
+      width: 5.2em;
+      flex-shrink: 0;
+    }
 
     /* 颜色选择器样式 */
     .color-picker-wrapper {
@@ -332,10 +340,17 @@
 
         <div class="range-with-num">
           <input type="number" id="auto-fit-pages" value="1" min="1" step="1" style="flex: 1;">
-          <button class="btn-main" onclick="autoFit()" style="width: 150px;" >适应宽度</button>
+          <button class="btn-main" onclick="autoFit()" style="width: 150px;">适应宽度</button>
         </div>
       </div>
 
+      <div class="control-group">
+        <label>每张图片复制份数</label>
+        <div class="range-with-num">
+          <input type="range" id="img-copies" value="1" min="1" max="200" step="1">
+          <input type="number" min="1" max="200" step="1" value="1">
+        </div>
+      </div>
 
       <div style="border-top:1px solid #e2e8f0; margin: 12px 0;"></div>
 
@@ -514,96 +529,100 @@
       let cursorY = pagePadding;
       let rowMaxHeight = 0; // 记录当前行中最高图片的高度，用于换行计算
 
-      // 4. 迭代图片进行绘制
+      // 4. 获取复制份数并迭代图片进行绘制
+      const imgCopies = parseInt(document.getElementById('img-copies').value) || 1;
+
       uploadedImages.forEach((img) => {
         // 计算图片缩放后的高度（保持原始比例）
         const ratio = img.height / img.width;
         const targetH = Math.round(targetW * ratio);
 
-        // --- 布局检查 ---
+        for (let c = 0; c < imgCopies; c++) {
+          // --- 布局检查 ---
 
-        // A. 换行检查：当前 X + 图片宽 > (纸宽 - 右边距)
-        if (cursorX + targetW > canvasW - pagePadding) {
-          cursorX = pagePadding; // 回到左侧
-          cursorY += rowMaxHeight + imgMargin; // 下移一行
-          rowMaxHeight = 0; // 重置行最高
-        }
-
-        // B. 分页检查：当前 Y + 图片高 > (纸高 - 下边距)
-        // 注意：这里使用了一个阈值(1px)防止因浮点数误差导致的意外分页
-        if (cursorY + targetH > canvasH - pagePadding + 1) {
-          // 创建新页面
-          ({ canvas, ctx } = createNewPageCanvas(canvasW, canvasH));
-          cursorX = pagePadding;
-          cursorY = pagePadding;
-          rowMaxHeight = 0;
-        }
-
-        // --- 核心绘制部分 (已修复) ---
-
-        if (bWeight > 0 && useTransparentStroke) {
-          // 透明图片沿内容边缘描边
-          const offCanvas = document.createElement('canvas');
-          offCanvas.width = targetW;
-          offCanvas.height = targetH;
-          const offCtx = offCanvas.getContext('2d');
-          offCtx.drawImage(img, 0, 0, targetW, targetH);
-          offCtx.globalCompositeOperation = 'source-in';
-          offCtx.fillStyle = borderColor;
-          offCtx.fillRect(0, 0, targetW, targetH);
-
-          // 为了防止多次描边叠加使半透明变回不透明，我们创建一层描边专属画布
-          const strokeCanvas = document.createElement('canvas');
-          strokeCanvas.width = targetW + bWeight * 2;
-          strokeCanvas.height = targetH + bWeight * 2;
-          const strokeCtx = strokeCanvas.getContext('2d');
-
-          // 通过多角度偏移绘制剪影，形成描边效果
-          const steps = 36; // 增加步数使边缘更平滑
-          for (let i = 0; i < steps; i++) {
-            const angle = (i * Math.PI * 2) / steps;
-            const dx = Math.cos(angle) * bWeight;
-            const dy = Math.sin(angle) * bWeight;
-            strokeCtx.drawImage(offCanvas, bWeight + dx, bWeight + dy);
+          // A. 换行检查：当前 X + 图片宽 > (纸宽 - 右边距)
+          if (cursorX + targetW > canvasW - pagePadding) {
+            cursorX = pagePadding; // 回到左侧
+            cursorY += rowMaxHeight + imgMargin; // 下移一行
+            rowMaxHeight = 0; // 重置行最高
           }
 
-          // 一次性应用透明度并绘制到主画布上
-          ctx.save();
-          ctx.globalAlpha = borderOpacity;
-          ctx.drawImage(strokeCanvas, cursorX - bWeight, cursorY - bWeight);
-          ctx.restore();
+          // B. 分页检查：当前 Y + 图片高 > (纸高 - 下边距)
+          // 注意：这里使用了一个阈值(1px)防止因浮点数误差导致的意外分页
+          if (cursorY + targetH > canvasH - pagePadding + 1) {
+            // 创建新页面
+            ({ canvas, ctx } = createNewPageCanvas(canvasW, canvasH));
+            cursorX = pagePadding;
+            cursorY = pagePadding;
+            rowMaxHeight = 0;
+          }
 
-          // 在描边上方绘制原图
-          ctx.drawImage(img, cursorX, cursorY, targetW, targetH);
+          // --- 核心绘制部分 (已修复) ---
 
-        } else {
-          // 原常规逻辑：矩形外框
-          // 1. 绘制图片主体
-          ctx.drawImage(img, cursorX, cursorY, targetW, targetH);
+          if (bWeight > 0 && useTransparentStroke) {
+            // 透明图片沿内容边缘描边
+            const offCanvas = document.createElement('canvas');
+            offCanvas.width = targetW;
+            offCanvas.height = targetH;
+            const offCtx = offCanvas.getContext('2d');
+            offCtx.drawImage(img, 0, 0, targetW, targetH);
+            offCtx.globalCompositeOperation = 'source-in';
+            offCtx.fillStyle = borderColor;
+            offCtx.fillRect(0, 0, targetW, targetH);
 
-          // 2. 绘制矩形边框 (使用原生 Stroke API)
-          if (bWeight > 0) {
+            // 为了防止多次描边叠加使半透明变回不透明，我们创建一层描边专属画布
+            const strokeCanvas = document.createElement('canvas');
+            strokeCanvas.width = targetW + bWeight * 2;
+            strokeCanvas.height = targetH + bWeight * 2;
+            const strokeCtx = strokeCanvas.getContext('2d');
+
+            // 通过多角度偏移绘制剪影，形成描边效果
+            const steps = 36; // 增加步数使边缘更平滑
+            for (let i = 0; i < steps; i++) {
+              const angle = (i * Math.PI * 2) / steps;
+              const dx = Math.cos(angle) * bWeight;
+              const dy = Math.sin(angle) * bWeight;
+              strokeCtx.drawImage(offCanvas, bWeight + dx, bWeight + dy);
+            }
+
+            // 一次性应用透明度并绘制到主画布上
             ctx.save();
             ctx.globalAlpha = borderOpacity;
-            ctx.lineWidth = bWeight;
-            ctx.strokeStyle = borderColor;
-
-            // Canvas 的 stroke 是居中描边。为了不改变图片尺寸，
-            // 我们需要将描边路径向内偏移线宽的一半，实现"内描边"效果。
-            const halfBW = bWeight / 2;
-            ctx.strokeRect(
-              cursorX + halfBW,
-              cursorY + halfBW,
-              targetW - bWeight,
-              targetH - bWeight
-            );
+            ctx.drawImage(strokeCanvas, cursorX - bWeight, cursorY - bWeight);
             ctx.restore();
-          }
-        }
 
-        // --- 更新游标 ---
-        rowMaxHeight = Math.max(rowMaxHeight, targetH);
-        cursorX += targetW + imgMargin; // X 游标右移，准备绘制下一张
+            // 在描边上方绘制原图
+            ctx.drawImage(img, cursorX, cursorY, targetW, targetH);
+
+          } else {
+            // 原常规逻辑：矩形外框
+            // 1. 绘制图片主体
+            ctx.drawImage(img, cursorX, cursorY, targetW, targetH);
+
+            // 2. 绘制矩形边框 (使用原生 Stroke API)
+            if (bWeight > 0) {
+              ctx.save();
+              ctx.globalAlpha = borderOpacity;
+              ctx.lineWidth = bWeight;
+              ctx.strokeStyle = borderColor;
+
+              // Canvas 的 stroke 是居中描边。为了不改变图片尺寸，
+              // 我们需要将描边路径向内偏移线宽的一半，实现"内描边"效果。
+              const halfBW = bWeight / 2;
+              ctx.strokeRect(
+                cursorX + halfBW,
+                cursorY + halfBW,
+                targetW - bWeight,
+                targetH - bWeight
+              );
+              ctx.restore();
+            }
+          }
+
+          // --- 更新游标 ---
+          rowMaxHeight = Math.max(rowMaxHeight, targetH);
+          cursorX += targetW + imgMargin; // X 游标右移，准备绘制下一张
+        }
       });
 
       // 内部函数：创建 Canvas 并添加到 DOM
@@ -668,22 +687,26 @@
         let cursorY = pagePadding;
         let rowMaxHeight = 0;
         let pageCount = 1;
+        const imgCopies = parseInt(document.getElementById('img-copies').value) || 1;
+
         for (const img of uploadedImages) {
           const ratio = img.height / img.width;
           const targetH = Math.round(targetW * ratio);
-          if (cursorX + targetW > canvasW - pagePadding) {
-            cursorX = pagePadding;
-            cursorY += rowMaxHeight + imgMargin;
-            rowMaxHeight = 0;
+          for (let c = 0; c < imgCopies; c++) {
+            if (cursorX + targetW > canvasW - pagePadding) {
+              cursorX = pagePadding;
+              cursorY += rowMaxHeight + imgMargin;
+              rowMaxHeight = 0;
+            }
+            if (cursorY + targetH > canvasH - pagePadding + 1) {
+              pageCount++;
+              cursorX = pagePadding;
+              cursorY = pagePadding;
+              rowMaxHeight = 0;
+            }
+            rowMaxHeight = Math.max(rowMaxHeight, targetH);
+            cursorX += targetW + imgMargin;
           }
-          if (cursorY + targetH > canvasH - pagePadding + 1) {
-            pageCount++;
-            cursorX = pagePadding;
-            cursorY = pagePadding;
-            rowMaxHeight = 0;
-          }
-          rowMaxHeight = Math.max(rowMaxHeight, targetH);
-          cursorX += targetW + imgMargin;
         }
         return pageCount;
       }
