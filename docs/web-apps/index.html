@@ -8,6 +8,99 @@
   <meta name="theme-color" content="#3498db">
   <link rel="icon" type="image/png" href="favicon.png" />
   <title>网页工具合集</title>
+
+  <script>
+    // 工具数据数组
+    const toolsData = [
+      {
+        name: "MP3 封面提取工具",
+        description: "用于提取音频文件的封面和元数据",
+        url: "mp3-cover-tags-extractor.html",
+        icon: "🎵",
+      },
+      {
+        name: "图片拼版工具",
+        description: "用于打印贴纸",
+        url: "print-images.html",
+        icon: "🌅",
+      },
+      {
+        name: "歌词排版工具",
+        description: "用于打印歌词",
+        url: "print-lyrics.html",
+        icon: "📖",
+      },
+      {
+        name: "电池快速放电工具",
+        description: "毒蘑菇性能测试",
+        url: "battery-dmg.html",
+        icon: "🔋",
+      },
+      {
+        name: "Always On Screen",
+        description: "屏幕常亮看板",
+        url: "https://canwdev.github.io/always-on-screen",
+        icon: "💡",
+        source: "https://github.com/canwdev/always-on-screen",
+      },
+      {
+        name: "Fire Calc",
+        description: "提前退休计算器",
+        url: "fire-calc.html",
+        icon: "🔥",
+        source: "https://github.com/canwdev/fire-calc",
+      },
+      {
+        name: "CSS Grid Calc",
+        description: "CSS Grid 栅格配置可视化分析器",
+        url: "grid-calc.html",
+        icon: "📐",
+      },
+      {
+        name: "二维码工具",
+        description: "生成/扫描二维码",
+        url: "qr.html",
+        icon: "🔑",
+      },
+      {
+        name: "Web MediaDevices Player",
+        description: "网页版 HDMI 采集卡",
+        url: "https://canwdev.github.io/web-mediadevices-player/",
+        icon: "📺",
+        source: "https://github.com/canwdev/web-mediadevices-player",
+      },
+      {
+        name: "PageCraft",
+        description: "网页开发效率工具",
+        url: "https://canwdev.github.io/page-craft-vite/index.html",
+        icon: "🛠️",
+        source: "https://github.com/canwdev/page-craft-vite",
+      },
+      {
+        name: "GarageBand Piano JS",
+        description: "网页版钢琴",
+        url: "https://canwdev.github.io/garageband-piano-js/",
+        icon: "🎹",
+        source: "https://github.com/canwdev/garageband-piano-js",
+      },
+      {
+        name: "AST i18n Extractor",
+        description: "基于 AST 从代码中提取国际化字符串",
+        url: "https://canwdev.github.io/ast-i18n-extractor/",
+        icon: "🌐",
+        source: "https://canwdev.github.io/ast-i18n-extractor/",
+      }
+      // {
+      //   name: "三体运动模拟",
+      //   description: "来自 Less Bug",
+      //   url: "3b.html",
+      //   icon: "🌌",
+      //   source: "https://www.less-bug.com/",
+      // },
+    ];
+
+  </script>
+
   <style>
     /* 全局样式 */
     * {
@@ -172,88 +265,6 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      // 工具数据数组
-      const toolsData = [
-        {
-          name: "图片拼版工具",
-          description: "用于打印贴纸",
-          url: "print-images.html",
-          icon: "🌅",
-        },
-        {
-          name: "歌词排版工具",
-          description: "用于打印歌词",
-          url: "print-lyrics.html",
-          icon: "📖",
-        },
-        {
-          name: "电池快速放电工具",
-          description: "毒蘑菇性能测试",
-          url: "battery-dmg.html",
-          icon: "🔋",
-        },
-        {
-          name: "Always On Screen",
-          description: "屏幕常亮看板",
-          url: "https://canwdev.github.io/always-on-screen",
-          icon: "💡",
-          source: "https://github.com/canwdev/always-on-screen",
-        },
-        {
-          name: "Fire Calc",
-          description: "提前退休计算器",
-          url: "fire-calc.html",
-          icon: "🔥",
-          source: "https://github.com/canwdev/fire-calc",
-        },
-        {
-          name: "CSS Grid Calc",
-          description: "CSS Grid 栅格配置可视化分析器",
-          url: "grid-calc.html",
-          icon: "📐",
-        },
-        {
-          name: "二维码工具",
-          description: "生成/扫描二维码",
-          url: "qr.html",
-          icon: "🔑",
-        },
-        {
-          name: "Web MediaDevices Player",
-          description: "网页版 HDMI 采集卡",
-          url: "https://canwdev.github.io/web-mediadevices-player/",
-          icon: "📺",
-          source: "https://github.com/canwdev/web-mediadevices-player",
-        },
-        {
-          name: "PageCraft",
-          description: "网页开发效率工具",
-          url: "https://canwdev.github.io/page-craft-vite/index.html",
-          icon: "🛠️",
-          source: "https://github.com/canwdev/page-craft-vite",
-        },
-        {
-          name: "GarageBand Piano JS",
-          description: "网页版钢琴",
-          url: "https://canwdev.github.io/garageband-piano-js/",
-          icon: "🎹",
-          source: "https://github.com/canwdev/garageband-piano-js",
-        },
-        {
-          name: "AST i18n Extractor",
-          description: "基于 AST 从代码中提取国际化字符串",
-          url: "https://canwdev.github.io/ast-i18n-extractor/",
-          icon: "🌐",
-          source: "https://canwdev.github.io/ast-i18n-extractor/",
-        }
-        // {
-        //   name: "三体运动模拟",
-        //   description: "来自 Less Bug",
-        //   url: "3b.html",
-        //   icon: "🌌",
-        //   source: "https://www.less-bug.com/",
-        // },
-      ];
 
       const toolsGrid = document.getElementById("toolsGrid");
 
