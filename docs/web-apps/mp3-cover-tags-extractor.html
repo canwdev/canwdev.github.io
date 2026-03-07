@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Meta Extractor - Clean Data</title>
+    <meta name="description" content="提取 MP3 文件的封面和元数据，批量提取元数据与封面 · 纯净 JSON 导出">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --bg: #fcfcfd;
+            --card: #ffffff;
+            --text: #1e293b;
+            --sub: #94a3b8;
+            --border: #f1f5f9;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 40px 20px;
+            line-height: 1.5;
+        }
+
+        .wrapper {
+            max-width: 720px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+        }
+
+        p.desc {
+            color: var(--sub);
+            font-size: 0.95rem;
+        }
+
+        /* 交互区 */
+        .drop-zone {
+            background: var(--card);
+            border: 2px dashed #cbd5e1;
+            border-radius: 16px;
+            padding: 50px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .drop-zone:hover {
+            border-color: var(--primary);
+            background: #f8faff;
+        }
+
+        .drop-zone.active {
+            border-color: var(--primary);
+            background: #eef2ff;
+            transform: scale(0.99);
+        }
+
+        .drop-zone b {
+            color: var(--primary);
+        }
+
+        /* 处理按钮 */
+        .actions {
+            margin-top: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            opacity: 0;
+            transition: 0.3s;
+        }
+
+        .actions.visible {
+            opacity: 1;
+        }
+
+        .dl-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+        }
+
+        /* 列表项 */
+        #list {
+            margin-top: 20px;
+        }
+
+        .item {
+            background: var(--card);
+            margin-bottom: 10px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--border);
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        .item .preview {
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            background: #f1f5f9;
+            margin-right: 15px;
+            object-fit: cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: var(--sub);
+        }
+
+        .item-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .item-name {
+            font-size: 14px;
+            font-weight: 600;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .item-status {
+            font-size: 12px;
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="wrapper">
+        <header>
+            <h1>Music Meta Extractor</h1>
+            <p class="desc">批量提取元数据与封面 · 纯净 JSON 导出</p>
+        </header>
+
+        <div class="drop-zone" id="dropZone">
+            <div style="font-size: 32px; margin-bottom: 10px;">📦</div>
+            <p>将音乐文件拖入此处，或 <b>点击选择</b></p>
+            <input type="file" id="fileInput" multiple accept="audio/*">
+        </div>
+
+        <div class="actions" id="actionsBar">
+            <span style="font-weight: 600; font-size: 14px;">待下载文件列表</span>
+            <button class="dl-btn" id="dlBtn">打包下载 ZIP</button>
+        </div>
+
+        <div id="list"></div>
+    </div>
+
+    <script>
+        const $ = id => document.getElementById(id);
+        const dropZone = $('dropZone');
+        const fileInput = $('fileInput');
+        const list = $('list');
+        const actionsBar = $('actionsBar');
+        const dlBtn = $('dlBtn');
+
+        dropZone.onclick = () => fileInput.click();
+
+        // 拖拽逻辑
+        ['dragover', 'dragenter'].forEach(e => {
+            dropZone.addEventListener(e, (ev) => { ev.preventDefault(); dropZone.classList.add('active'); });
+        });
+        ['dragleave', 'drop'].forEach(e => {
+            dropZone.addEventListener(e, (ev) => { ev.preventDefault(); dropZone.classList.remove('active'); });
+        });
+
+        fileInput.onchange = e => handleFiles(e.target.files);
+        dropZone.ondrop = e => handleFiles(e.dataTransfer.files);
+
+        async function handleFiles(files) {
+            if (!files.length) return;
+
+            list.innerHTML = '';
+            actionsBar.classList.add('visible');
+            const zip = new JSZip();
+
+            const tasks = Array.from(files).map(file => processFile(file, zip));
+            await Promise.all(tasks);
+
+            dlBtn.onclick = async () => {
+                const content = await zip.generateAsync({ type: "blob" });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(content);
+                link.download = `music_meta_export_${Date.now()}.zip`;
+                link.click();
+            };
+        }
+
+        function processFile(file, zip) {
+            return new Promise((resolve) => {
+                const baseName = file.name.replace(/\.[^/.]+$/, "");
+                const itemUI = createUI(file.name);
+                list.appendChild(itemUI);
+
+                window.jsmediatags.read(file, {
+                    onSuccess: (tag) => {
+                        const { tags } = tag;
+
+                        // --- 1. 纯净元数据 JSON (不含 picture) ---
+                        const cleanMeta = { ...tags };
+                        delete cleanMeta.picture; // 关键：移除封面对象
+                        delete cleanMeta.APIC; // 关键：移除封面对象
+                        zip.file(`${baseName}.json`, JSON.stringify(cleanMeta, null, 4));
+
+                        // --- 2. 封面提取逻辑 ---
+                        let coverDataUrl = null;
+                        if (tags.picture) {
+                            const { data, format } = tags.picture;
+                            const uint8Array = new Uint8Array(data);
+
+                            // 转换为 Base64 供预览和 cover.json 使用
+                            let binary = '';
+                            uint8Array.forEach(b => binary += String.fromCharCode(b));
+                            const base64 = btoa(binary);
+                            coverDataUrl = `data:${format};base64,${base64}`;
+
+                            // 同时也保存一份原始图片文件在 ZIP 里方便直观查看
+                            const ext = format.split('/')[1] || 'jpg';
+                            zip.file(`${baseName}-cover.${ext}`, uint8Array);
+                        }
+
+                        updateUI(itemUI, "处理成功", coverDataUrl);
+                        resolve();
+                    },
+                    onError: (err) => {
+                        updateUI(itemUI, "提取失败", null, true);
+                        resolve();
+                    }
+                });
+            });
+        }
+
+        function createUI(name) {
+            const div = document.createElement('div');
+            div.className = 'item';
+            div.innerHTML = `
+            <div class="preview">...</div>
+            <div class="item-info">
+                <div class="item-name">${name}</div>
+                <div class="item-status">解析中...</div>
+            </div>
+        `;
+            return div;
+        }
+
+        function updateUI(el, status, coverUrl, isError = false) {
+            const statusEl = el.querySelector('.item-status');
+            const previewEl = el.querySelector('.preview');
+            statusEl.innerText = status;
+            if (isError) statusEl.style.color = '#f43f5e';
+            else statusEl.style.color = '#10b981';
+
+            if (coverUrl) {
+                previewEl.innerHTML = `<img src="${coverUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">`;
+            } else {
+                previewEl.innerText = '无封面';
+            }
+        }
+    </script>
+
+</body>
+
+</html>
