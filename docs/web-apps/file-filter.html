@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <title>文件递归搜索器</title>
+  <meta name="description"
+    content="无需上传服务器，基于现代浏览器 File System Access API 实现。支持通过文件名列表，在本地文件夹中深度递归搜索目标文件，并支持一键精准提取与批量导出至新文件夹。">
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+      line-height: 1.6;
+      color: #1e293b;
+      background: #f1f5f9;
+    }
+
+    .card {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    }
+
+    h2 {
+      margin-top: 0;
+      color: #0f172a;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 0.5rem;
+    }
+
+    .header-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 0.5rem;
+    }
+
+    label {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    textarea {
+      width: 100%;
+      height: 180px;
+      margin-bottom: 1rem;
+      padding: 0.75rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-family: monospace;
+      box-sizing: border-box;
+      resize: vertical;
+    }
+
+    .options {
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      color: #475569;
+    }
+
+    .options input {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 0.6rem 1.2rem;
+      cursor: pointer;
+      border: none;
+      border-radius: 6px;
+      font-weight: 500;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .btn-blue {
+      background: #2563eb;
+      color: white;
+    }
+
+    .btn-blue:hover {
+      background: #1d4ed8;
+    }
+
+    .btn-gray {
+      background: #64748b;
+      color: white;
+    }
+
+    .btn-gray:hover {
+      background: #475569;
+    }
+
+    .btn-success {
+      background: #10b981;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #059669;
+    }
+
+    button:disabled {
+      background: #cbd5e1;
+      cursor: not-allowed;
+      color: #64748b;
+    }
+
+    #log {
+      background: #f8fafc;
+      padding: 1rem;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      margin-bottom: 1rem;
+      font-size: 0.85rem;
+      color: #475569;
+      min-height: 24px;
+    }
+
+    .result-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem;
+      background: white;
+      border: 1px solid #e2e8f0;
+      margin-bottom: 0.5rem;
+      border-radius: 6px;
+    }
+
+    .path-text {
+      font-size: 0.8rem;
+      color: #64748b;
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="card">
+    <h2>文件递归搜索器</h2>
+
+    <div class="header-actions">
+      <label>搜索列表 (每行一个文件名):</label>
+      <button id="importNames" class="btn-gray" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">
+        📂 获取文件名
+      </button>
+    </div>
+
+    <textarea id="fileList" placeholder="example.txt&#10;my_folder&#10;数据.xlsx"></textarea>
+
+    <div class="options">
+      <input type="checkbox" id="ignoreCase" checked>
+      <label for="ignoreCase">忽略大小写 (Ignore Case)</label>
+    </div>
+
+    <div class="controls">
+      <button id="selectDir" class="btn-blue">1. 指定搜索根目录</button>
+      <button id="searchBtn" class="btn-blue" disabled>2. 开始搜索</button>
+      <button id="downloadAll" class="btn-success" style="display:none">批量导出文件</button>
+    </div>
+
+    <div id="log">就绪。请先选择文件夹或导入名称。</div>
+    <div id="results"></div>
+  </div>
+
+  <script>
+    let rootHandle = null;
+    let matchedFiles = [];
+
+    const dom = {
+      importBtn: document.getElementById('importNames'),
+      selectDirBtn: document.getElementById('selectDir'),
+      searchBtn: document.getElementById('searchBtn'),
+      downloadAllBtn: document.getElementById('downloadAll'),
+      fileList: document.getElementById('fileList'),
+      ignoreCase: document.getElementById('ignoreCase'),
+      log: document.getElementById('log'),
+      results: document.getElementById('results')
+    };
+
+    const setLog = (msg) => dom.log.innerText = msg;
+
+    // 1. 递归提取名称
+    dom.importBtn.onclick = async () => {
+      try {
+        const dirHandle = await window.showDirectoryPicker();
+        setLog(`正在提取名称...`);
+        const names = [];
+        async function scan(handle) {
+          for await (const entry of handle.values()) {
+            names.push(entry.name);
+            if (entry.kind === 'directory') await scan(entry);
+          }
+        }
+        await scan(dirHandle);
+        dom.fileList.value = [...new Set(names)].join('\n');
+        setLog(`提取完成！共获取 ${names.length} 个名称。`);
+      } catch (err) {
+        if (err.name !== 'AbortError') setLog("错误: " + err.message);
+      }
+    };
+
+    // 2. 选择搜索目录
+    dom.selectDirBtn.onclick = async () => {
+      try {
+        rootHandle = await window.showDirectoryPicker();
+        setLog(`已锁定目录: ${rootHandle.name}`);
+        dom.searchBtn.disabled = false;
+      } catch (err) {
+        if (err.name !== 'AbortError') console.error(err);
+      }
+    };
+
+    // 3. 递归搜索逻辑
+    async function recursiveSearch(dirHandle, targets, isIgnoreCase, currentPath = "") {
+      for await (const entry of dirHandle.values()) {
+        const fullPath = `${currentPath}/${entry.name}`;
+
+        // 匹配逻辑：如果是忽略大小写，则全部转小写比较
+        const checkName = isIgnoreCase ? entry.name.toLowerCase() : entry.name;
+
+        if (targets.has(checkName)) {
+          matchedFiles.push({
+            name: entry.name,
+            path: fullPath,
+            handle: entry,
+            kind: entry.kind
+          });
+        }
+
+        if (entry.kind === 'directory') {
+          await recursiveSearch(entry, targets, isIgnoreCase, fullPath);
+        }
+      }
+    }
+
+    // 4. 执行搜索
+    dom.searchBtn.onclick = async () => {
+      const isIgnoreCase = dom.ignoreCase.checked;
+      let input = dom.fileList.value.split('\n').map(v => v.trim()).filter(v => v);
+
+      if (input.length === 0) return alert("请输入待查找的文件名");
+
+      // 如果忽略大小写，则将搜索目标集合全部转为小写
+      const targetSet = new Set(isIgnoreCase ? input.map(v => v.toLowerCase()) : input);
+
+      matchedFiles = [];
+      dom.results.innerHTML = "";
+      setLog("搜索中...");
+
+      await recursiveSearch(rootHandle, targetSet, isIgnoreCase);
+
+      setLog(`匹配完成：找到 ${matchedFiles.length} 个项目。`);
+      if (matchedFiles.length > 0) {
+        dom.downloadAllBtn.style.display = 'inline-flex';
+        renderResults();
+      }
+    };
+
+    function renderResults() {
+      matchedFiles.forEach((file, index) => {
+        const div = document.createElement('div');
+        div.className = 'result-item';
+        div.innerHTML = `
+                <div style="flex: 1; min-width: 0;">
+                    <strong>${file.kind === 'directory' ? '📁' : '📄'} ${file.name}</strong>
+                    <span class="path-text" title="${file.path}">${file.path}</span>
+                </div>
+                ${file.kind === 'file' ? `<button class="btn-gray" onclick="downloadSingle(${index})" style="font-size:0.7rem; flex-shrink:0; margin-left:10px;">下载</button>` : ''}
+            `;
+        dom.results.appendChild(div);
+      });
+    }
+
+    window.downloadSingle = async (index) => {
+      const { handle, name } = matchedFiles[index];
+      const file = await handle.getFile();
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(file);
+      a.download = name;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    };
+
+    // 5. 批量写入
+    dom.downloadAllBtn.onclick = async () => {
+      try {
+        const targetDirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+        setLog("正在写入文件...");
+        let count = 0;
+        for (const item of matchedFiles) {
+          if (item.kind === 'file') {
+            const file = await item.handle.getFile();
+            const newFileHandle = await targetDirHandle.getFileHandle(item.name, { create: true });
+            const writable = await newFileHandle.createWritable();
+            await writable.write(file);
+            await writable.close();
+            count++;
+          }
+        }
+        setLog(`写入成功：已将 ${count} 个文件保存至 ${targetDirHandle.name}`);
+      } catch (err) {
+        if (err.name !== 'AbortError') setLog("导出失败: " + err.message);
+      }
+    };
+  </script>
+</body>
+
+</html>
