@@ -7,6 +7,7 @@
 ## 最近更新
 
 - Linux
+  - [[Arch Linux Btrfs 迁移指南]]
   - [[Comparison]]
   - [[Debian]]
   - [[基于 Docker 制作一个 Debian+Xfce4+KasmVNC 容器]]
@@ -18,6 +19,7 @@
   - [[一加 6T 刷 Win11ARM 指南]]
   - [[Windows 设备如何在使用 Android 手机 USB 共享上网的情况下，在局域网进行远程桌面连接(RDP)]]
 - Windows 配置
+  - [[在vhdx虚拟磁盘上安装Windows]]
   - [[Windows 通过 New-NetNat 给其他网卡共享网络]]
   - [[Windows 更新的相关设置]]
   - [[Win11 修改]]
