@@ -42,43 +42,7 @@ sudo dpkg -i iptsd_0.1-1_amd64.deb
 
 ## 2. 安装 Arch Linux / Manjaro
 
-### 2.1 手动下载
-
-在 [这里](https://pkg.surfacelinux.com/arch/) 可以直接下载 `zst` 文件，下载前需去除 `.blob` 后缀，如：`https://pkg.surfacelinux.com/arch/iptsd-0.1-1-x86_64.pkg.tar.zst`
-
-需要下载这些包：
-
-```
-linux-surface-headers linux-surface surface-ipts-firmware iptsd
-```
-
-### 2.2 安装
-
-如果直接安装，可能会提示签名错误，此时需要修改配置：`sudo vim /etc/pacman.conf`
-
-```
-# SigLevel = Required DatabaseOptional
-SigLevel = Never
-# LocalFileSigLevel = Optional
-LocalFileSigLevel = Never
-```
-
-然后就可以直接安装了：
-
-```sh
-# 内核
-sudo pacman -U linux-surface-5.8.5.arch1-1-x86_64.pkg.tar.zst \
-	linux-surface-headers-5.8.5.arch1-1-x86_64.pkg.tar.zst
-
-# 驱动程序
-sudo pacman -U surface-ipts-firmware-20200402-1-any.pkg.tar.zst \
-	iptsd-0.1-1-x86_64.pkg.tar.zst
-	
-# 额外的软件，来自 AUR，如果你装了 yay
-# 可能需要开启代理才能下载成功
-export ALL_PROXY=socks5://proxyAddress:port
-yay -S libwacom-surface surface-dtx-daemon surface-control
-```
+[[Archlinux 安装 linux-surface 并设为默认内核]]
 
 ## 3. 常见问题
 

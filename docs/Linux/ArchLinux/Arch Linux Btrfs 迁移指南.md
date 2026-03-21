@@ -12,13 +12,37 @@
 
 ## 准备目标电脑 (Target)
 
-在目标电脑上启动 LiveCD，联网，并对新硬盘进行分区。
+在目标电脑上启动 LiveCD，联网并配置国内镜像（参考 [[Arch Linux 安装指南]]），并对新硬盘进行分区。
 
 ```shell
-# 格式化分区
+# 查看分区
+lsblk -f
+# 或
+fdisk -l
+```
+
+```shell
+# 识别并创建分区
+cfdisk /dev/nvme0n1
+
+#使用上下键移动到显示为 "Free Space"（大小约 64G）的那一行。
+#左右键选择 [ New ]，按回车。
+#提示输入大小时，默认会填满所有空闲空间，直接回车。
+#选择 [ Write ]，输入 yes 确认。
+#选择 [ Quit ] 退出。
+#此时，你应该会多出一个设备节点，如 `/dev/nvme0n1p6`
+```
+
+```shell
+# 格式化分区（根据实际情况！）
+# 输入以下命令回车后会立即格式化，谨慎操作！
+
+# EFI分区
 mkfs.vfat -F32 /dev/nvme0n1p1
+# swap分区
 mkswap /dev/nvme0n1p2
 swapon /dev/nvme0n1p2
+# 系统分区（btrfs）
 mkfs.btrfs /dev/nvme0n1p3
 
 # 挂载 Btrfs 根并创建接收路径
@@ -39,19 +63,20 @@ PermitRootLogin yes
 PasswordAuthentication yes
 ```
 
-启动 SSH 服务
-
 ```shell
+#启动 SSH 服务
 systemctl start sshd
+#设置root密码
+passwd
+#获取当前 IP 地址
+ip a
 ```
-
-获取当前 IP 地址：`ip a`
 
 现在，你可以在另一台电脑上通过终端连接了：`ssh root@<你的IP地址>`
 
 ## 网络传输数据 (Source -> Target)
 
-我们将利用 btrfs send/receive 通过 SSH 将子卷直接“流”向新电脑。这种方式比 rclone 更适合克隆整个系统。
+我们将利用 `btrfs send/receive` 通过 SSH 将子卷直接“流”向新电脑。这种方式比 `rclone` 更适合克隆整个系统。
 
 在源电脑上： 首先为当前的子卷创建只读快照（这是 send 的前提）：
 
@@ -69,7 +94,7 @@ sync
 ```
 
 
-在目标电脑上： 确保已安装 openssh 并临时允许 root 登录（或开启服务）。
+在目标电脑上： 确保已安装 `openssh` 并临时允许 root 登录（或开启服务）。
 
 从源电脑发起传输：
 
@@ -80,6 +105,11 @@ btrfs send /root_backup | ssh root@目标IP "btrfs receive /mnt"
 # 传输 home 分区
 btrfs send /home_backup | ssh root@目标IP "btrfs receive /mnt"
 ```
+
+注意：
+- 传输过程中不会有任何提示，如果要看网速可以使用 `btop`
+- 中断后不能续传，如果你中断了任务，必须手动删除目标端那个失败的子卷，然后重新开始（在目标机器上执行 `btrfs subvolume delete /mnt/不完整的子卷名`）
+- 传输成功后程序会静默退出，没有任何提示
 
 ## 恢复子卷结构与清理
 
@@ -96,10 +126,10 @@ btrfs subvolume snapshot /mnt/home_backup /mnt/@home
 btrfs subvolume delete /mnt/root_backup
 btrfs subvolume delete /mnt/home_backup
 
-# 重新挂载到正确的位置
+# 重新挂载到正确的位置（注意替换成真实dev设备！）
 umount /mnt
 mount -o subvol=@ /dev/nvme0n1p3 /mnt
-mkdir /mnt/home
+#mkdir /mnt/home
 mount -o subvol=@home /dev/nvme0n1p3 /mnt/home
 mkdir -p /mnt/boot/efi
 mount /dev/nvme0n1p1 /mnt/boot/efi
@@ -130,7 +160,7 @@ arch-chroot /mnt
 ```bash
 pacman -Syu linux linux-firmware
 ```
-注意： 如果你使用的是其他内核（如 linux-lts 或 linux-zen），请替换相应包名。
+注意： 如果你使用的是其他内核（如 `linux-zen` 或 `linux-surface`），请替换相应包名。
 
 执行完这一步后，/boot/vmlinuz-linux 就会出现
 
@@ -145,7 +175,7 @@ pacman -Syu linux linux-firmware
 mkinitcpio -P
 
 # 重新安装 GRUB 引导
-grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
+grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
 
 # 重新生成 GRUB 配置
 grub-mkconfig -o /boot/grub/grub.cfg
