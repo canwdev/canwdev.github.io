@@ -1,7 +1,7 @@
 # Arch Linux 安装指南
 
 日期：2025.12.22
-参考：https://github.com/SHORiN-KiWATA/ShorinArchExperience-ArchlinuxGuide/wiki
+参考： https://github.com/SHORiN-KiWATA/ShorinArchExperience-ArchlinuxGuide/wiki
 
 ## Live CD 准备
 
@@ -11,6 +11,11 @@
 iwctl
 station wlan0 connect <SSID>
 <PASSOWD>
+```
+
+```shell
+ip a #查看网络连接信息
+ping bilibili.com #确认网络正常
 ```
 
 配置国内镜像
