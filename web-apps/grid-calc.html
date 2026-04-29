@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="CSS Grid 栅格配置可视化分析器，输入目标像素尺寸自动计算最佳栅格数和 Span 分配，实时预览布局效果。">
+    <title>Grid 栅格配置可视化分析器</title>
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --text-color: #333;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            margin-top: 0;
+            font-size: 1.2rem;
+            color: #555;
+        }
+
+        /* 输入区域 */
+        .input-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: opacity 0.2s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        /* 结果展示 */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            background: #f8f9ff;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px dashed var(--primary-color);
+        }
+
+        .result-item b {
+            display: block;
+            color: var(--primary-color);
+            font-size: 1.4rem;
+        }
+
+        /* 可视化区域 */
+        .viz-container {
+            margin-top: 30px;
+            overflow-x: auto;
+        }
+
+        .grid-preview {
+            display: grid;
+            background: #eee;
+            gap: var(--gap);
+            padding: 10px;
+            border-radius: 4px;
+            min-width: 600px;
+        }
+
+        .grid-item {
+            background: rgba(74, 144, 226, 0.2);
+            border: 1px solid var(--primary-color);
+            height: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            position: relative;
+            font-size: 12px;
+        }
+
+        .grid-item span {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .grid-item i {
+            font-style: normal;
+            color: #666;
+            font-size: 10px;
+        }
+
+        .target-info {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #888;
+        }
+
+        .error-tag {
+            position: absolute;
+            top: -10px;
+            right: 0;
+            background: #ff4d4f;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 10px;
+        }
+
+        /* CSS 代码生成 */
+        .code-container {
+            position: relative;
+            background: #2d2d2d;
+            padding: 20px;
+            border-radius: 8px;
+            color: #f8f8f2;
+            font-family: 'Courier New', Courier, monospace;
+            margin-top: 15px;
+        }
+
+        .code-container pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #555;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .copy-btn:hover {
+            background: #777;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="card">
+            <h2>1. 配置参数</h2>
+            <div class="input-group">
+                <div class="field">
+                    <label>目标像素数组 (逗号分隔)</label>
+                    <input type="text" id="targetPxs" value="676, 500">
+                </div>
+                <div class="field">
+                    <label>间距 Gap (px)</label>
+                    <input type="number" id="gap" value="24">
+                </div>
+                <div class="field">
+                    <label>最大尝试栅格数</label>
+                    <input type="number" id="maxGrid" value="200">
+                </div>
+            </div>
+            <button onclick="updateVisualization()">立即计算并预览</button>
+        </div>
+
+        <div class="card" id="resultCard" style="display:none;">
+            <h2>2. 计算结果</h2>
+            <div class="results-grid" id="resultsText">
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>3. 栅格可视化预览</h2>
+            <div class="viz-container">
+                <div id="gridPreview" class="grid-preview"></div>
+            </div>
+            <div class="target-info" id="targetInfo"></div>
+        </div>
+
+        <div class="card" id="cssCard" style="display:none;">
+            <h2>4. CSS 代码生成</h2>
+            <div class="code-container">
+                <button class="copy-btn" onclick="copyCss()">复制</button>
+                <pre id="cssCode"></pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * 核心算法：寻找最合适的 gridCount 和对应的 span
+         */
+        function findBestGridConfig(targetPxs, gap = 24, maxGrid = 200) {
+            const totalWidth = targetPxs.reduce((a, b) => a + b, 0) + (targetPxs.length - 1) * gap;
+            let bestConfig = { gridCount: 0, spans: [], totalError: Infinity, details: [] };
+
+            for (let n = 12; n <= maxGrid; n++) {
+                const unitWidth = (totalWidth - (n - 1) * gap) / n;
+                if (unitWidth <= 0) continue;
+
+                let currentSpans = [];
+                let currentTotalError = 0;
+                let currentDetails = [];
+
+                for (let px of targetPxs) {
+                    const exactSpan = (px + gap) / (unitWidth + gap);
+                    const recommendedSpan = Math.round(exactSpan);
+                    const actualPx = recommendedSpan * unitWidth + (recommendedSpan - 1) * gap;
+                    const error = Math.abs(px - actualPx);
+
+                    currentSpans.push(recommendedSpan);
+                    currentTotalError += error;
+                    currentDetails.push({
+                        target: px,
+                        actual: actualPx.toFixed(2),
+                        span: recommendedSpan,
+                        error: error.toFixed(2)
+                    });
+                }
+
+                if (currentTotalError < bestConfig.totalError) {
+                    bestConfig = {
+                        gridCount: n,
+                        spans: currentSpans,
+                        totalError: currentTotalError,
+                        unitWidth: unitWidth.toFixed(2),
+                        details: currentDetails
+                    };
+                }
+                if (currentTotalError < 0.1) break;
+            }
+            return bestConfig;
+        }
+
+        function updateVisualization() {
+            // 获取输入
+            const targetPxsRaw = document.getElementById('targetPxs').value;
+            const targetPxs = targetPxsRaw.split(',').map(v => parseFloat(v.trim())).filter(v => !isNaN(v));
+            const gap = parseFloat(document.getElementById('gap').value) || 0;
+            const maxGrid = parseInt(document.getElementById('maxGrid').value) || 200;
+
+            if (targetPxs.length === 0) {
+                alert("请输入有效的像素数值");
+                return;
+            }
+
+            // 计算
+            const result = findBestGridConfig(targetPxs, gap, maxGrid);
+
+            // 显示文本结果
+            document.getElementById('resultCard').style.display = 'block';
+            document.getElementById('resultsText').innerHTML = `
+            <div class="result-item"><b>${result.gridCount}</b>推荐栅格总数</div>
+            <div class="result-item"><b>${result.unitWidth}px</b>单元格宽度 (Unit)</div>
+            <div class="result-item"><b>${result.totalError.toFixed(4)}px</b>总像素误差</div>
+            <div class="result-item"><b>${result.spans.join(' : ')}</b>Span 分配</div>
+        `;
+
+            // 渲染可视化 Grid
+            const previewEl = document.getElementById('gridPreview');
+            previewEl.style.setProperty('--gap', gap + 'px');
+            previewEl.style.gridTemplateColumns = `repeat(${result.gridCount}, 1fr)`;
+            previewEl.innerHTML = '';
+
+            result.details.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'grid-item';
+                div.style.gridColumn = `span ${item.span}`;
+                div.innerHTML = `
+                <span>Span ${item.span}</span>
+                <i>实际: ${item.actual}px</i>
+                <i>目标: ${item.target}px</i>
+                ${item.error > 0.5 ? `<div class="error-tag">误差 ${item.error}px</div>` : ''}
+            `;
+                previewEl.appendChild(div);
+            });
+
+            document.getElementById('targetInfo').innerText = `* 模拟容器总宽度: ${(result.gridCount * result.unitWidth + (result.gridCount - 1) * gap).toFixed(2)}px (基于目标总像素计算)`;
+
+            // 生成并显示 CSS 代码
+            generateAndShowCss(result, gap);
+        }
+
+        function generateAndShowCss(result, gap) {
+            const cssCard = document.getElementById('cssCard');
+            const cssCodeEl = document.getElementById('cssCode');
+            cssCard.style.display = 'block';
+
+            let css = `.grid-container {
+    display: grid;
+    grid-template-columns: repeat(${result.gridCount}, 1fr);
+    gap: ${gap}px;
+}
+
+`;
+            result.details.forEach((item, index) => {
+                css += `.item-${index + 1} {
+    grid-column: span ${item.span};
+}
+
+`;
+            });
+
+            cssCodeEl.textContent = css.trim();
+        }
+
+        function copyCss() {
+            const cssCode = document.getElementById('cssCode').textContent;
+            navigator.clipboard.writeText(cssCode).then(() => {
+                const copyBtn = document.querySelector('.copy-btn');
+                copyBtn.textContent = '已复制!';
+                setTimeout(() => {
+                    copyBtn.textContent = '复制';
+                }, 2000);
+            });
+        }
+
+        // 初始化执行一次
+        updateVisualization();
+    </script>
+
+</body>
+
+</html>
