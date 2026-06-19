@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="电池快速放电工具，利用 WebGL 高负载渲染快速消耗电量至目标值，支持 WakeLock 防息屏、电量监控日志，适用于锂电池存储前放电。">
+    <title>电池快速放电工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+            color: #333;
+        }
+
+        /* ====== 全屏 Canvas 背景 ====== */
+        #render-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            background: #000;
+        }
+
+        #render-container.inverted canvas {
+            filter: invert(1);
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        #fps {
+            position: fixed;
+            top: 12px;
+            left: 12px;
+            color: #0f0;
+            font-family: monospace;
+            z-index: 100;
+            pointer-events: none;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        /* ====== 右侧悬浮控制面板 ====== */
+        .card {
+            position: fixed;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            width: 320px;
+            max-height: 90vh;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            z-index: 50;
+            color: #fff;
+            transition: transform 0.35s cubic-bezier(.4, 0, .2, 1), opacity 0.35s ease;
+        }
+
+        .card.collapsed {
+            transform: translateY(-50%) translateX(calc(100% + 10px));
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* 折叠/展开按钮 */
+        #togglePanelBtn {
+            position: fixed;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            z-index: 60;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: right 0.35s cubic-bezier(.4, 0, .2, 1), background 0.2s;
+            padding: 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        #togglePanelBtn:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        #togglePanelBtn.panel-open {
+            right: 352px;
+        }
+
+        h1 {
+            margin-top: 0;
+            color: #fff;
+            font-size: 20px;
+        }
+
+        .card p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 14px;
+        }
+
+        input[type="number"] {
+            padding: 8px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 8px;
+            width: 100%;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="number"]:focus {
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* 复选框样式 */
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #22c55e;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            display: inline;
+            margin-bottom: 0;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        button {
+            padding: 10px 0;
+            font-size: 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+            flex: 1;
+        }
+
+        #startBtn {
+            background: rgba(34, 197, 94, 0.85);
+            color: white;
+        }
+
+        #startBtn:hover:not(:disabled) {
+            background: rgba(22, 163, 74, 0.95);
+        }
+
+        #stopBtn {
+            background: rgba(239, 68, 68, 0.85);
+            color: white;
+        }
+
+        #stopBtn:hover:not(:disabled) {
+            background: rgba(220, 38, 38, 0.95);
+        }
+
+        button:disabled {
+            background: rgba(156, 163, 175, 0.4);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .status-box {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 14px;
+            border-radius: 10px;
+            margin-top: 16px;
+            line-height: 2;
+            font-size: 14px;
+        }
+
+        .status-box strong {
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 99px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .tag.running {
+            background: rgba(254, 240, 138, 0.9);
+            color: #854d0e;
+        }
+
+        .tag.stopped {
+            background: rgba(229, 231, 235, 0.8);
+            color: #374151;
+        }
+
+        .tag.wakelock-on {
+            background: rgba(187, 247, 208, 0.9);
+            color: #166534;
+        }
+
+        .tag.wakelock-off {
+            background: rgba(254, 202, 202, 0.9);
+            color: #991b1b;
+        }
+
+        /* 使用说明 */
+        .info-section {
+            margin-top: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            padding-top: 14px;
+        }
+
+        .info-section h3 {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 8px;
+        }
+
+        .info-section ul {
+            padding-left: 18px;
+            margin: 0;
+        }
+
+        .info-section li {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.7;
+        }
+
+        /* 电量监控日志 */
+        .log-section {
+            margin-top: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            padding-top: 14px;
+        }
+
+        .log-section h3 {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 8px;
+        }
+
+        #batteryLog {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 10px;
+            max-height: 150px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.6;
+        }
+
+        #batteryLog .log-entry {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 2px 0;
+        }
+
+        #batteryLog .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        #batteryLog .log-down {
+            color: #f87171;
+        }
+
+        #batteryLog .log-up {
+            color: #4ade80;
+        }
+
+        #batteryLog .log-same {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* 滚动条美化 */
+        .card::-webkit-scrollbar,
+        #batteryLog::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .card::-webkit-scrollbar-track,
+        #batteryLog::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .card::-webkit-scrollbar-thumb,
+        #batteryLog::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 全屏 Canvas 渲染区 -->
+    <div id="render-container" class="inverted">
+        <canvas id="c1" width="1024" height="1024"></canvas>
+    </div>
+    <div id="fps">FPS: 0</div>
+
+    <!-- 右侧悬浮控制面板 -->
+    <button id="togglePanelBtn" class="panel-open" title="收起/展开面板">▶</button>
+    <div class="card">
+        <h1 style="margin-bottom: 8px;">&#128267; 电池放电工具</h1>
+
+        <div class="form-group">
+            <label for="targetLevel">目标停止电量 (%)</label>
+            <input type="number" id="targetLevel" value="50" min="1" max="100">
+        </div>
+
+        <div class="checkbox-group">
+            <input type="checkbox" id="invertToggle" checked>
+            <label for="invertToggle">反色显示（防止 OLED 省电）</label>
+        </div>
+
+        <div class="button-group">
+            <button id="startBtn">开始放电</button>
+            <button id="stopBtn" disabled>停止放电</button>
+        </div>
+
+        <div class="status-box">
+            <div><strong>当前状态:</strong> <span id="statusTag" class="tag stopped">已停止</span></div>
+            <div><strong>当前电量:</strong> <span id="batteryLevel">获取中...</span></div>
+            <div><strong>唤醒锁 (防息屏):</strong> <span id="wakeLockTag" class="tag wakelock-off">未启用</span></div>
+        </div>
+
+        <!-- 电量监控日志 -->
+        <div class="log-section">
+            <h3>&#128202; 电量监控日志</h3>
+            <div id="batteryLog"><span class="log-entry log-same">等待开始...</span></div>
+        </div>
+
+        <!-- 使用说明 -->
+        <div class="info-section">
+            <h3>&#128161; 使用目的说明</h3>
+            <ul>
+                <li>测试设备电池在高负载下的续航表现</li>
+                <li>快速将电池电量降至50%（锂电池的最佳存储电量）</li>
+                <li>结合了"毒蘑菇"满载 GPU/CPU 的高强度渲染算法来实现快速放电</li>
+                <li>使用 WakeLock API 防止息屏</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // ====== WebGL 毒蘑菇渲染部分 ======
+        let gl, shaderProgram;
+        let glposition, glright, glforward, glup, glorigin, glx, gly, gllen;
+        let cx = 1024, cy = 1024;
+        let len = 1.6, ang1 = 2.8, ang2 = 0.4;
+        let cenx = 0.0, ceny = 0.0, cenz = 0.0;
+
+        const KERNEL = "float kernal(vec3 ver){\n" +
+            "   vec3 a;\n" +
+            "float b,c,d,e;\n" +
+            "   a=ver;\n" +
+            "   for(int i=0;i<5;i++){\n" +
+            "       b=length(a);\n" +
+            "       c=atan(a.y,a.x)*8.0;\n" +
+            "       e=1.0/b;\n" +
+            "       d=acos(a.z/b)*8.0;\n" +
+            "       b=pow(b,8.0);\n" +
+            "       a=vec3(b*sin(d)*cos(c),b*sin(d)*sin(c),b*cos(d))+ver;\n" +
+            "       if(b>6.0){\n" +
+            "           break;\n" +
+            "       }\n" +
+            "   }" +
+            "   return 4.0-a.x*a.x-a.y*a.y-a.z*a.z;" +
+            "}";
+
+        const VSHADER_SOURCE =
+            "#version 100 \n" +
+            "precision highp float;\n" +
+            "attribute vec4 position;" +
+            "varying vec3 dir, localdir;" +
+            "uniform vec3 right, forward, up, origin;" +
+            "uniform float x,y;" +
+            "void main() {" +
+            "   gl_Position = position; " +
+            "   dir = forward + right * position.x*x + up * position.y*y;" +
+            "   localdir.x = position.x*x;" +
+            "   localdir.y = position.y*y;" +
+            "   localdir.z = -1.0;" +
+            "} ";
+
+        const FSHADER_SOURCE =
+            "#version 100 \n" +
+            "#define PI 3.14159265358979324\n" +
+            "#define M_L 0.3819660113\n" +
+            "#define M_R 0.6180339887\n" +
+            "#define MAXR 8\n" +
+            "#define SOLVER 8\n" +
+            "precision highp float;\n" +
+            "float kernal(vec3 ver)\n;" +
+            "uniform vec3 right, forward, up, origin;\n" +
+            "varying vec3 dir, localdir;\n" +
+            "uniform float len;\n" +
+            "vec3 ver;\n" +
+            "int sign;" +
+            "float v, v1, v2;\n" +
+            "float r1, r2, r3, r4, m1, m2, m3, m4;\n" +
+            "vec3 n, reflect;\n" +
+            "const float step = 0.002;\n" +
+            "vec3 color;\n" +
+            "void main() {\n" +
+            "   color.r=0.0;\n" +
+            "   color.g=0.0;\n" +
+            "   color.b=0.0;\n" +
+            "   sign=0;" +
+            "   v1 = kernal(origin + dir * (step*len));\n" +
+            "   v2 = kernal(origin);\n" +
+            "   for (int k = 2; k < 1002; k++) {\n" +
+            "      ver = origin + dir * (step*len*float(k));\n" +
+            "      v = kernal(ver);\n" +
+            "      if (v > 0.0 && v1 < 0.0) {\n" +
+            "         r1 = step * len*float(k - 1);\n" +
+            "         r2 = step * len*float(k);\n" +
+            "         m1 = kernal(origin + dir * r1);\n" +
+            "         m2 = kernal(origin + dir * r2);\n" +
+            "         for (int l = 0; l < SOLVER; l++) {\n" +
+            "            r3 = r1 * 0.5 + r2 * 0.5;\n" +
+            "            m3 = kernal(origin + dir * r3);\n" +
+            "            if (m3 > 0.0) {\n" +
+            "               r2 = r3;\n" +
+            "               m2 = m3;\n" +
+            "            }\n" +
+            "            else {\n" +
+            "               r1 = r3;\n" +
+            "               m1 = m3;\n" +
+            "            }\n" +
+            "         }\n" +
+            "         if (r3 < 2.0 * len) {\n" +
+            "               sign=1;" +
+            "            break;\n" +
+            "         }\n" +
+            "      }\n" +
+            "      if (v < v1&&v1>v2&&v1 < 0.0 && (v1*2.0 > v || v1 * 2.0 > v2)) {\n" +
+            "         r1 = step * len*float(k - 2);\n" +
+            "         r2 = step * len*(float(k) - 2.0 + 2.0*M_L);\n" +
+            "         r3 = step * len*(float(k) - 2.0 + 2.0*M_R);\n" +
+            "         r4 = step * len*float(k);\n" +
+            "         m2 = kernal(origin + dir * r2);\n" +
+            "         m3 = kernal(origin + dir * r3);\n" +
+            "         for (int l = 0; l < MAXR; l++) {\n" +
+            "            if (m2 > m3) {\n" +
+            "               r4 = r3;\n" +
+            "               r3 = r2;\n" +
+            "               r2 = r4 * M_L + r1 * M_R;\n" +
+            "               m3 = m2;\n" +
+            "               m2 = kernal(origin + dir * r2);\n" +
+            "            }\n" +
+            "            else {\n" +
+            "               r1 = r2;\n" +
+            "               r2 = r3;\n" +
+            "               r3 = r4 * M_R + r1 * M_L;\n" +
+            "               m2 = m3;\n" +
+            "               m3 = kernal(origin + dir * r3);\n" +
+            "            }\n" +
+            "         }\n" +
+            "         if (m2 > 0.0) {\n" +
+            "            r1 = step * len*float(k - 2);\n" +
+            "            r2 = r2;\n" +
+            "            m1 = kernal(origin + dir * r1);\n" +
+            "            m2 = kernal(origin + dir * r2);\n" +
+            "            for (int l = 0; l < SOLVER; l++) {\n" +
+            "               r3 = r1 * 0.5 + r2 * 0.5;\n" +
+            "               m3 = kernal(origin + dir * r3);\n" +
+            "               if (m3 > 0.0) {\n" +
+            "                  r2 = r3;\n" +
+            "                  m2 = m3;\n" +
+            "               }\n" +
+            "               else {\n" +
+            "                  r1 = r3;\n" +
+            "                  m1 = m3;\n" +
+            "               }\n" +
+            "            }\n" +
+            "            if (r3 < 2.0 * len&&r3> step*len) {\n" +
+            "                   sign=1;" +
+            "               break;\n" +
+            "            }\n" +
+            "         }\n" +
+            "         else if (m3 > 0.0) {\n" +
+            "            r1 = step * len*float(k - 2);\n" +
+            "            r2 = r3;\n" +
+            "            m1 = kernal(origin + dir * r1);\n" +
+            "            m2 = kernal(origin + dir * r2);\n" +
+            "            for (int l = 0; l < SOLVER; l++) {\n" +
+            "               r3 = r1 * 0.5 + r2 * 0.5;\n" +
+            "               m3 = kernal(origin + dir * r3);\n" +
+            "               if (m3 > 0.0) {\n" +
+            "                  r2 = r3;\n" +
+            "                  m2 = m3;\n" +
+            "               }\n" +
+            "               else {\n" +
+            "                  r1 = r3;\n" +
+            "                  m1 = m3;\n" +
+            "               }\n" +
+            "            }\n" +
+            "            if (r3 < 2.0 * len&&r3> step*len) {\n" +
+            "                   sign=1;" +
+            "               break;\n" +
+            "            }\n" +
+            "         }\n" +
+            "      }\n" +
+            "      v2 = v1;\n" +
+            "      v1 = v;\n" +
+            "   }\n" +
+            "   if (sign==1) {\n" +
+            "      ver = origin + dir*r3 ;\n" +
+            "       r1=ver.x*ver.x+ver.y*ver.y+ver.z*ver.z;" +
+            "      n.x = kernal(ver - right * (r3*0.00025)) - kernal(ver + right * (r3*0.00025));\n" +
+            "      n.y = kernal(ver - up * (r3*0.00025)) - kernal(ver + up * (r3*0.00025));\n" +
+            "      n.z = kernal(ver + forward * (r3*0.00025)) - kernal(ver - forward * (r3*0.00025));\n" +
+            "      r3 = n.x*n.x+n.y*n.y+n.z*n.z;\n" +
+            "      n = n * (1.0 / sqrt(r3));\n" +
+            "      ver = localdir;\n" +
+            "      r3 = ver.x*ver.x+ver.y*ver.y+ver.z*ver.z;\n" +
+            "      ver = ver * (1.0 / sqrt(r3));\n" +
+            "      reflect = n * (-2.0*dot(ver, n)) + ver;\n" +
+            "      r3 = reflect.x*0.276+reflect.y*0.920+reflect.z*0.276;\n" +
+            "      r4 = n.x*0.276+n.y*0.920+n.z*0.276;\n" +
+            "      r3 = max(0.0,r3);\n" +
+            "      r3 = r3 * r3*r3*r3;\n" +
+            "      r3 = r3 * 0.45 + r4 * 0.25 + 0.3;\n" +
+            "      n.x = sin(r1*10.0)*0.5+0.5;\n" +
+            "      n.y = sin(r1*10.0+2.05)*0.5+0.5;\n" +
+            "      n.z = sin(r1*10.0-2.05)*0.5+0.5;\n" +
+            "      color = n*r3;\n" +
+            "   }\n" +
+            "   gl_FragColor = vec4(color.x, color.y, color.z, 1.0);" +
+            "}";
+
+        function initWebGL() {
+            const canvas = document.getElementById('c1');
+            gl = canvas.getContext('webgl');
+
+            let vertshader = gl.createShader(gl.VERTEX_SHADER);
+            let fragshader = gl.createShader(gl.FRAGMENT_SHADER);
+            shaderProgram = gl.createProgram();
+
+            gl.shaderSource(vertshader, VSHADER_SOURCE);
+            gl.compileShader(vertshader);
+            if (!gl.getShaderParameter(vertshader, gl.COMPILE_STATUS)) {
+                console.error("Vert Shader Info:", gl.getShaderInfoLog(vertshader));
+            }
+
+            gl.shaderSource(fragshader, FSHADER_SOURCE + KERNEL);
+            gl.compileShader(fragshader);
+            if (!gl.getShaderParameter(fragshader, gl.COMPILE_STATUS)) {
+                console.error("Frag Shader Info:", gl.getShaderInfoLog(fragshader));
+            }
+
+            gl.attachShader(shaderProgram, vertshader);
+            gl.attachShader(shaderProgram, fragshader);
+            gl.linkProgram(shaderProgram);
+            gl.useProgram(shaderProgram);
+
+            const positions = [-1.0, -1.0, 0.0, 1.0, -1.0, 0.0, 1.0, 1.0, 0.0, -1.0, -1.0, 0.0, 1.0, 1.0, 0.0, -1.0, 1.0, 0.0];
+            glposition = gl.getAttribLocation(shaderProgram, 'position');
+            glright = gl.getUniformLocation(shaderProgram, 'right');
+            glforward = gl.getUniformLocation(shaderProgram, 'forward');
+            glup = gl.getUniformLocation(shaderProgram, 'up');
+            glorigin = gl.getUniformLocation(shaderProgram, 'origin');
+            glx = gl.getUniformLocation(shaderProgram, 'x');
+            gly = gl.getUniformLocation(shaderProgram, 'y');
+            gllen = gl.getUniformLocation(shaderProgram, 'len');
+
+            let buffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+            gl.vertexAttribPointer(glposition, 3, gl.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(glposition);
+
+            gl.viewport(0, 0, 1024, 1024);
+
+            drawFrame();
+        }
+
+        function drawFrame() {
+            gl.uniform1f(glx, cx * 2.0 / (cx + cy));
+            gl.uniform1f(gly, cy * 2.0 / (cx + cy));
+            gl.uniform1f(gllen, len);
+            gl.uniform3f(glorigin, len * Math.cos(ang1) * Math.cos(ang2) + cenx, len * Math.sin(ang2) + ceny, len * Math.sin(ang1) * Math.cos(ang2) + cenz);
+            gl.uniform3f(glright, Math.sin(ang1), 0, -Math.cos(ang1));
+            gl.uniform3f(glup, -Math.sin(ang2) * Math.cos(ang1), Math.cos(ang2), -Math.sin(ang2) * Math.sin(ang1));
+            gl.uniform3f(glforward, -Math.cos(ang1) * Math.cos(ang2), -Math.sin(ang2), -Math.sin(ang1) * Math.cos(ang2));
+            gl.drawArrays(gl.TRIANGLES, 0, 6);
+            gl.finish();
+        }
+
+        // ====== 逻辑控制部分 ======
+        let isRunning = false;
+        let animFrameId = null;
+        let wakeLock = null;
+        let batteryInstance = null;
+        let lastTime = performance.now();
+        let frameCount = 0;
+        let batteryLogInterval = null;
+        let lastLoggedLevel = null;
+
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const statusTag = document.getElementById('statusTag');
+        const wakeLockTag = document.getElementById('wakeLockTag');
+        const targetLevelInput = document.getElementById('targetLevel');
+        const batteryLevelDisplay = document.getElementById('batteryLevel');
+        const fpsDisplay = document.getElementById('fps');
+        const invertToggle = document.getElementById('invertToggle');
+        const renderContainer = document.getElementById('render-container');
+        const batteryLogEl = document.getElementById('batteryLog');
+
+        // 反色切换
+        invertToggle.addEventListener('change', () => {
+            if (invertToggle.checked) {
+                renderContainer.classList.add('inverted');
+            } else {
+                renderContainer.classList.remove('inverted');
+            }
+        });
+
+        async function requestWakeLock() {
+            if ('wakeLock' in navigator) {
+                try {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                    wakeLockTag.className = 'tag wakelock-on';
+                    wakeLockTag.innerText = '已启用';
+                    wakeLock.addEventListener('release', () => {
+                        wakeLockTag.className = 'tag wakelock-off';
+                        wakeLockTag.innerText = '未启用';
+                        wakeLock = null;
+                    });
+                } catch (err) {
+                    console.error(`WakeLock error: ${err.name}, ${err.message}`);
+                }
+            } else {
+                wakeLockTag.className = 'tag wakelock-off';
+                wakeLockTag.innerText = '不支持此功能';
+            }
+        }
+
+        function releaseWakeLock() {
+            if (wakeLock !== null) {
+                wakeLock.release().then(() => {
+                    wakeLock = null;
+                });
+            }
+        }
+
+        function initBattery() {
+            if ('getBattery' in navigator) {
+                navigator.getBattery().then(battery => {
+                    batteryInstance = battery;
+                    updateBatteryInfo(battery);
+                    battery.addEventListener('levelchange', () => {
+                        updateBatteryInfo(battery);
+                    });
+                });
+            } else {
+                batteryLevelDisplay.innerText = '浏览器不支持电池状态查询 API';
+            }
+        }
+
+        function updateBatteryInfo(battery) {
+            let level = Math.round(battery.level * 100);
+            let isCharging = battery.charging ? ' (充电中)' : '';
+            batteryLevelDisplay.innerText = `${level}%${isCharging}`;
+
+            let target = parseInt(targetLevelInput.value);
+            if (isRunning && level <= target && !battery.charging) {
+                stopDischarge();
+                addBatteryLog(level, '已达到目标电量，自动停止');
+                alert(`已达到目标电量 ${target}%，放电已自动停止。`);
+            }
+        }
+
+        // ====== 电量监控日志 ======
+        function getTimeStr() {
+            const now = new Date();
+            return now.toLocaleTimeString('zh-CN', { hour12: false });
+        }
+
+        function addBatteryLog(level, note) {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+
+            let cssClass = 'log-same';
+            let arrow = '';
+            if (lastLoggedLevel !== null) {
+                if (level < lastLoggedLevel) {
+                    cssClass = 'log-down';
+                    arrow = ' ▼' + (lastLoggedLevel - level) + '%';
+                } else if (level > lastLoggedLevel) {
+                    cssClass = 'log-up';
+                    arrow = ' ▲' + (level - lastLoggedLevel) + '%';
+                }
+            }
+
+            entry.className = 'log-entry ' + cssClass;
+            const noteStr = note ? ` - ${note}` : '';
+            entry.textContent = `[${getTimeStr()}] ${level}%${arrow}${noteStr}`;
+
+            batteryLogEl.appendChild(entry);
+            batteryLogEl.scrollTop = batteryLogEl.scrollHeight;
+
+            lastLoggedLevel = level;
+        }
+
+        function startBatteryMonitor() {
+            // 清空日志
+            batteryLogEl.innerHTML = '';
+            lastLoggedLevel = null;
+
+            // 立即记录一次
+            if (batteryInstance) {
+                const level = Math.round(batteryInstance.level * 100);
+                addBatteryLog(level, '开始监控');
+            }
+
+            // 每60秒记录一次
+            batteryLogInterval = setInterval(() => {
+                if (batteryInstance) {
+                    const level = Math.round(batteryInstance.level * 100);
+                    if (level !== lastLoggedLevel) {
+                        addBatteryLog(level);
+                    }
+                }
+            }, 60000);
+        }
+
+        function stopBatteryMonitor() {
+            if (batteryLogInterval) {
+                clearInterval(batteryLogInterval);
+                batteryLogInterval = null;
+            }
+            // 记录停止时电量
+            if (batteryInstance) {
+                const level = Math.round(batteryInstance.level * 100);
+                addBatteryLog(level, '已停止');
+            }
+        }
+
+        function renderLoop(time) {
+            if (!isRunning) return;
+
+            frameCount++;
+            if (time - lastTime >= 1000) {
+                fpsDisplay.innerText = `FPS: ${frameCount}`;
+                frameCount = 0;
+                lastTime = time;
+            }
+
+            ang1 += 0.01;
+            drawFrame();
+
+            animFrameId = requestAnimationFrame(renderLoop);
+        }
+
+        function startDischarge() {
+            if (isRunning) return;
+
+            let target = parseInt(targetLevelInput.value);
+            if (isNaN(target) || target < 1 || target > 100) {
+                alert('请输入有效的目标电量 (1-100)');
+                return;
+            }
+
+            if (batteryInstance) {
+                let currentLevel = Math.round(batteryInstance.level * 100);
+                if (currentLevel <= target) {
+                    alert(`当前电量 (${currentLevel}%) 已经低于或等于目标电量 (${target}%)`);
+                    return;
+                }
+                if (batteryInstance.charging) {
+                    console.warn('检测到设备正在充电，放电测试可能无效，建议断开电源。');
+                }
+            }
+
+            isRunning = true;
+            startBtn.disabled = true;
+            stopBtn.disabled = false;
+            targetLevelInput.disabled = true;
+
+            statusTag.className = 'tag running';
+            statusTag.innerText = '正在放电...';
+
+            requestWakeLock();
+            startBatteryMonitor();
+
+            lastTime = performance.now();
+            frameCount = 0;
+            animFrameId = requestAnimationFrame(renderLoop);
+        }
+
+        function stopDischarge() {
+            if (!isRunning) return;
+            isRunning = false;
+
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+            targetLevelInput.disabled = false;
+
+            statusTag.className = 'tag stopped';
+            statusTag.innerText = '已停止';
+
+            releaseWakeLock();
+            stopBatteryMonitor();
+
+            if (animFrameId) {
+                cancelAnimationFrame(animFrameId);
+                animFrameId = null;
+            }
+            fpsDisplay.innerText = 'FPS: 0';
+        }
+
+        startBtn.addEventListener('click', startDischarge);
+        stopBtn.addEventListener('click', stopDischarge);
+
+        // 面板折叠/展开
+        const toggleBtn = document.getElementById('togglePanelBtn');
+        const cardPanel = document.querySelector('.card');
+        toggleBtn.addEventListener('click', () => {
+            const isOpen = !cardPanel.classList.contains('collapsed');
+            if (isOpen) {
+                cardPanel.classList.add('collapsed');
+                toggleBtn.classList.remove('panel-open');
+                toggleBtn.innerText = '◀';
+            } else {
+                cardPanel.classList.remove('collapsed');
+                toggleBtn.classList.add('panel-open');
+                toggleBtn.innerText = '▶';
+            }
+        });
+
+        window.addEventListener('load', () => {
+            try {
+                initWebGL();
+            } catch (e) {
+                console.error(e);
+                alert("WebGL初始化失败，该工具可能无法在当前浏览器中运行。");
+            }
+            initBattery();
+        });
+
+        document.addEventListener('visibilitychange', () => {
+            if (isRunning && document.visibilityState === 'visible' && wakeLock === null) {
+                requestWakeLock();
+            }
+        });
+
+        window.addEventListener('beforeunload', stopDischarge);
+    </script>
+</body>
+
+</html>
