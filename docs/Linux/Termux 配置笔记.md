@@ -36,7 +36,15 @@ apt install zsh
 apt install git
 git clone --depth=1 git://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh
 cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc
-chsh zsh
+chsh -s zsh
+```
+
+## fish
+
+fish：开箱即用的 shell（推荐）
+```shell
+pkg install fish -y
+chsh -s fish
 ```
 
 ## Termux 设置 sshd
