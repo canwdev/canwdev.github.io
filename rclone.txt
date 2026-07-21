@@ -1,0 +1,3 @@
+rclone sync D:\Projects\dev\canwdev.github.io\docs\ E:\Backup\docs\ --track-renames --track-renames-strategy modtime,leaf --progress -v --checkers 10
+
+pause;

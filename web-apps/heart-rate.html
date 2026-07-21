@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Bluetooth 实时心率看板</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            padding: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        h1 {
+            font-size: 24pt;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        .subtitle {
+            font-size: 11pt;
+            color: #7f8c8d;
+        }
+        .control-panel {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .btn-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            align-items: center;
+        }
+        .btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 13pt;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+        }
+        .btn:hover {
+            background-color: #c0392b;
+            transform: translateY(-1px);
+        }
+        .btn:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-secondary {
+            background-color: #3498db;
+        }
+        .btn-secondary:hover {
+            background-color: #2980b9;
+        }
+        .btn-secondary:disabled {
+            background-color: #bdc3c7;
+        }
+        .btn-pip {
+            background-color: #9b59b6;
+        }
+        .btn-pip:hover {
+            background-color: #8e44ad;
+        }
+        .btn-pip:disabled {
+            background-color: #bdc3c7;
+        }
+        .status-text {
+            margin-top: 10px;
+            font-size: 11pt;
+            color: #555;
+            font-style: italic;
+        }
+        .record-meta {
+            margin-top: 8px;
+            font-size: 10.5pt;
+            color: #7f8c8d;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            text-align: center;
+            border-top: 5px solid #e74c3c;
+            margin-bottom: 20px;
+        }
+        .heart-icon {
+            font-size: 48pt;
+            color: #e74c3c;
+            animation: heartbeat 1s infinite ease-in-out;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+        .heart-static {
+            animation: none;
+        }
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+        .bpm-value {
+            font-size: 64pt;
+            font-weight: 800;
+            color: #2c3e50;
+            line-height: 1;
+        }
+        .bpm-unit {
+            font-size: 16pt;
+            color: #7f8c8d;
+            font-weight: normal;
+        }
+        .chart-container {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+        .chart-title {
+            font-size: 13pt;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-weight: bold;
+            border-left: 4px solid #e74c3c;
+            padding-left: 8px;
+        }
+        .chart-range {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .chart-range-btn {
+            padding: 5px 14px;
+            border: 1px solid #dde1e4;
+            border-radius: 16px;
+            background: #fff;
+            color: #555;
+            cursor: pointer;
+            font-size: 10.5pt;
+            transition: all 0.15s ease;
+        }
+        .chart-range-btn:hover {
+            border-color: #e74c3c;
+            color: #e74c3c;
+        }
+        .chart-range-btn.active {
+            background: #e74c3c;
+            color: #fff;
+            border-color: #e74c3c;
+        }
+        .info-section {
+            background-color: #eaedf1;
+            border-radius: 8px;
+            padding: 20px;
+            font-size: 10.5pt;
+            line-height: 1.6;
+            color: #34495e;
+        }
+        .info-section h3 {
+            margin-bottom: 8px;
+            color: #2c3e50;
+        }
+        .info-section ul {
+            padding-left: 20px;
+        }
+        .error-msg {
+            color: #c0392b;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Web Bluetooth 实时心率看板</h1>
+        <div class="subtitle">通过浏览器蓝牙直接读取并绘制佳明或兼容设备的心率数据</div>
+    </header>
+
+    <div class="control-panel">
+        <div class="btn-row">
+            <button id="connectBtn" class="btn">连接心率设备</button>
+            <button id="downloadBtn" class="btn btn-secondary" disabled>下载心率数据</button>
+            <button id="pipBtn" class="btn btn-pip">画中画</button>
+        </div>
+        <div id="status" class="status-text">等待连接...</div>
+        <div id="recordMeta" class="record-meta">已记录 0 条心率数据</div>
+    </div>
+
+    <div class="card">
+        <div id="heartIcon" class="heart-icon heart-static">❤️</div>
+        <div class="bpm-value"><span id="bpm">--</span> <span class="bpm-unit">BPM</span></div>
+    </div>
+
+    <div class="chart-container">
+        <div id="chartTitle" class="chart-title">实时心率趋势图</div>
+        <div id="chartRange" class="chart-range"></div>
+        <svg id="chartSvg" width="100%" height="200" style="background: #fafafa; border-radius: 4px; overflow: visible;"></svg>
+    </div>
+
+    <div class="info-section">
+        <h3>使用限制与配置提醒：</h3>
+        <ul>
+            <li><strong>广播开关</strong>：请务必先开启手表的【心率推送】。</li>
+            <li><strong>浏览器环境</strong>：必须使用基于 Chromium 内核的浏览器。Safari 和 Firefox 默认不支持 Web Bluetooth。</li>
+            <li><strong>安全限制</strong>：Web Bluetooth 要求必须在安全上下文（<strong>HTTPS</strong>）中运行，或者直接在本地双击打开（即 <code>file:///</code> 协议的本地 html，或者 <code>localhost</code>）。</li>
+            <li><strong>数据导出</strong>：连接设备后所有心率读数会自动记录，可随时点击「下载心率数据」导出完整 JSON。</li>
+            <li><strong>画中画</strong>：点击「画中画」将实时心率与趋势图浮窗显示（需 Chrome 116+ / Edge 116+）。</li>
+        </ul>
+    </div>
+
+    <script>
+        const connectBtn = document.getElementById('connectBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const pipBtn = document.getElementById('pipBtn');
+        const statusDiv = document.getElementById('status');
+        const recordMetaDiv = document.getElementById('recordMeta');
+        const bpmSpan = document.getElementById('bpm');
+        const heartIcon = document.getElementById('heartIcon');
+        const chartSvg = document.getElementById('chartSvg');
+        const chartTitle = document.getElementById('chartTitle');
+        const chartRangeEl = document.getElementById('chartRange');
+
+        const CHART_WINDOWS = [
+            { label: '10秒', ms: 10 * 1000 },
+            { label: '30秒', ms: 30 * 1000 },
+            { label: '1 分钟', ms: 60 * 1000 },
+            { label: '3 分钟', ms: 3 * 60 * 1000 },
+            { label: '5 分钟', ms: 5 * 60 * 1000 },
+            { label: '10 分钟', ms: 10 * 60 * 1000 },
+            { label: '30 分钟', ms: 30 * 60 * 1000 },
+            { label: '全部', ms: Infinity },
+        ];
+        let chartWindowMs = CHART_WINDOWS[1].ms;
+        let currentBpm = 0;
+
+        /** @type {Array<object>} 完整心率记录（不限条数） */
+        let heartRateRecords = [];
+
+        /** @type {object|null} 当前连接设备信息 */
+        let connectedDevice = null;
+
+        /** @type {object|null} 蓝牙 GATT 连接对象引用 */
+        let activeBluetoothDevice = null;
+
+        const sessionInfo = {
+            startTime: null,
+            endTime: null,
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            timezoneOffsetMinutes: new Date().getTimezoneOffset(),
+        };
+
+        /** @type {Window|null} 画中画窗口引用 */
+        let pipWindow = null;
+        let pipBpmSpan = null;
+        let pipHeartIcon = null;
+        let pipChartSvg = null;
+
+        const HEART_RATE_SERVICE_UUID = 'heart_rate';
+        const HEART_RATE_MEASUREMENT_CHARACTERISTIC_UUID = 'heart_rate_measurement';
+        const DEVICE_INFO_SERVICE_UUID = 'device_information';
+        const DEVICE_INFO_CHARACTERISTICS = {
+            manufacturer: 'manufacturer_name_string',
+            model: 'model_number_string',
+            serialNumber: 'serial_number_string',
+            hardwareRevision: 'hardware_revision_string',
+            firmwareRevision: 'firmware_revision_string',
+            softwareRevision: 'software_revision_string',
+        };
+
+        if (!navigator.bluetooth) {
+            statusDiv.innerHTML = '<span class="error-msg">抱歉，您的浏览器不支持 Web Bluetooth。请使用 Chrome 或 Edge 浏览器。</span>';
+            connectBtn.disabled = true;
+        }
+
+        if (!('documentPictureInPicture' in window)) {
+            pipBtn.disabled = true;
+            pipBtn.title = '当前浏览器不支持 Document Picture-in-Picture（需 Chrome/Edge 116+）';
+        }
+
+        downloadBtn.addEventListener('click', downloadHeartRateData);
+        pipBtn.addEventListener('click', openPictureInPicture);
+
+        initChartRangeButtons();
+
+        connectBtn.addEventListener('click', handleConnectClick);
+
+        async function handleConnectClick() {
+            if (activeBluetoothDevice?.gatt?.connected) {
+                activeBluetoothDevice.gatt.disconnect();
+                return;
+            }
+
+            try {
+                statusDiv.textContent = '正在请求蓝牙设备...';
+
+                const device = await navigator.bluetooth.requestDevice({
+                    filters: [{ services: [HEART_RATE_SERVICE_UUID] }],
+                    optionalServices: [DEVICE_INFO_SERVICE_UUID],
+                });
+
+                activeBluetoothDevice = device;
+                sessionInfo.startTime = new Date().toISOString();
+                sessionInfo.endTime = null;
+
+                connectedDevice = {
+                    id: device.id,
+                    name: device.name || null,
+                    connectedAt: sessionInfo.startTime,
+                };
+
+                statusDiv.textContent = `正在连接到: ${device.name || '心率计设备'}...`;
+                device.addEventListener('gattserverdisconnected', onDisconnected);
+
+                const server = await device.gatt.connect();
+                statusDiv.textContent = '连接成功，正在读取设备信息...';
+
+                await readDeviceInformation(server);
+
+                const service = await server.getPrimaryService(HEART_RATE_SERVICE_UUID);
+                statusDiv.textContent = '正在激活心率特征通知...';
+
+                const characteristic = await service.getCharacteristic(HEART_RATE_MEASUREMENT_CHARACTERISTIC_UUID);
+                await characteristic.startNotifications();
+                characteristic.addEventListener('characteristicvaluechanged', handleHeartRateChanged);
+
+                statusDiv.innerHTML = `<span style="color: #27ae60; font-weight: bold;">已成功连接到 ${device.name || '设备'} 并持续监听数据。</span>`;
+                connectBtn.textContent = '断开连接';
+                updateRecordMeta();
+            }
+            catch (error) {
+                console.error(error);
+                statusDiv.innerHTML = `<span class="error-msg">连接失败: ${error.message || error}</span>`;
+                activeBluetoothDevice = null;
+            }
+        }
+
+        async function readDeviceInformation(server) {
+            try {
+                const infoService = await server.getPrimaryService(DEVICE_INFO_SERVICE_UUID);
+                const details = {};
+
+                for (const [key, uuid] of Object.entries(DEVICE_INFO_CHARACTERISTICS)) {
+                    try {
+                        const char = await infoService.getCharacteristic(uuid);
+                        const value = await char.readValue();
+                        details[key] = decodeBluetoothString(value);
+                    }
+                    catch {
+                        // 部分设备不提供该字段，忽略即可
+                    }
+                }
+
+                connectedDevice = { ...connectedDevice, ...details };
+            }
+            catch {
+                // 设备可能未暴露 Device Information Service
+            }
+        }
+
+        function decodeBluetoothString(dataView) {
+            const bytes = new Uint8Array(dataView.buffer, dataView.byteOffset, dataView.byteLength);
+            return new TextDecoder('utf-8').decode(bytes).replace(/\0/g, '').trim();
+        }
+
+        function onDisconnected() {
+            sessionInfo.endTime = new Date().toISOString();
+            if (connectedDevice) {
+                connectedDevice.disconnectedAt = sessionInfo.endTime;
+            }
+
+            statusDiv.innerHTML = '<span class="error-msg">蓝牙连接已断开</span>';
+            bpmSpan.textContent = '--';
+            currentBpm = 0;
+            updateHeartAnimation(heartIcon, 0);
+            connectBtn.textContent = '连接心率设备';
+            activeBluetoothDevice = null;
+            syncPipDisplay();
+            updateRecordMeta();
+        }
+
+        function parseBpm(value) {
+            const flags = value.getUint8(0);
+            const isRate16Bits = flags & 0x01;
+            return isRate16Bits ? value.getUint16(1, true) : value.getUint8(1);
+        }
+
+        function handleHeartRateChanged(event) {
+            const now = new Date();
+            const bpm = parseBpm(event.target.value);
+
+            heartRateRecords.push({
+                timestampLocal: formatLocalDateTime(now),
+                timestampMs: now.getTime(),
+                bpm,
+            });
+
+            currentBpm = bpm;
+            bpmSpan.textContent = bpm;
+            updateHeartAnimation(heartIcon, bpm);
+
+            updateChart();
+            syncPipDisplay();
+            updateRecordMeta();
+        }
+
+        function formatLocalDateTime(date) {
+            const pad = (n, len = 2) => String(n).padStart(len, '0');
+            return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} `
+                + `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}.${pad(date.getMilliseconds(), 3)}`;
+        }
+
+        function formatFilenameDate(date) {
+            const pad = (n) => String(n).padStart(2, '0');
+            return `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}-`
+                + `${pad(date.getHours())}${pad(date.getMinutes())}${pad(date.getSeconds())}`;
+        }
+
+        function computeStatistics(records) {
+            if (records.length === 0) {
+                return {
+                    count: 0,
+                    minBpm: null,
+                    maxBpm: null,
+                    avgBpm: null,
+                    firstRecordAt: null,
+                    lastRecordAt: null,
+                };
+            }
+
+            const bpms = records.map((r) => r.bpm);
+            const sum = bpms.reduce((acc, v) => acc + v, 0);
+
+            return {
+                count: records.length,
+                minBpm: Math.min(...bpms),
+                maxBpm: Math.max(...bpms),
+                avgBpm: Math.round((sum / bpms.length) * 10) / 10,
+                firstRecordAt: records[0].timestampLocal,
+                lastRecordAt: records[records.length - 1].timestampLocal,
+                samplingSpanMs: records[records.length - 1].timestampMs - records[0].timestampMs,
+            };
+        }
+
+        function buildExportPayload() {
+            const exportedAt = new Date();
+            const endTime = sessionInfo.endTime || exportedAt.toISOString();
+            const startMs = sessionInfo.startTime ? new Date(sessionInfo.startTime).getTime() : null;
+            const endMs = new Date(endTime).getTime();
+
+            return {
+                exportInfo: {
+                    formatVersion: '1.0',
+                    exportedAt: exportedAt.toISOString(),
+                    exportedAtLocal: formatLocalDateTime(exportedAt),
+                    exporter: 'Web Bluetooth 实时心率看板',
+                    recordCount: heartRateRecords.length,
+                },
+                environment: {
+                    userAgent: navigator.userAgent,
+                    platform: navigator.platform,
+                    language: navigator.language,
+                    timezone: sessionInfo.timezone,
+                    timezoneOffsetMinutes: sessionInfo.timezoneOffsetMinutes,
+                },
+                device: connectedDevice || {
+                    id: null,
+                    name: null,
+                    note: '未连接设备或连接信息不可用',
+                },
+                bluetooth: {
+                    heartRateServiceUuid: HEART_RATE_SERVICE_UUID,
+                    heartRateMeasurementCharacteristicUuid: HEART_RATE_MEASUREMENT_CHARACTERISTIC_UUID,
+                },
+                session: {
+                    startTime: sessionInfo.startTime,
+                    endTime,
+                    durationSeconds: startMs != null ? Math.round((endMs - startMs) / 1000) : null,
+                    isConnected: !!activeBluetoothDevice?.gatt?.connected,
+                },
+                statistics: computeStatistics(heartRateRecords),
+                records: heartRateRecords,
+            };
+        }
+
+        function downloadHeartRateData() {
+            if (heartRateRecords.length === 0) {
+                statusDiv.innerHTML = '<span class="error-msg">暂无可导出的心率数据，请先连接设备并接收数据。</span>';
+                return;
+            }
+
+            const payload = buildExportPayload();
+            const json = JSON.stringify(payload, null, 2);
+            const blob = new Blob([json], { type: 'application/json;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+
+            const deviceName = (connectedDevice?.name || 'heart-rate').replace(/[^\w\u4e00-\u9fa5-]+/g, '_');
+            const filename = `${deviceName}_${formatFilenameDate(new Date())}.json`;
+
+            const anchor = document.createElement('a');
+            anchor.href = url;
+            anchor.download = filename;
+            document.body.appendChild(anchor);
+            anchor.click();
+            document.body.removeChild(anchor);
+            URL.revokeObjectURL(url);
+
+            statusDiv.innerHTML = `<span style="color: #27ae60;">已导出 ${heartRateRecords.length} 条心率记录到 ${filename}</span>`;
+        }
+
+        function initChartRangeButtons() {
+            chartRangeEl.innerHTML = CHART_WINDOWS.map((w) => (
+                `<button type="button" class="chart-range-btn${w.ms === chartWindowMs ? ' active' : ''}" data-ms="${w.ms}">${w.label}</button>`
+            )).join('');
+
+            chartRangeEl.addEventListener('click', (event) => {
+                const btn = event.target.closest('.chart-range-btn');
+                if (!btn) return;
+
+                chartWindowMs = Number(btn.dataset.ms);
+                chartRangeEl.querySelectorAll('.chart-range-btn').forEach((el) => {
+                    el.classList.toggle('active', Number(el.dataset.ms) === chartWindowMs);
+                });
+                updateChart();
+            });
+
+        }
+
+        function getActiveChartWindowLabel() {
+            return CHART_WINDOWS.find((w) => w.ms === chartWindowMs)?.label || '';
+        }
+
+
+        function getChartDisplayData() {
+            if (heartRateRecords.length === 0) return [];
+
+            const cutoff = Date.now() - chartWindowMs;
+            return heartRateRecords
+                .filter((record) => record.timestampMs >= cutoff)
+                .map((record) => record.bpm);
+        }
+
+        function updateHeartAnimation(element, bpm) {
+            if (!element) return;
+
+            if (bpm > 0) {
+                element.classList.remove('heart-static');
+                element.style.animationDuration = `${60 / bpm}s`;
+            }
+            else {
+                element.classList.add('heart-static');
+                element.style.animationDuration = '';
+            }
+        }
+
+        function updateRecordMeta() {
+            const count = heartRateRecords.length;
+            recordMetaDiv.textContent = `已记录 ${count} 条心率数据`;
+            downloadBtn.disabled = count === 0;
+        }
+
+        function renderChart(svgElement, chartHeight) {
+            const displayData = getChartDisplayData();
+            if (displayData.length === 0 || !svgElement) return;
+
+            const width = svgElement.clientWidth || 320;
+            const height = chartHeight;
+            const padding = { top: 16, right: 16, bottom: 16, left: 32 };
+
+            const minHr = Math.min(...displayData) - 5 < 40 ? 40 : Math.min(...displayData) - 5;
+            const maxHr = Math.max(...displayData) + 5 > 200 ? 200 : Math.max(...displayData) + 5;
+            const hrRange = maxHr - minHr || 10;
+
+            const points = [];
+            const stepDenominator = Math.max(displayData.length - 1, 1);
+            const stepX = (width - padding.left - padding.right) / stepDenominator;
+
+            for (let i = 0; i < displayData.length; i++) {
+                const x = padding.left + i * stepX;
+                const y = padding.top + (1 - (displayData[i] - minHr) / hrRange) * (height - padding.top - padding.bottom);
+                points.push(`${x},${y}`);
+            }
+
+            const polylinePath = points.join(' ');
+            const areaPath = `${padding.left},${height - padding.bottom} ${polylinePath} ${padding.left + (displayData.length - 1) * stepX},${height - padding.bottom}`;
+
+            let yTicksHtml = '';
+            const tickCount = 4;
+            for (let i = 0; i <= tickCount; i++) {
+                const val = Math.round(minHr + (hrRange / tickCount) * i);
+                const y = padding.top + (1 - i / tickCount) * (height - padding.top - padding.bottom);
+                yTicksHtml += `
+                    <line x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}" stroke="#eef2f3" stroke-width="1" />
+                    <text x="${padding.left - 6}" y="${y + 3}" font-size="8pt" fill="#7f8c8d" text-anchor="end">${val}</text>
+                `;
+            }
+
+            const gradientId = svgElement.id ? `gradient-${svgElement.id}` : 'gradient';
+
+            svgElement.innerHTML = `
+                <defs>
+                    <linearGradient id="${gradientId}" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stop-color="#e74c3c" stop-opacity="0.3"/>
+                        <stop offset="100%" stop-color="#e74c3c" stop-opacity="0.0"/>
+                    </linearGradient>
+                </defs>
+                ${yTicksHtml}
+                <polygon points="${areaPath}" fill="url(#${gradientId})" />
+                <polyline points="${polylinePath}" fill="none" stroke="#e74c3c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+                ${points.length > 0 ? `<circle cx="${points[points.length - 1].split(',')[0]}" cy="${points[points.length - 1].split(',')[1]}" r="4" fill="#e74c3c" stroke="white" stroke-width="2" />` : ''}
+            `;
+        }
+
+        function updateChart() {
+            renderChart(chartSvg, 200);
+            if (pipChartSvg) {
+                renderChart(pipChartSvg, getPipChartHeight());
+            }
+        }
+
+        function getPipChartHeight() {
+            if (!pipChartSvg) return 88;
+            return pipChartSvg.clientHeight || pipChartSvg.getBoundingClientRect().height || 88;
+        }
+
+        function syncPipDisplay() {
+            if (!pipWindow || pipWindow.closed || !pipBpmSpan || !pipHeartIcon) return;
+
+            pipBpmSpan.textContent = bpmSpan.textContent;
+            updateHeartAnimation(pipHeartIcon, currentBpm);
+        }
+
+        function closePictureInPicture() {
+            pipWindow = null;
+            pipBpmSpan = null;
+            pipHeartIcon = null;
+            pipChartSvg = null;
+            pipBtn.textContent = '画中画';
+        }
+
+        async function openPictureInPicture() {
+            if (pipWindow && !pipWindow.closed) {
+                pipWindow.focus();
+                return;
+            }
+
+            try {
+                pipWindow = await documentPictureInPicture.requestWindow({
+                    width: 280,
+                    height: 130,
+                });
+
+                const doc = pipWindow.document;
+                doc.title = '心率看板';
+
+                const style = doc.createElement('style');
+                style.textContent = `
+                    * { box-sizing: border-box; margin: 0; padding: 0; }
+                    html, body {
+                        height: 100%;
+                    }
+                    body {
+                        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                        background: #fff;
+                        color: #333;
+                        padding: 6px;
+                        overflow: hidden;
+                        display: flex;
+                        flex-direction: column;
+                    }
+                    .pip-row {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 6px;
+                        padding: 2px 0 4px;
+                        border-bottom: 2px solid #e74c3c;
+                        margin-bottom: 4px;
+                        flex-shrink: 0;
+                    }
+                    .pip-heart {
+                        font-size: 18pt;
+                        color: #e74c3c;
+                        animation: heartbeat 1s infinite ease-in-out;
+                        line-height: 1;
+                    }
+                    .pip-heart.heart-static { animation: none; }
+                    @keyframes heartbeat {
+                        0%, 100% { transform: scale(1); }
+                        50% { transform: scale(1.12); }
+                    }
+                    .pip-bpm {
+                        font-size: 22pt;
+                        font-weight: 800;
+                        color: #2c3e50;
+                        line-height: 1;
+                    }
+                    .pip-unit {
+                        font-size: 9pt;
+                        color: #7f8c8d;
+                        font-weight: normal;
+                    }
+                    .pip-chart-area {
+                        flex: 1;
+                        min-height: 0;
+                        display: flex;
+                    }
+                    #pipChartSvg {
+                        display: block;
+                        width: 100%;
+                        height: 100%;
+                        min-height: 0;
+                        background: #fafafa;
+                        border-radius: 3px;
+                    }
+                `;
+                doc.head.appendChild(style);
+
+                doc.body.innerHTML = `
+                    <div class="pip-row">
+                        <span id="pipHeartIcon" class="pip-heart heart-static">❤️</span>
+                        <span class="pip-bpm"><span id="pipBpm">--</span> <span class="pip-unit">BPM</span></span>
+                    </div>
+                    <div class="pip-chart-area">
+                        <svg id="pipChartSvg"></svg>
+                    </div>
+                `;
+
+                pipBpmSpan = doc.getElementById('pipBpm');
+                pipHeartIcon = doc.getElementById('pipHeartIcon');
+                pipChartSvg = doc.getElementById('pipChartSvg');
+
+                pipWindow.addEventListener('pagehide', closePictureInPicture);
+                pipWindow.addEventListener('resize', () => requestAnimationFrame(updateChart));
+
+                pipBtn.textContent = '画中画中';
+                syncPipDisplay();
+                requestAnimationFrame(updateChart);
+            }
+            catch (error) {
+                console.error(error);
+                closePictureInPicture();
+                if (error.name !== 'NotAllowedError') {
+                    statusDiv.innerHTML = `<span class="error-msg">画中画打开失败: ${error.message || error}</span>`;
+                }
+            }
+        }
+
+        window.addEventListener('resize', updateChart);
+    </script>
+</body>
+</html>

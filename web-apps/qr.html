@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="二维码工具 - 在线生成和扫描二维码，支持文本转二维码及图片二维码识别。">
+  <title>二维码工具 - 生成与扫描</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --text-light: #64748b;
+      --border: #e2e8f0;
+      --radius: 12px;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 500px;
+      background: var(--card-bg);
+      padding: 30px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      margin-top: 0;
+      margin-bottom: 24px;
+      text-align: center;
+      color: var(--text);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 24px;
+      background: #f1f5f9;
+      padding: 4px;
+      border-radius: 8px;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      background: transparent;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--text-light);
+      transition: all 0.2s;
+    }
+
+    .tab.active {
+      background: white;
+      color: var(--primary);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text-light);
+    }
+
+    textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      resize: vertical;
+      min-height: 100px;
+      box-sizing: border-box;
+      font-size: 1rem;
+      font-family: inherit;
+    }
+
+    textarea:focus {
+      outline: 2px solid #bfdbfe;
+      border-color: var(--primary);
+    }
+
+    button.main-btn {
+      width: 100%;
+      padding: 12px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-size: 1rem;
+    }
+
+    button.main-btn:hover {
+      background: var(--primary-hover);
+    }
+
+    button.main-btn:disabled {
+      background: #94a3b8;
+      cursor: not-allowed;
+    }
+
+    .result-container {
+      margin-top: 24px;
+      text-align: center;
+      padding: 20px;
+      background: #f8fafc;
+      border-radius: 8px;
+      border: 1px dashed var(--border);
+      min-height: 100px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #qrcode-output {
+      margin-bottom: 15px;
+    }
+
+    #qrcode-output img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 40px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: #f8fafc;
+    }
+
+    .drop-zone.hover {
+      border-color: var(--primary);
+      background: #eff6ff;
+    }
+
+    .drop-zone p {
+      margin: 10px 0 0;
+      color: var(--text-light);
+      font-size: 0.875rem;
+    }
+
+    .drop-zone svg {
+      width: 48px;
+      height: 48px;
+      color: var(--text-light);
+    }
+
+    #scan-result {
+      width: 100%;
+      text-align: left;
+      word-break: break-all;
+      background: white;
+      padding: 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      margin-top: 10px;
+      font-family: monospace;
+      font-size: 0.9rem;
+      white-space: pre-wrap;
+    }
+
+    .copy-btn {
+      margin-top: 10px;
+      padding: 6px 12px;
+      font-size: 0.75rem;
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .copy-btn:hover {
+      background: #e2e8f0;
+    }
+
+    .hidden-input {
+      display: none;
+    }
+
+    .loading-spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid var(--primary);
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 10px;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>二维码工具</h1>
+
+    <div class="tabs">
+      <button id="tab-generate" class="tab active" onclick="switchTab('generate')">生成</button>
+      <button id="tab-scan" class="tab" onclick="switchTab('scan')">扫描</button>
+    </div>
+
+    <!-- 生成部分 -->
+    <div id="section-generate" class="section active">
+      <div class="input-group">
+        <label for="qr-input">请输入文本或 URL</label>
+        <textarea id="qr-input" placeholder="在此输入内容..." oninput="debounceGenerateQR()"></textarea>
+      </div>
+
+      <div class="result-container" id="generate-result">
+        <div id="qrcode-output"></div>
+        <p id="generate-hint" style="color: var(--text-light); font-size: 0.875rem;">二维码将在此处实时显示</p>
+      </div>
+    </div>
+
+    <!-- 扫描部分 -->
+    <div id="section-scan" class="section">
+      <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+        </svg>
+        <p>点击、上传或拖拽二维码图片</p>
+        <input type="file" id="file-input" class="hidden-input" accept="image/*" onchange="handleFileSelect(event)">
+      </div>
+
+      <div class="result-container" id="scan-result-container" style="display: none;">
+        <label>识别结果：</label>
+        <div id="scan-result"></div>
+        <button class="copy-btn" onclick="copyResult()">复制结果</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 动态脚本加载器
+    const loadedScripts = {};
+    function loadScript(url) {
+      if (loadedScripts[url]) return loadedScripts[url];
+
+      loadedScripts[url] = new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = url;
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+      });
+      return loadedScripts[url];
+    }
+
+    // 切换标签
+    function switchTab(type) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+
+      document.getElementById('tab-' + type).classList.add('active');
+      document.getElementById('section-' + type).classList.add('active');
+    }
+
+    // 页面加载时自动加载库
+    window.addEventListener('DOMContentLoaded', () => {
+      loadScript('https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js');
+    });
+
+    // --- 生成功能 ---
+    let debounceTimer;
+    function debounceGenerateQR() {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(generateQR, 300);
+    }
+
+    // 中文支持：将字符串转换为 UTF-8 字节流
+    function toUtf8Bytes(str) {
+      const utf8 = [];
+      for (let i = 0; i < str.length; i++) {
+        let charcode = str.charCodeAt(i);
+        if (charcode < 0x80) utf8.push(charcode);
+        else if (charcode < 0x800) {
+          utf8.push(0xc0 | (charcode >> 6),
+            0x80 | (charcode & 0x3f));
+        }
+        else if (charcode < 0xd800 || charcode >= 0xe000) {
+          utf8.push(0xe0 | (charcode >> 12),
+            0x80 | ((charcode >> 6) & 0x3f),
+            0x80 | (charcode & 0x3f));
+        }
+        else {
+          i++;
+          charcode = 0x10000 + (((charcode & 0x3ff) << 10) | (str.charCodeAt(i) & 0x3ff));
+          utf8.push(0xf0 | (charcode >> 18),
+            0x80 | ((charcode >> 12) & 0x3f),
+            0x80 | ((charcode >> 6) & 0x3f),
+            0x80 | (charcode & 0x3f));
+        }
+      }
+      return utf8;
+    }
+
+    async function generateQR() {
+      const text = document.getElementById('qr-input').value.trim();
+      const output = document.getElementById('qrcode-output');
+      const hint = document.getElementById('generate-hint');
+
+      if (!text) {
+        output.innerHTML = '';
+        hint.style.display = 'block';
+        return;
+      }
+
+      hint.style.display = 'none';
+
+      try {
+        await loadScript('https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js');
+
+        // 设置 UTF-8 支持
+        if (typeof qrcode !== 'undefined') {
+          // qrcode-generator 的默认 stringToBytes 不支持多字节
+          // 我们覆盖它以支持 UTF-8
+          qrcode.stringToBytes = function (s) {
+            return toUtf8Bytes(s);
+          };
+        }
+
+        const typeNumber = 0; // 自动检测
+        const errorCorrectionLevel = 'L';
+        const qr = qrcode(typeNumber, errorCorrectionLevel);
+
+        qr.addData(text);
+        qr.make();
+
+        output.innerHTML = qr.createImgTag(5); // 单元大小为5
+      } catch (err) {
+        console.error(err);
+        output.innerHTML = '<p style="color: red;">生成失败</p>';
+      }
+    }
+
+    // --- 扫描功能 ---
+    const dropZone = document.getElementById('drop-zone');
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropZone.addEventListener(eventName, () => dropZone.classList.add('hover'), false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, () => dropZone.classList.remove('hover'), false);
+    });
+
+    dropZone.addEventListener('drop', handleDrop, false);
+
+    function handleDrop(e) {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      if (files.length > 0) {
+        processFile(files[0]);
+      }
+    }
+
+    function handleFileSelect(e) {
+      const files = e.target.files;
+      if (files.length > 0) {
+        processFile(files[0]);
+      }
+    }
+
+    async function processFile(file) {
+      if (!file.type.startsWith('image/')) {
+        alert('请上传图片文件');
+        return;
+      }
+
+      const resultContainer = document.getElementById('scan-result-container');
+      const resultDiv = document.getElementById('scan-result');
+
+      resultContainer.style.display = 'flex';
+      resultDiv.innerHTML = '<div class="loading-spinner"></div>';
+
+      try {
+        // 动态加载 jsQR
+        await loadScript('https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js');
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const img = new Image();
+          img.onload = function () {
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            context.drawImage(img, 0, 0);
+
+            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+            const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+            if (code) {
+              resultDiv.textContent = code.data;
+            } else {
+              resultDiv.textContent = '未在图片中检测到二维码';
+            }
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      } catch (err) {
+        console.error(err);
+        resultDiv.innerHTML = '<p style="color: red;">加载扫描库失败，请检查网络</p>';
+      }
+    }
+
+    function copyResult() {
+      const text = document.getElementById('scan-result').textContent;
+      if (text && text !== '未在图片中检测到二维码') {
+        navigator.clipboard.writeText(text).then(() => {
+          const btn = document.querySelector('.copy-btn');
+          const originalText = btn.textContent;
+          btn.textContent = '已复制！';
+          setTimeout(() => btn.textContent = originalText, 2000);
+        });
+      }
+    }
+  </script>
+</body>
+
+</html>

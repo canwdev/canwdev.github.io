@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>用电量计算 (JavaScript 版)</title>
+  <style>
+
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      margin: 0;
+    }
+
+    input, select {
+      padding: 10px;
+    }
+
+    input {
+      width: 200px;
+    }
+
+    label {
+      display: inline-block;
+      width: 120px;
+    }
+
+    a {
+      color: #007BFF;
+    }
+
+    button {
+      padding: 10px 15px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    #result {
+      color: green;
+    }
+  </style>
+</head>
+<body>
+<h1>用电量计算</h1>
+<div>
+  <label for="w">电器功率 (W)：</label>
+  <input id="w" placeholder="输入功率" type="number" value="1000">
+</div>
+<br>
+<div>
+  <label for="time">用电时长：</label>
+  <input id="time" placeholder="输入用电时长" type="number" value="1">
+  <select id="unit" onchange="convertToKWh()" size="1">
+    <option value="min">分钟</option>
+    <option selected="selected" value="h">小时</option>
+    <option value="d">天</option>
+  </select>
+  <button id="convertToKWh">转换为千瓦时</button>
+</div>
+<h2>Result: <span id="result"></span></h2>
+<hr>
+
+<h2>说明</h2>
+<div>
+  千瓦时（kWh）是电量单位，表示1000瓦的电器工作1小时所消耗的电量。通常所说的<mark>1度电</mark>就是指1kWh。<br>
+  <br>
+  kWh = (W / 1000) * h<br>
+  <br>
+  知道电器功率和用电时长就可以计算出使用了多少度电。为了方便计算，时间单位可选择：分钟、小时、天。
+  <br>
+
+  <br>
+  <br>
+  参考：<a href="https://www.dianziaihaozhe.com/gongju/kWh/" target="_blank">电学在线工具</a>
+</div>
+
+<script>
+  function convertToKWh() {
+    const W = parseFloat(document.getElementById('w').value);
+    const time = parseFloat(document.getElementById('time').value);
+    const unit = document.getElementById('unit').value;
+
+    let h
+    if (unit === 'min') {
+      h = time / 60
+    } else if (unit === 'h') {
+      h = time
+    } else if (unit === 'd') {
+      h = time * 24
+    }
+
+    const kWh = (W / 1000) * h
+    document.getElementById('result').textContent = `${parseFloat(kWh.toFixed(3))} kWh`;
+  }
+
+  document.getElementById('convertToKWh').addEventListener('click', convertToKWh);
+  convertToKWh()
+</script>
+</body>
+</html>
