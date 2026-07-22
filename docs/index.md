@@ -19,7 +19,7 @@
     - [[一加 6T 刷 Win11ARM 指南]]
     - [[Windows 设备如何在使用 Android 手机 USB 共享上网的情况下，在局域网进行远程桌面连接(RDP)]]
 - Windows 配置
-    - [[在vhdx虚拟磁盘上安装Windows]]
+    - [[在 vhdx 虚拟磁盘上安装 Windows]]
     - [[Windows 通过 New-NetNat 给其他网卡共享网络]]
     - [[Windows 更新的相关设置]]
     - [[Win11 修改]]
@@ -28,8 +28,8 @@
 - 未分类
 	- [[Sunshine Moonlight 串流]]
 	- [[Excel 技巧]]
-    - [[FE前端技术栈]]
-      - [[如何调试已打包的Electron程序]]
+    - [[Web 前端技术栈（旧）]]
+      - [[如何调试已打包的 Electron 程序]]
       - [[Nuxt.js 高级用法]]
     - [[Ubuntu Server 安装 TigerVNC + Xfce4 桌面环境]]
     - [[AutoHotKey]]

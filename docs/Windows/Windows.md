@@ -1,6 +1,6 @@
 
 - [[Windows 脚本 + 常用命令]]
-- [[Windows 使用VHD镜像无损备份恢复系统]]
+- [[Windows 使用 VHD 镜像无损备份恢复系统]]
 - [[Windows UEFI BCD 引导修复]]
 - [[Windows 注册表修改]]
 - [[RDP 远程桌面连接]]

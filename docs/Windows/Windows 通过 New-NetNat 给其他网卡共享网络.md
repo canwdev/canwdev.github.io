@@ -33,7 +33,7 @@ Get-NetNat
 
 现在在客户端电脑设置网卡的静态IP地址如下，客户端此时可以正常上网。
 
-![[netconfig.png]]
+![[netconfig.webp]]
 
 参考
 - [在 Windows 上设置 NAT 或网络共享的正确方法——避免Wi-Fi热点无法使用](https://kenvix.com/post/setup-nat-on-windows/)
