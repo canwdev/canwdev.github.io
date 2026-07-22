@@ -1,7 +1,5 @@
 包含 JS/jQuery 基础用法
 
-## [[js-object-clone]]
-
 ## [[JS 的节流与防抖函数]]
 
 ## [[JavaScript AJAX 请求数据的各种写法]]

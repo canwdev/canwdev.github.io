@@ -61,7 +61,7 @@ chsh -s fish
 
 ## 备份与恢复
 
-参考[官方备份教程](https://wiki.termux.com/wiki/Backing_up_Termux)，通过备份termux的data数据，可以实现备份、恢复、或迁移到其他设备（仅限相同架构），我写了一份 [备份恢复脚本](./setup-termux/termux_backup.sh)
+参考[官方备份教程](https://wiki.termux.com/wiki/Backing_up_Termux)，通过备份 termux 的 data 数据，可以实现备份、恢复、或迁移到其他设备（仅限相同架构）。步骤见下方。
 
 ### 备份
 

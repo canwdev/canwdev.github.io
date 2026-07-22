@@ -63,7 +63,7 @@ systemctl enable frps
 
 运行`frpc -c frpc.ini`可启动客户端服务，
 
-* windows可使用[NSSM](./windows-setup-mongodb.md)来实现自动运行服务
+* Windows 可使用 [NSSM](https://nssm.cc/) 来实现自动运行服务
 
 ### frpc 守护服务、开机启动：systemd/systemctl 配置
 

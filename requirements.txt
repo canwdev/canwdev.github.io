@@ -4,3 +4,4 @@ mkdocs-roamlinks-plugin>=0.3.2
 mkdocs-callouts>=1.14
 mkdocs-git-revision-date-localized-plugin>=1.2
 mkdocs-glightbox>=0.4
+mdx-truly-sane-lists>=1.3

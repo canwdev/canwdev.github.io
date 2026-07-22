@@ -1,3 +1,4 @@
 .vscode/settings.json
 *.drawio.bkp
 site/
+__pycache__/

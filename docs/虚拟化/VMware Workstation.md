@@ -15,7 +15,7 @@ chmod +x *.bundle
 
 启动 VMware，如果出现【VMware Kernel Module Updatert】弹窗，则需要：`sudo pacman -S linux-headers`，选择对应的版本安装，比如我的是 `linux54-headers`。安装完成后重新打开 VMWare 就可以了。更多说明请查看 [Arch VMware 文档]([https://wiki.archlinux.org/index.php/VMware_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)](https://wiki.archlinux.org/index.php/VMware_(简体中文))
 
-[[Arch Linux 安装 VirtualBox 虚拟机]]
+[Arch Linux 安装 VirtualBox 虚拟机](./VirtualBox.md#arch-linux-virtualbox)
 
 ### VMWare vmdk 拆分与合并
 

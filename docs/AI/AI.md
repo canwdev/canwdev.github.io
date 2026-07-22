@@ -1,7 +1,7 @@
 ## 教程
 
-- 目前多数工具都是基于 Python，推荐先 [[Python 学习]]
-- [[动手学深度学习]] 
+- 目前多数工具都是基于 Python，推荐先 [[安装 Python]]
+- [动手学深度学习](https://zh.d2l.ai/)
 - [CS DIY](https://github.com/pkuflyingpig/cs-self-learning/)
 
 ## 技术

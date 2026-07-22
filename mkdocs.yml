@@ -1,4 +1,4 @@
-site_name: Canwdev's Tech Blog - Obsidian
+site_name: Canwdev's Blog
 repo_url: https://github.com/canwdev/canwdev.github.io
 repo_name: canwdev/canwdev.github.io
 edit_uri: edit/main/docs/
@@ -56,8 +56,16 @@ markdown_extensions:
   - md_in_html
   # Obsidian soft line breaks (also helps multi-line callouts)
   - nl2br
+  # Obsidian/GFM-style 2-space nested lists (Python-Markdown defaults to 4)
+  - mdx_truly_sane_lists:
+      nested_indent: 2
+  # Use pymdownx slugify so Chinese headings keep CJK in ids (default toc slugify → "#npmyarn")
+  # Matches Obsidian / roamlinks anchors like "#设置-npmyarn-镜像"
   - toc:
       permalink: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
 
   # Python Markdown Extensions
   - pymdownx.arithmatex:
@@ -86,6 +94,13 @@ markdown_extensions:
       custom_checkbox: true
   - pymdownx.tilde
 
+# Obsidian vault helpers (#hashtag, attachments, shield `[[` in code from roamlinks)
+hooks:
+  - hooks/obsidian_fence_protect.py
+  - hooks/obsidian_hashtags.py
+  - hooks/obsidian_attachments.py
+  - hooks/obsidian_fence_restore.py
+
 plugins:
   - search
   # Obsidian [[wikilinks]]
@@ -109,9 +124,9 @@ plugins:
       zoomable: true
       draggable: true
       auto_caption: true
-  # Frontmatter tags: (Obsidian YAML tags work; inline #tags do not)
+  # Tags index: frontmatter `tags:` + inline Obsidian `#hashtag` (via hooks)
+  # Listing injected via <!-- material/tags --> in docs/tags.md
   - tags:
-      tags_file: tags.md
 
 extra:
   social:
