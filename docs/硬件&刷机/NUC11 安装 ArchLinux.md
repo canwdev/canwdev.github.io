@@ -1,4 +1,4 @@
-推荐安装 Manjaro Linux 可解决大部分驱动问题。
+推荐安装 Manjaro Linux，可解决大部分驱动问题。
 
 参考：
 
@@ -7,7 +7,7 @@
 
 ## 显示器或 VNC Server 屏幕闪烁
 
-创建文件`sudo vim /etc/X11/xorg.conf.d/20-intel-graphics.conf`，粘贴以下内容：
+创建文件 `sudo vim /etc/X11/xorg.conf.d/20-intel-graphics.conf`，粘贴以下内容：
 
 ```
 Section "Device"
@@ -37,7 +37,7 @@ The [PulseAudio#Switch on connect](https://wiki.archlinux.org/title/PulseAudio#S
 
 ## 外接耳机不在音频设备列表中
 
-创建文件 `sudo vim /etc/modprobe.d/alsa-base.conf` 添加以下内容：
+创建文件 `sudo vim /etc/modprobe.d/alsa-base.conf`，添加以下内容：
 
 ```
 options snd-hda-intel model=dell-headset-multi
