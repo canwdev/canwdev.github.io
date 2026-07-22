@@ -27,20 +27,13 @@
   - [[RDP 远程桌面连接]]
   - [[Windows 脚本 + 常用命令#无法加载文件 xxx.ps1，因为在此系统上禁止运行脚本]]
 - 未分类
+  - [[软件推荐]]
   - [[Sunshine Moonlight 串流]]
-  - [[Excel 技巧]]
-  - [[Web 前端技术栈（旧）]]
-    - [[如何调试已打包的 Electron 程序]]
-    - [[Nuxt.js 高级用法]]
   - [[Ubuntu Server 安装 TigerVNC + Xfce4 桌面环境]]
-  - [[AutoHotKey]]
-    - [[修改狼派 A89 CIY 小键盘区按键映射（AHK脚本）]]
   - [[qemu-windows]]
   - [[使用 ffmpeg 批量截取视频封面]]
-  - [[摄影]]
   - [[局域网文件传输工具]]
   - [[Windows 注册表修改]]
-  - [[AI]]
 
 ## Web Apps
 
