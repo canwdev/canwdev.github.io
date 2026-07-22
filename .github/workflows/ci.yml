@@ -1,17 +1,33 @@
 name: ci
+
 on:
   push:
     branches:
       - master
       - main
+      - dev
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - uses: actions/checkout@v4
         with:
-          python-version: 3.x
-      - run: pip install mkdocs-material
-      - run: pip install mkdocs-roamlinks-plugin
-      - run: mkdocs gh-deploy --force
+          # Full history needed for accurate page dates
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Deploy
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        run: mkdocs gh-deploy --force
+
+      - name: Build only
+        if: github.ref != 'refs/heads/main' && github.ref != 'refs/heads/master'
+        run: mkdocs build

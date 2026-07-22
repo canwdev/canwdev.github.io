@@ -1,20 +1,35 @@
 ## 个人博客
 
-本仓库使用了mkdocs模板，主要的 Obsidian 文档在 `docs` 目录内。
+本仓库使用 MkDocs Material，Obsidian 笔记在 `docs/` 目录。
 
-本地运行需要 python3 环境
+本地运行需要 Python 3：
 
 ```shell
-# 安装依赖
-pip install mkdocs
-pip install mkdocs-material
-pip install mkdocs-roamlinks-plugin
-
-# 运行
+pip install -r requirements.txt
 mkdocs serve
+```
+
+已启用：
+
+- `[[wikilinks]]` — mkdocs-roamlinks-plugin
+- `> [!WARNING]` 等 callout — mkdocs-callouts
+- 页面创建 / 更新时间 — git-revision-date-localized
+- 图片灯箱 — mkdocs-glightbox
+- 标签索引 — Material `tags`（frontmatter `tags:`）
+- 即时加载 / TOC 跟随 / 页脚翻页 / 编辑入口
+
+标签写法示例：
+
+```yaml
+---
+tags:
+  - Linux
+  - Docker
+---
 ```
 
 ## 参考
 
 - https://squidfunk.github.io/mkdocs-material/setup/
-- https://sspai.com/prime/story/mkdocs-primer
+- https://github.com/sondregronas/mkdocs-callouts
+- https://github.com/blueswen/mkdocs-glightbox

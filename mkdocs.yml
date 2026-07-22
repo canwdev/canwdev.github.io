@@ -1,36 +1,52 @@
 site_name: Canwdev's Tech Blog - Obsidian
 repo_url: https://github.com/canwdev/canwdev.github.io
+repo_name: canwdev/canwdev.github.io
+edit_uri: edit/main/docs/
+
+# Keep Obsidian vault config out of the published site
+exclude_docs: |
+  .obsidian/**
 
 theme:
-    name: 'material'
-    language: zh
-    palette:
-      # Palette toggle for automatic mode
-      - media: "(prefers-color-scheme)"
-        toggle:
-          icon: material/brightness-auto
-          name: Switch to light mode
+  name: material
+  language: zh
+  features:
+    - content.code.copy
+    - content.code.annotate
+    - content.action.edit
+    - navigation.instant
+    - navigation.tracking
+    - navigation.top
+    - navigation.footer
+    - toc.follow
+    - search.highlight
+    - search.suggest
+  palette:
+    # Palette toggle for automatic mode
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
 
-      # Palette toggle for light mode
-      - media: "(prefers-color-scheme: light)"
-        scheme: default
-        primary: deep purple
-        accent: pink
-        toggle:
-          icon: material/brightness-7
-          name: Switch to dark mode
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: blue
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
 
-      # Palette toggle for dark mode
-      - media: "(prefers-color-scheme: dark)"
-        scheme: slate
-        primary: indigo
-        accent: blue
-        toggle:
-          icon: material/brightness-4
-          name: Switch to system preference
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: orange
+      accent: amber
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
 
 markdown_extensions:
-
   # Python Markdown
   - abbr
   - admonition
@@ -38,6 +54,8 @@ markdown_extensions:
   - def_list
   - footnotes
   - md_in_html
+  # Obsidian soft line breaks (also helps multi-line callouts)
+  - nl2br
   - toc:
       permalink: true
 
@@ -49,8 +67,8 @@ markdown_extensions:
   - pymdownx.caret
   - pymdownx.details
   - pymdownx.emoji:
-      emoji_index: !!python/name:materialx.emoji.twemoji
-      emoji_generator: !!python/name:materialx.emoji.to_svg
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
   - pymdownx.highlight:
       anchor_linenums: true
       auto_title: true
@@ -68,7 +86,30 @@ markdown_extensions:
 
 plugins:
   - search
+  # Obsidian [[wikilinks]]
   - roamlinks
+  # Obsidian > [!WARNING] callouts → Material admonitions
+  - callouts
+  # Page created / last updated from git history
+  - git-revision-date-localized:
+      enable_creation_date: true
+      type: datetime
+      timezone: Asia/Shanghai
+      locale: zh
+      fallback_to_build_date: true
+  # Click images to open lightbox
+  - glightbox:
+      touchNavigation: true
+      loop: false
+      effect: zoom
+      width: 100%
+      height: auto
+      zoomable: true
+      draggable: true
+      auto_caption: true
+  # Frontmatter tags: (Obsidian YAML tags work; inline #tags do not)
+  - tags:
+      tags_file: tags.md
 
 extra:
   social:
