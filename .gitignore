@@ -2,3 +2,16 @@
 docs/.obsidian/workspace.json
 *.drawio.bkp
 docs/.obsidian/plugins/novel-word-count/data.json
+
+# Quartz
+.DS_Store
+node_modules
+public
+prof
+tsconfig.tsbuildinfo
+.quartz-cache
+private/
+.replit
+replit.nix
+.quartz/
+quartz/cli/tui/dist/
