@@ -9,7 +9,8 @@
 4. 如果黑屏，且设备管理器中端口（COM）出现 9008 设备，则成功
 
 > [!WARNING] 9008 刷机或救砖操作会破坏基带；若需救砖，提前备份基带所在的几个分区
-#### 教学视频，G8X 同样适用：
+
+教学视频，G8X 同样适用：
 
 如何进入 9008： https://www.bilibili.com/video/BV1rB4y1N7BM/
 如何进入 fastboot： https://www.bilibili.com/video/BV193411s74D
