@@ -20,7 +20,7 @@
     
     
       
-        <title>Debian 12 服务器设置 Swap 方法 - Canwdev's Tech Blog - Obsidian</title>
+        <title>Debian 12 服务器设置 Swap 方法 - Canwdev's Blog</title>
       
     
     
@@ -92,7 +92,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="页眉">
-    <a href="../.." title="Canwdev's Tech Blog - Obsidian" class="md-header__button md-logo" aria-label="Canwdev's Tech Blog - Obsidian" data-md-component="logo">
+    <a href="../.." title="Canwdev's Blog" class="md-header__button md-logo" aria-label="Canwdev's Blog" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
@@ -106,7 +106,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            Canwdev's Tech Blog - Obsidian
+            Canwdev's Blog
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -240,13 +240,13 @@
 
 <nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="Canwdev's Tech Blog - Obsidian" class="md-nav__button md-logo" aria-label="Canwdev's Tech Blog - Obsidian" data-md-component="logo">
+    <a href="../.." title="Canwdev's Blog" class="md-nav__button md-logo" aria-label="Canwdev's Blog" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
 
     </a>
-    Canwdev's Tech Blog - Obsidian
+    Canwdev's Blog
   </label>
   
     <div class="md-nav__source">
@@ -277,7 +277,7 @@
   <span class="md-ellipsis">
     
   
-    Canwdev's Tech Blog
+    Home
   
 
     
@@ -656,7 +656,7 @@
   <span class="md-ellipsis">
     
   
-    Git 区分工作和个人用户名和邮箱
+    git 区分工作和个人用户名和邮箱
   
 
     
@@ -1879,7 +1879,7 @@
   <span class="md-ellipsis">
     
   
-    git #snippet git 递归更新脚本：用 Bun 运行 bun run ./bun-update-git.ts
+    git 脚本
   
 
     
@@ -2287,7 +2287,7 @@
   <span class="md-ellipsis">
     
   
-    Rclone
+    rclone
   
 
     
@@ -2564,7 +2564,7 @@
   <span class="md-ellipsis">
     
   
-    snippet inputmask
+    Inputmask
   
 
     
@@ -2592,7 +2592,7 @@
   <span class="md-ellipsis">
     
   
-    snippet 创建一个 textarea 以便复制
+    Snippets
   
 
     
@@ -2648,7 +2648,7 @@
   <span class="md-ellipsis">
     
   
-    snippet 动态加载 script src，支持并发加载相同 url 不冲突。
+    dynamicLoadScript
   
 
     
@@ -2955,7 +2955,7 @@
   <span class="md-ellipsis">
     
   
-    Jsonp
+    jsonp
   
 
     
@@ -3381,7 +3381,7 @@
   <span class="md-ellipsis">
     
   
-    Powershell 开启类 oh my zsh 历史提示
+    Powershell 开启类 oh-my-zsh 历史提示
   
 
     
@@ -3465,7 +3465,7 @@
   <span class="md-ellipsis">
     
   
-    软件 Download - Wez's Terminal Emulator
+    WezTerm 配置
   
 
     
@@ -3829,7 +3829,7 @@
   <span class="md-ellipsis">
     
   
-    Windows
+    Windows11 ReFS
   
 
     
@@ -6327,7 +6327,7 @@
   <span class="md-ellipsis">
     
   
-    Qemu nodejs dev
+    qemu nodejs dev
   
 
     
@@ -6409,91 +6409,67 @@
 
 <p><strong>推荐：使用 Swap 文件（更灵活、易于管理）</strong></p>
 <p><strong>1. 创建 Swap 文件</strong></p>
-<ul>
-<li><strong>确定 Swap 文件大小：</strong><ul>
-<li>通常建议 Swap 文件大小为 RAM 的 1-2 倍，但如果你的服务器内存足够大 (例如 16GB+), 可以酌情减小。</li>
-<li>这里我们以创建 2GB 的 Swap 文件为例。</li>
-</ul>
-</li>
-<li>
-<p><strong>创建 Swap 文件：</strong></p>
-<ul>
-<li>使用 <code>fallocate</code> 命令创建一个指定大小的文件。<br>
-   <div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Bash</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1"></a>sudo<span class="w"> </span>fallocate<span class="w"> </span>-l<span class="w"> </span>2G<span class="w"> </span>/swapfile
-</code></pre></div></td></tr></tbody></table></div></li>
-<li>或者使用 <code>dd</code> 命令<br>
-   <div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Bash</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-1-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1"></a>sudo<span class="w"> </span>dd<span class="w"> </span><span class="k">if</span><span class="o">=</span>/dev/zero<span class="w"> </span><span class="nv">of</span><span class="o">=</span>/swapfile<span class="w"> </span><span class="nv">bs</span><span class="o">=</span><span class="m">1024</span><span class="w"> </span><span class="nv">count</span><span class="o">=</span><span class="m">2097152</span>
-</code></pre></div></td></tr></tbody></table></div></li>
-<li><code>if=/dev/zero</code>: 输入设备，生成 0 字节数据流</li>
-<li><code>of=/swapfile</code>: 输出文件</li>
-<li><code>bs=1024</code>: 块大小，1024 字节 (1KB)</li>
-<li><code>count=2097152</code>: 块数量，相当于 2GB (1024 * 2097152 = 2,147,483,648 字节)</li>
-</ul>
-</li>
-<li>
-<p><strong>设置文件权限：</strong><br>
+<p>* <strong>确定 Swap 文件大小：</strong><br>
+      * 通常建议 Swap 文件大小为 RAM 的 1-2 倍，但如果你的服务器内存足够大 (例如 16GB+), 可以酌情减小。<br>
+      * 这里我们以创建 2GB 的 Swap 文件为例。<br>
+   * <strong>创建 Swap 文件：</strong><br>
+     * 使用 <code>fallocate</code> 命令创建一个指定大小的文件。<br>
+       </p><div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Bash</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1"></a>sudo<span class="w"> </span>fallocate<span class="w"> </span>-l<span class="w"> </span>2G<span class="w"> </span>/swapfile
+</code></pre></div></td></tr></tbody></table></div><br>
+     * 或者使用 <code>dd</code> 命令<br>
+       <div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Bash</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-1-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1"></a>sudo<span class="w"> </span>dd<span class="w"> </span><span class="k">if</span><span class="o">=</span>/dev/zero<span class="w"> </span><span class="nv">of</span><span class="o">=</span>/swapfile<span class="w"> </span><span class="nv">bs</span><span class="o">=</span><span class="m">1024</span><span class="w"> </span><span class="nv">count</span><span class="o">=</span><span class="m">2097152</span>
+</code></pre></div></td></tr></tbody></table></div><br>
+       * <code>if=/dev/zero</code>: 输入设备，生成 0 字节数据流<br>
+       * <code>of=/swapfile</code>: 输出文件<br>
+       * <code>bs=1024</code>: 块大小，1024 字节 (1KB)<br>
+       * <code>count=2097152</code>: 块数量，相当于 2GB (1024 * 2097152 = 2,147,483,648 字节)<p></p>
+<p>* <strong>设置文件权限：</strong><br>
      </p><div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Bash</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-2-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1"></a>sudo<span class="w"> </span>chmod<span class="w"> </span><span class="m">600</span><span class="w"> </span>/swapfile
-</code></pre></div></td></tr></tbody></table></div><p></p>
-<ul>
-<li>只有 root 用户可以读取和写入 Swap 文件。</li>
-</ul>
-</li>
-<li>
-<p><strong>将文件标记为 Swap 空间：</strong><br>
+</code></pre></div></td></tr></tbody></table></div><br>
+     * 只有 root 用户可以读取和写入 Swap 文件。<p></p>
+<p>* <strong>将文件标记为 Swap 空间：</strong><br>
      </p><div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Bash</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-3-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1"></a>sudo<span class="w"> </span>mkswap<span class="w"> </span>/swapfile
 </code></pre></div></td></tr></tbody></table></div><p></p>
-</li>
-<li>
-<p><strong>启用 Swap 空间：</strong><br>
+<p>* <strong>启用 Swap 空间：</strong><br>
      </p><div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Bash</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-4-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1"></a>sudo<span class="w"> </span>swapon<span class="w"> </span>/swapfile
 </code></pre></div></td></tr></tbody></table></div><p></p>
-</li>
-</ul>
 <p><strong>2. 设置开机自动挂载 Swap</strong></p>
-<ul>
-<li><strong>编辑 <code>/etc/fstab</code> 文件：</strong><br>
-     <div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Bash</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-5-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1"></a>sudo<span class="w"> </span>nano<span class="w"> </span>/etc/fstab
-</code></pre></div></td></tr></tbody></table></div></li>
-<li><strong>在文件末尾添加以下行：</strong><br>
+<p>* <strong>编辑 <code>/etc/fstab</code> 文件：</strong><br>
+     </p><div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Bash</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-5-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1"></a>sudo<span class="w"> </span>nano<span class="w"> </span>/etc/fstab
+</code></pre></div></td></tr></tbody></table></div><br>
+   * <strong>在文件末尾添加以下行：</strong><br>
      <div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Text Only</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-6-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1"></a>/swapfile   none    swap    sw      0       0
-</code></pre></div></td></tr></tbody></table></div></li>
-<li><strong>保存并关闭文件。</strong></li>
-</ul>
+</code></pre></div></td></tr></tbody></table></div><br>
+   * <strong>保存并关闭文件。</strong><p></p>
 <p><strong>3. 修改 Swapiness 值 (可选)</strong></p>
-<ul>
-<li><strong>Swapiness 值</strong> 决定了系统在何时开始使用 Swap 空间。值越高，系统越倾向于使用 Swap。</li>
-<li><strong>默认值 60</strong> 对于服务器来说可能太高，可以考虑降低到 10 或者 20。</li>
-<li><strong>查看当前的 Swapiness 值：</strong><br>
-     <div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Bash</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-7-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1"></a>cat<span class="w"> </span>/proc/sys/vm/swappiness
-</code></pre></div></td></tr></tbody></table></div></li>
-<li><strong>临时修改 Swapiness 值 (重启失效):</strong><br>
+<p>* <strong>Swapiness 值</strong> 决定了系统在何时开始使用 Swap 空间。值越高，系统越倾向于使用 Swap。<br>
+   * <strong>默认值 60</strong> 对于服务器来说可能太高，可以考虑降低到 10 或者 20。<br>
+   * <strong>查看当前的 Swapiness 值：</strong><br>
+     </p><div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Bash</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-7-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1"></a>cat<span class="w"> </span>/proc/sys/vm/swappiness
+</code></pre></div></td></tr></tbody></table></div><br>
+   * <strong>临时修改 Swapiness 值 (重启失效):</strong><br>
      <div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Bash</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-8-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1"></a>sudo<span class="w"> </span>sysctl<span class="w"> </span>vm.swappiness<span class="o">=</span><span class="m">10</span>
-</code></pre></div></td></tr></tbody></table></div></li>
-<li><strong>永久修改 Swapiness 值：</strong><ul>
-<li><strong>编辑 <code>/etc/sysctl.conf</code> 文件:</strong><br>
-   <div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Bash</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-9-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1"></a>sudo<span class="w"> </span>nano<span class="w"> </span>/etc/sysctl.conf
-</code></pre></div></td></tr></tbody></table></div></li>
-<li><strong>在文件末尾添加以下行：</strong><br>
-   <div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Text Only</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-10-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1"></a>vm.swappiness=10
-</code></pre></div></td></tr></tbody></table></div></li>
-<li><strong>保存并关闭文件。</strong></li>
-<li><strong>应用修改:</strong><br>
-   <div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Bash</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-11-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1"></a>sudo<span class="w"> </span>sysctl<span class="w"> </span>-p
-</code></pre></div></td></tr></tbody></table></div></li>
-</ul>
-</li>
-</ul>
+</code></pre></div></td></tr></tbody></table></div><br>
+   * <strong>永久修改 Swapiness 值：</strong><br>
+     * <strong>编辑 <code>/etc/sysctl.conf</code> 文件:</strong><br>
+       <div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Bash</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-9-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1"></a>sudo<span class="w"> </span>nano<span class="w"> </span>/etc/sysctl.conf
+</code></pre></div></td></tr></tbody></table></div><br>
+     * <strong>在文件末尾添加以下行：</strong><br>
+       <div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Text Only</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-10-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1"></a>vm.swappiness=10
+</code></pre></div></td></tr></tbody></table></div><br>
+     * <strong>保存并关闭文件。</strong><br>
+     * <strong>应用修改:</strong><br>
+       <div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Bash</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-11-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1"></a>sudo<span class="w"> </span>sysctl<span class="w"> </span>-p
+</code></pre></div></td></tr></tbody></table></div><p></p>
 <p><strong>4. 验证 Swap 设置</strong></p>
-<ul>
-<li><strong>查看是否启用了 Swap:</strong><br>
-     <div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Bash</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-12-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1"></a>sudo<span class="w"> </span>swapon<span class="w"> </span>-s
+<p>* <strong>查看是否启用了 Swap:</strong><br>
+     </p><div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Bash</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-12-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1"></a>sudo<span class="w"> </span>swapon<span class="w"> </span>-s
 </code></pre></div></td></tr></tbody></table></div><br>
      或者<br>
      <div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Bash</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-13-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1"></a>free<span class="w"> </span>-h
-</code></pre></div></td></tr></tbody></table></div></li>
-<li>如果看到 <code>/swapfile</code> 或者有 Swap 信息，表示 Swap 空间已经设置并启用了。</li>
-<li>也可以使用 <code>htop</code> 查看 swap</li>
-</ul>
+</code></pre></div></td></tr></tbody></table></div><br>
+   * 如果看到 <code>/swapfile</code> 或者有 Swap 信息，表示 Swap 空间已经设置并启用了。<br>
+   * 也可以使用 <code>htop</code> 查看 swap<p></p>
 
 
 
