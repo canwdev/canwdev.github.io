@@ -51,9 +51,13 @@ Windows 替代方案：Git Bash、WSL、Scoop (`scoop install coreutils`)
 - **内容**: 75+ GNU 命令 + findutils (`find`, `xargs`) + `grep`
 - **注意**: 与 PowerShell 别名有冲突 (`cat`, `cp`, `ls`, `rm` 等)，安装时会询问是否修改 `$PROFILE`
 
-## PSReadLine 预测提示（类似 fish 自动补全）
+## PSReadLine 预测提示（类似 fish / oh-my-zsh 自动补全）
 
-PowerShell 7.4+ 默认开启预测提示（`PredictionSource = History`），从历史记录显示建议，但默认是 **列表视图**。
+> 参考：[about_PSReadLine - PowerShell | Microsoft Learn](https://learn.microsoft.com/zh-cn/powershell/module/psreadline/about/about_psreadline?view=powershell-7.6)
+
+### PowerShell 7.4+
+
+默认开启预测提示（`PredictionSource = History`），从历史记录显示建议，但默认是 **列表视图**。
 
 **切换为 fish 风格的行内提示：**
 ```powershell
@@ -67,16 +71,16 @@ Set-PSReadLineOption -PredictionViewStyle Inline, ListView
 
 ### PowerShell 5.1
 
-默认 **关闭**，需手动启用：
+默认 **关闭**，需手动启用。先升级 PSReadLine（5.1 预装版本较旧）：
+
+```powershell
+Install-Module -Name PSReadLine -AllowClobber -Force
+```
+
+然后启用预测：
+
 ```powershell
 Set-PSReadLineOption -HistorySearchCursorMovesToEnd
 Set-PSReadLineOption -PredictionSource History
 Set-PSReadLineOption -PredictionViewStyle Inline
 ```
-
-建议先升级 PSReadLine（5.1 预装版本较旧）：
-```powershell
-Install-Module PSReadLine -Force
-```
-
-将上述命令添加到 `$PROFILE` 即可持久化。
