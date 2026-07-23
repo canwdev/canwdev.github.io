@@ -9,7 +9,7 @@
         <link rel="prev" href="../Bitlocker%20%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/">
       
       
-        <link rel="next" href="../Powershell%20%E5%BC%80%E5%90%AF%E7%B1%BB%20oh-my-zsh%20%E5%8E%86%E5%8F%B2%E6%8F%90%E7%A4%BA/">
+        <link rel="next" href="../RDP%20%E5%9C%A8%E8%BF%9C%E7%A8%8B%E6%A1%8C%E9%9D%A2%E8%BF%9E%E6%8E%A5%E6%9C%8D%E5%8A%A1%E4%B8%AD%E4%BD%BF%E7%94%A8%E8%87%AA%E5%AE%9A%E4%B9%89%E8%AF%81%E4%B9%A6%E5%8A%A0%E5%AF%86/">
       
       
         
@@ -20,7 +20,7 @@
     
     
       
-        <title>Powershell 如何安装 OnMyPosh - Canwdev's Blog</title>
+        <title>PowerShell (pwsh) 笔记 - Canwdev's Blog</title>
       
     
     
@@ -81,7 +81,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#安装" class="md-skip">
+        <a href="#powershell-pwsh-笔记" class="md-skip">
           跳转至
         </a>
       
@@ -117,7 +117,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Powershell 如何安装 OnMyPosh
+              PowerShell (pwsh) 笔记
             
           </span>
         </div>
@@ -3359,6 +3359,8 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
+        
+      
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
           
@@ -3367,7 +3369,7 @@
   <span class="md-ellipsis">
     
   
-    Powershell 如何安装 OnMyPosh
+    PowerShell (pwsh) 笔记
   
 
     
@@ -3385,7 +3387,7 @@
   <span class="md-ellipsis">
     
   
-    Powershell 如何安装 OnMyPosh
+    PowerShell (pwsh) 笔记
   
 
     
@@ -3401,6 +3403,8 @@
   
   
   
+    
+  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -3409,10 +3413,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
       
         <li class="md-nav__item">
-  <a href="#安装" class="md-nav__link">
+  <a href="#pwsh-与-windows-powershell-区别" class="md-nav__link">
     <span class="md-ellipsis">
       
-        安装：
+        pwsh 与 Windows PowerShell 区别
       
     </span>
   </a>
@@ -3420,13 +3424,85 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#安装-nerd-font-字体" class="md-nav__link">
+  <a href="#安装-pwsh" class="md-nav__link">
     <span class="md-ellipsis">
       
-        安装 Nerd Font 字体：
+        安装 pwsh
       
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#设为默认终端" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        设为默认终端
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#coreutils" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Coreutils
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#microsoftcoreutils" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        microsoft/coreutils
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#psreadline-预测提示类似-fish--oh-my-zsh-自动补全" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PSReadLine 预测提示（类似 fish / oh-my-zsh 自动补全）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PSReadLine 预测提示（类似 fish / oh-my-zsh 自动补全）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#powershell-74" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PowerShell 7.4+
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#powershell-51" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PowerShell 5.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -3434,34 +3510,6 @@
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../Powershell%20%E5%BC%80%E5%90%AF%E7%B1%BB%20oh-my-zsh%20%E5%8E%86%E5%8F%B2%E6%8F%90%E7%A4%BA/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Powershell 开启类 oh-my-zsh 历史提示
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -3922,34 +3970,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../pwsh/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    PowerShell (pwsh) 笔记
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../%E4%BF%AE%E6%94%B9%20Windows%20%E7%BD%91%E7%BB%9C%E7%B1%BB%E5%9E%8B%E5%85%AC%E7%94%A8%E4%B8%BA%E4%B8%93%E7%94%A8%E7%BD%91%E7%BB%9C/" class="md-nav__link">
         
   
@@ -4042,6 +4062,34 @@
     
   
     如何在 Linux or Windows 下设置环境变量
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../%E6%89%8B%E5%8A%A8%E6%81%A2%E5%A4%8D%E6%96%87%E4%BB%B6%E5%A4%B9%E5%8F%B3%E9%94%AE%E8%8F%9C%E5%8D%95VSCode%E5%92%8C%E7%BB%88%E7%AB%AF/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    手动恢复文件夹右键菜单VSCode和终端
   
 
     
@@ -6637,6 +6685,8 @@
   
   
   
+    
+  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -6645,10 +6695,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
       
         <li class="md-nav__item">
-  <a href="#安装" class="md-nav__link">
+  <a href="#pwsh-与-windows-powershell-区别" class="md-nav__link">
     <span class="md-ellipsis">
       
-        安装：
+        pwsh 与 Windows PowerShell 区别
       
     </span>
   </a>
@@ -6656,13 +6706,85 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#安装-nerd-font-字体" class="md-nav__link">
+  <a href="#安装-pwsh" class="md-nav__link">
     <span class="md-ellipsis">
       
-        安装 Nerd Font 字体：
+        安装 pwsh
       
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#设为默认终端" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        设为默认终端
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#coreutils" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Coreutils
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#microsoftcoreutils" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        microsoft/coreutils
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#psreadline-预测提示类似-fish--oh-my-zsh-自动补全" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PSReadLine 预测提示（类似 fish / oh-my-zsh 自动补全）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PSReadLine 预测提示（类似 fish / oh-my-zsh 自动补全）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#powershell-74" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PowerShell 7.4+
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#powershell-51" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PowerShell 5.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -6683,7 +6805,7 @@
 
 
   
-    <a href="https://github.com/canwdev/canwdev.github.io/edit/main/docs/Windows/Powershell 如何安装 OnMyPosh.md" title="编辑此页" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/canwdev/canwdev.github.io/edit/main/docs/Windows/PowerShell pwsh 配置笔记.md" title="编辑此页" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"></path></svg>
     </a>
@@ -6691,32 +6813,96 @@
   
 
 
-  <h1>Powershell 如何安装 OnMyPosh</h1>
-
-<p>2022.7.16 15:57</p>
-<p>Oh My Posh 是适用于 Windows Powershell 的增强版本，类似于 Linux 下的 oh-my-zsh。官网：<a href="https://ohmyposh.dev/">https://ohmyposh.dev/</a></p>
-<h2 id="安装">安装：<a class="headerlink" href="#安装" title="Permanent link">¶</a></h2>
-<p>打开Powershell（管理员），并执行以下命令：<br>
-</p><div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">PowerShell</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1"></a><span class="nb">Set-ExecutionPolicy</span> <span class="n">Bypass</span> <span class="n">-Scope</span> <span class="k">Process</span> <span class="n">-Force</span><span class="p">;</span> <span class="nb">Invoke-Expression</span> <span class="p">((</span><span class="nb">New-Object</span> <span class="n">System</span><span class="p">.</span><span class="n">Net</span><span class="p">.</span><span class="n">WebClient</span><span class="p">).</span><span class="n">DownloadString</span><span class="p">(</span><span class="s1">'https://ohmyposh.dev/install.ps1'</span><span class="p">))</span>
-</code></pre></div></td></tr></tbody></table></div><br>
-安装完成后需要重启终端，才能使环境变量生效。<p></p>
-<p>初始化配置：<br>
-</p><div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">PowerShell</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-1-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1"></a><span class="n">notepad</span> <span class="nv">$profile</span>
-</code></pre></div></td></tr></tbody></table></div><br>
-打开记事本，编辑配置文件，输入以下内容：<br>
-<div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Text Only</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-2-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1"></a>oh-my-posh init pwsh --config C:\Users\user\AppData\Local\Programs\oh-my-posh\themes\negligible.omp.json | Invoke-Expression
-</code></pre></div></td></tr></tbody></table></div><br>
-其中 <code>negligible</code> 是主题名字，在这个目录下还可以看到其他主题。<br>
-若要在终端查看所有主题样式，可以输入：<code>Get-PoshThemes</code><p></p>
-<h2 id="安装-nerd-font-字体">安装 Nerd Font 字体：<a class="headerlink" href="#安装-nerd-font-字体" title="Permanent link">¶</a></h2>
-<p>由于许多主题使用了字体图标，需要安装嵌入了Nerd Font的字体方可正常显示。<br>
-字体下载网站：<a href="https://www.nerdfonts.com/">https://www.nerdfonts.com/</a></p>
-<p>推荐几个字体：<br>
-- CascadiaCode（WindowsTerminal 默认字体）<br>
-- JetBrainsMono（IDEA 默认字体）</p>
-<p>将字体安装到系统后，还需要设置终端的字体才能使用，这里推荐几个终端软件：<br>
-- Windows Terminal<br>
-- Cmder</p>
+<h1 id="powershell-pwsh-笔记">PowerShell (pwsh) 笔记<a class="headerlink" href="#powershell-pwsh-笔记" title="Permanent link">¶</a></h1>
+<h2 id="pwsh-与-windows-powershell-区别">pwsh 与 Windows PowerShell 区别<a class="headerlink" href="#pwsh-与-windows-powershell-区别" title="Permanent link">¶</a></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Windows PowerShell</th>
+<th>pwsh (PowerShell 7+)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>平台</td>
+<td>仅 Windows</td>
+<td>跨平台 (Windows/macOS/Linux)</td>
+</tr>
+<tr>
+<td>框架</td>
+<td>.NET Framework</td>
+<td>.NET (Core)</td>
+</tr>
+<tr>
+<td>版本</td>
+<td>最高 5.1</td>
+<td>持续更新 (7.x)</td>
+</tr>
+<tr>
+<td>开源</td>
+<td>否</td>
+<td>是</td>
+</tr>
+</tbody>
+</table>
+<p>大部分命令兼容，但旧模块/功能仅限 Windows PowerShell 5.1。</p>
+<h2 id="安装-pwsh">安装 pwsh<a class="headerlink" href="#安装-pwsh" title="Permanent link">¶</a></h2>
+<div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">PowerShell</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1">1</a></span>
+<span class="normal"><a href="#__codelineno-0-2">2</a></span>
+<span class="normal"><a href="#__codelineno-0-3">3</a></span>
+<span class="normal"><a href="#__codelineno-0-4">4</a></span>
+<span class="normal"><a href="#__codelineno-0-5">5</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1"></a><span class="c"># 推荐：winget</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2"></a><span class="n">winget</span> <span class="n">install</span> <span class="n">Microsoft</span><span class="p">.</span><span class="n">PowerShell</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3"></a>
+<a id="__codelineno-0-4" name="__codelineno-0-4"></a><span class="c"># 或从 GitHub 下载 MSI</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5"></a><span class="c"># https://github.com/PowerShell/PowerShell/releases</span>
+</code></pre></div></td></tr></tbody></table></div>
+<p>安装后终端输入 <code>pwsh</code> 启动。</p>
+<h2 id="设为默认终端">设为默认终端<a class="headerlink" href="#设为默认终端" title="Permanent link">¶</a></h2>
+<p><strong>推荐：Windows Terminal 设置</strong><br>
+1. 打开 Windows Terminal → Ctrl+, → 启动<br>
+2. <strong>默认配置文件</strong> → 选择 <strong>PowerShell 7</strong><br>
+3. <strong>默认终端应用程序</strong> → 选择 <strong>Windows Terminal</strong></p>
+<p><strong>VS Code 中设为默认</strong><br>
+- <code>Ctrl+Shift+P</code> → <code>Terminal: Select Default Profile</code> → 选择 <strong>PowerShell 7</strong></p>
+<h2 id="coreutils">Coreutils<a class="headerlink" href="#coreutils" title="Permanent link">¶</a></h2>
+<p><strong>GNU Coreutils</strong> — Linux/Unix 系统基本命令行工具集，包含：<br>
+- 文件操作：<code>ls</code>, <code>cp</code>, <code>mv</code>, <code>rm</code>, <code>mkdir</code>, <code>touch</code><br>
+- 文本处理：<code>cat</code>, <code>echo</code>, <code>head</code>, <code>tail</code>, <code>sort</code>, <code>wc</code><br>
+- 其他：<code>chmod</code>, <code>chown</code>, <code>date</code>, <code>sleep</code>, <code>whoami</code></p>
+<p>Windows 替代方案：Git Bash、WSL、Scoop (<code>scoop install coreutils</code>)</p>
+<h2 id="microsoftcoreutils">microsoft/coreutils<a class="headerlink" href="#microsoftcoreutils" title="Permanent link">¶</a></h2>
+<p>微软 2026 年发布的项目，让 Unix 命令原生运行在 Windows 上。</p>
+<ul>
+<li><strong>基于</strong> Rust 重写的 <a href="https://github.com/uutils/coreutils">uutils/coreutils</a></li>
+<li><strong>安装</strong>: <code>winget install Microsoft.Coreutils</code></li>
+<li><strong>内容</strong>: 75+ GNU 命令 + findutils (<code>find</code>, <code>xargs</code>) + <code>grep</code></li>
+<li><strong>注意</strong>: 与 PowerShell 别名有冲突 (<code>cat</code>, <code>cp</code>, <code>ls</code>, <code>rm</code> 等)，安装时会询问是否修改 <code>$PROFILE</code></li>
+</ul>
+<h2 id="psreadline-预测提示类似-fish--oh-my-zsh-自动补全">PSReadLine 预测提示（类似 fish / oh-my-zsh 自动补全）<a class="headerlink" href="#psreadline-预测提示类似-fish--oh-my-zsh-自动补全" title="Permanent link">¶</a></h2>
+<blockquote>
+<p>参考：<a href="https://learn.microsoft.com/zh-cn/powershell/module/psreadline/about/about_psreadline?view=powershell-7.6">about_PSReadLine - PowerShell | Microsoft Learn</a></p>
+</blockquote>
+<h3 id="powershell-74">PowerShell 7.4+<a class="headerlink" href="#powershell-74" title="Permanent link">¶</a></h3>
+<p>默认开启预测提示（<code>PredictionSource = History</code>），从历史记录显示建议，但默认是 <strong>列表视图</strong>。</p>
+<p><strong>切换为 fish 风格的行内提示：</strong><br>
+</p><div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">PowerShell</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-1-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1"></a><span class="nb">Set-PSReadLineOption</span> <span class="n">-PredictionViewStyle</span> <span class="n">Inline</span>
+</code></pre></div></td></tr></tbody></table></div><p></p>
+<p><strong>同时启用列表 + 行内：</strong><br>
+</p><div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">PowerShell</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-2-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1"></a><span class="nb">Set-PSReadLineOption</span> <span class="n">-PredictionViewStyle</span> <span class="n">Inline</span><span class="p">,</span> <span class="n">ListView</span>
+</code></pre></div></td></tr></tbody></table></div><p></p>
+<h3 id="powershell-51">PowerShell 5.1<a class="headerlink" href="#powershell-51" title="Permanent link">¶</a></h3>
+<p>默认 <strong>关闭</strong>，需手动启用。先升级 PSReadLine（5.1 预装版本较旧）：</p>
+<div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">PowerShell</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-3-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1"></a><span class="nb">Install-Module</span> <span class="n">-Name</span> <span class="n">PSReadLine</span> <span class="n">-AllowClobber</span> <span class="n">-Force</span>
+</code></pre></div></td></tr></tbody></table></div>
+<p>然后启用预测：</p>
+<div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">PowerShell</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-4-1">1</a></span>
+<span class="normal"><a href="#__codelineno-4-2">2</a></span>
+<span class="normal"><a href="#__codelineno-4-3">3</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1"></a><span class="nb">Set-PSReadLineOption</span> <span class="n">-HistorySearchCursorMovesToEnd</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2"></a><span class="nb">Set-PSReadLineOption</span> <span class="n">-PredictionSource</span> <span class="nb">History</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3"></a><span class="nb">Set-PSReadLineOption</span> <span class="n">-PredictionViewStyle</span> <span class="n">Inline</span>
+</code></pre></div></td></tr></tbody></table></div>
 
 
 
@@ -6739,7 +6925,7 @@
     <span class="md-icon" title="最后更新">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"></path></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-datetime" title="2023年3月28日 11:59:36 CST">2023年3月28日 11:59:36</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-datetime" title="2026年7月22日 15:51:09 CST">2026年7月22日 15:51:09</span>
   </span>
 
     
@@ -6749,7 +6935,7 @@
     <span class="md-icon" title="创建日期">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14.47 15.08 11 13V7h1.5v5.25l3.08 1.83c-.41.28-.79.62-1.11 1m-1.39 4.84c-.36.05-.71.08-1.08.08-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8c0 .37-.03.72-.08 1.08.69.1 1.33.32 1.92.64.1-.56.16-1.13.16-1.72 0-5.5-4.5-10-10-10S2 6.5 2 12s4.47 10 10 10c.59 0 1.16-.06 1.72-.16-.32-.59-.54-1.23-.64-1.92M18 15v3h-3v2h3v3h2v-3h3v-2h-3v-3z"></path></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-datetime" title="2023年3月28日 11:59:36 CST">2023年3月28日 11:59:36</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-datetime" title="2026年7月22日 15:51:09 CST">2026年7月22日 15:51:09</span>
   </span>
 
     
@@ -6801,13 +6987,13 @@
         
         
           
-          <a href="../Powershell%20%E5%BC%80%E5%90%AF%E7%B1%BB%20oh-my-zsh%20%E5%8E%86%E5%8F%B2%E6%8F%90%E7%A4%BA/" class="md-footer__link md-footer__link--next" aria-label="下一页: Powershell 开启类 oh-my-zsh 历史提示">
+          <a href="../RDP%20%E5%9C%A8%E8%BF%9C%E7%A8%8B%E6%A1%8C%E9%9D%A2%E8%BF%9E%E6%8E%A5%E6%9C%8D%E5%8A%A1%E4%B8%AD%E4%BD%BF%E7%94%A8%E8%87%AA%E5%AE%9A%E4%B9%89%E8%AF%81%E4%B9%A6%E5%8A%A0%E5%AF%86/" class="md-footer__link md-footer__link--next" aria-label="下一页: RDP 在远程桌面连接服务中使用自定义证书加密">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 下一页
               </span>
               <div class="md-ellipsis">
-                Powershell 开启类 oh-my-zsh 历史提示
+                RDP 在远程桌面连接服务中使用自定义证书加密
               </div>
             </div>
             <div class="md-footer__button md-icon">
