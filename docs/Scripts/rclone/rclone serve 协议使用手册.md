@@ -192,9 +192,9 @@ rclone serve webdav D:\share --addr 0.0.0.0:8086 --user admin --pass yourpasswor
 ```
 
 **客户端（挂载为 Z: 盘）**：
-```batch
-rem 注意：--webdav-pass 需要加密后的密码
-rem 先用 rclone obscure yourpassword 生成加密字符串
+```shell
+# 注意：--webdav-pass 需要加密后的密码
+# 先用 rclone obscure yourpassword 生成加密字符串
 rclone mount :webdav: Z: --webdav-url http://192.168.1.100:8086 --webdav-vendor other --webdav-user admin --webdav-pass <obscured-password> --vfs-cache-mode off --network-mode
 ```
 挂载后，打开"此电脑"即可看到 `Z:` 盘，像本地磁盘一样操作。
