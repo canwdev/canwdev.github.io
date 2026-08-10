@@ -1,12 +1,12 @@
-- 另请参见 [[Debian]]
+- 另请参见 [[Debian 常用命令]]
 
 ## 提示
 
-> ubuntu 的 snap 是真的垃圾，因此决定放弃 ubuntu，转向 [[Debian]] 或 [[ArchLinux]]！
+> ubuntu 的 snap 是真的垃圾，因此决定放弃 ubuntu，转向 [[Debian 常用命令]] 或 [[ArchLinux]]！
 ## Wine 中文乱码解决
 
 - [参考](https://juejin.cn/post/6844903917742981128)
-1. 首先确保系统语言为中文 [[Ubuntu#Ubuntu 终端下修改语言]]
+1. 首先确保系统语言为中文 [[Ubuntu 常用命令#Ubuntu 终端下修改语言]]
 3. 复制 Windows 系统中的 **msyh.ttc** **simsun.ttc** （位于 `C:\Windows\Fonts\`）到 wine 的字体目录（位于 `~/.wine/drive_c/windows/Fonts/`） 
 4. 创建一个 `font.reg`，填写以下内容：
 ```reg

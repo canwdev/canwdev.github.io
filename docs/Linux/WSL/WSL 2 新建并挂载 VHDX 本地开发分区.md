@@ -1,3 +1,5 @@
+> 已验证所有命令，放心使用。
+
 新建 vhdx
 
 ```shell
@@ -69,23 +71,43 @@ ls /mnt/dev-drive/
 
 Windows 自动挂载脚本
 
+`mount.ps1`
 ```powershell
 $vhdxPath = "D:\Projects\wsl\dev_drive.vhdx"
-$logPath  = "D:\Projects\wsl\mount.log"
-
-function Log ($msg) {
-    "[( Get-Date -Format 'yyyy-MM-dd HH:mm:ss' )] $msg" | Out-File -FilePath $logPath -Append
-}
-
-Log "Mounting VHDX..."
 
 if (Test-Path $vhdxPath) {
-    $res = wsl --mount --vhd $vhdxPath --name wsl-dev --bare 2>&1
-    Log "Mount result $res"
+    $res = wsl --mount --vhd $vhdxPath --name dev-drive --bare 2>&1
+    Write-Host "Mount result: $res"
 } else {
-    Log "Error: file not found $vhdxPath"
+    Write-Host "Error: file not found $vhdxPath"
 }
+
 ```
+执行方法：`powershell mount.ps1`
+
+开机自动执行挂载（计划任务）以管理员权限执行：
+
+```powershell
+$action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoProfile -WindowStyle Hidden -File `"D:\Projects\wsl\mount.ps1`""
+$trigger = New-ScheduledTaskTrigger -AtStartup
+$principal = New-ScheduledTaskPrincipal -UserId "$env:USERDOMAIN\$env:USERNAME" -LogonType Interactive -RunLevel Highest
+Register-ScheduledTask -TaskName "WSL Mount dev-drive" -Action $action -Trigger $trigger -Principal $principal -Description "Auto mount WSL dev-drive when startup"
+
+# 验证任务已创建
+Get-ScheduledTask -TaskName "WSL Mount dev-drive"
+
+# 手动触发
+Start-ScheduledTask -TaskName "WSL Mount dev-drive"
+
+# 打开计划任务程序验证
+taskschd.msc
+
+# 如需删除
+# Unregister-ScheduledTask -TaskName "WSL Mount dev-drive" -Confirm:$false
+
+```
+
+可能还需要：[[WSL 2 开机自启以及常驻后台]]
 
 卸载分区（非必要）
 

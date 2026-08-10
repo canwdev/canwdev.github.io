@@ -9,26 +9,16 @@
 
 ## Debian
 
+- [Debian | 镜像站使用帮助 | 清华大学开源软件镜像站 | Tsinghua Open Source Mirror](https://mirrors.tuna.tsinghua.edu.cn/help/debian/)
+	- 建议勾选“强制安全更新使用镜像”
+	- 传统格式（`/etc/apt/sources.list`）、DEB822 格式（`/etc/apt/sources.list.d/debian.sources`）都要修改
 - USTC [repository file generator](https://mirrors.ustc.edu.cn/repogen/)
 
-Debian (/etc/apt/sources.list): 
-Debian GNU/Linux 12 (bookworm)
-```bash
-deb https://mirrors.ustc.edu.cn/debian/ bookworm main contrib non-free non-free-firmware
-deb-src https://mirrors.ustc.edu.cn/debian/ bookworm main contrib non-free non-free-firmware
+> 查看当前系统版本：`cat /etc/os-release`
 
-deb https://mirrors.ustc.edu.cn/debian/ bookworm-updates main contrib non-free non-free-firmware
-deb-src https://mirrors.ustc.edu.cn/debian/ bookworm-updates main contrib non-free non-free-firmware
-
-deb https://mirrors.ustc.edu.cn/debian/ bookworm-backports main contrib non-free non-free-firmware
-deb-src https://mirrors.ustc.edu.cn/debian/ bookworm-backports main contrib non-free non-free-firmware
-
-deb https://mirrors.ustc.edu.cn/debian-security/ bookworm-security main contrib non-free non-free-firmware
-deb-src https://mirrors.ustc.edu.cn/debian-security/ bookworm-security main contrib non-free non-free-firmware
-```
 ## Ubuntu 
 
-- 清华大学 https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/
+- [Ubuntu | 镜像站使用帮助 | 清华大学开源软件镜像站 | Tsinghua Open Source Mirror](https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/)
 - USTC [repository file generator](https://mirrors.ustc.edu.cn/repogen/)
 
 Ubuntu 的软件源配置文件是 `/etc/apt/sources.list`。将系统自带的该文件做个备份，将该文件替换为下面内容，即可使用选择的软件源镜像。
@@ -44,32 +34,12 @@ vim /etc/apt/sources.list
 
 > 使用 `lsb_release -a` 命令查看 Ubuntu 版本
 
-/etc/apt/sources.list 
-Ubuntu 版本：24.04 LTS
-```shell
-deb https://mirrors.ustc.edu.cn/ubuntu/ noble main restricted universe multiverse
-deb-src https://mirrors.ustc.edu.cn/ubuntu/ noble main restricted universe multiverse
-
-deb https://mirrors.ustc.edu.cn/ubuntu/ noble-security main restricted universe multiverse
-deb-src https://mirrors.ustc.edu.cn/ubuntu/ noble-security main restricted universe multiverse
-
-deb https://mirrors.ustc.edu.cn/ubuntu/ noble-updates main restricted universe multiverse
-deb-src https://mirrors.ustc.edu.cn/ubuntu/ noble-updates main restricted universe multiverse
-
-deb https://mirrors.ustc.edu.cn/ubuntu/ noble-backports main restricted universe multiverse
-deb-src https://mirrors.ustc.edu.cn/ubuntu/ noble-backports main restricted universe multiverse
-
-## Not recommended
-# deb https://mirrors.ustc.edu.cn/ubuntu/ noble-proposed main restricted universe multiverse
-# deb-src https://mirrors.ustc.edu.cn/ubuntu/ noble-proposed main restricted universe multiverse
-```
-
 ```sh
 # 更新源
 apt update
 
 # 升级全部
-# apt upgrade
+apt upgrade
 ```
 
 ## Manjaro Linux

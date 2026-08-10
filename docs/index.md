@@ -7,13 +7,12 @@
 
 ## 最近更新
 
-- Linux
+- Linux / wsl
+  - [[WSL 2 新建并挂载 VHDX 本地开发分区]]
   - [[Arch Linux Btrfs 迁移指南]]
-  - [[Comparison]]
-  - [[Debian]]
-  - [[基于 Docker 制作一个 Debian+Xfce4+KasmVNC 容器]]
-- Hyper-V / wsl2
-  - [[wsl2 wslg 配置并开启远程桌面(xrdp)]]
+  - [[虚拟机、桌面环境、Linux 发行版对比]]
+  - [[Debian 常用命令]]
+- Hyper-V
   - [[Hyper-V 固定虚拟机网络 IP 地址 配网指南]]
 - Windows on ARM
   - [[LG G8X 刷机]]

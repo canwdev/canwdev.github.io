@@ -21,7 +21,7 @@ pacman -S \
   nginx zsh \
   keepassxc seahorse \
 ```
-- [[Debian#oh-my-zsh]]
+- [[Debian 常用命令#oh-my-zsh]]
 ## pacman 命令
 
 - `pacman -Syu` = 执行全面系统更新

@@ -2,9 +2,9 @@ WSL 是在 Windows 下快速简单的运行 Linux 的一种方式，目前最新
 
 ## 安装 WSL
 
-系统要求：Windows 10 x64 1903 或更高版本，内部版本为 18362 或更高版本。
+> 本文已过期，请参考：[官方安装教程](https://learn.microsoft.com/zh-cn/windows/wsl/install)
 
-参考：[官方安装教程](https://learn.microsoft.com/zh-cn/windows/wsl/install)
+系统要求：Windows 10 x64 1903 或更高版本，内部版本为 18362 或更高版本。
 
 使用管理员权限运行命令（也可以在控制面板的 程序->启用或关闭Windows功能中开启）：
 ```sh
@@ -35,19 +35,17 @@ openSUSE-Leap-15.4                     openSUSE Leap 15.4
 openSUSE-Tumbleweed                    openSUSE Tumbleweed
 ```
 
-比如我们要安装 Ubuntu 22.04 LTS，则可以输入以下命令：
+比如我们要安装 Debian，则可以输入以下命令：
 ```sh
-wsl --install -d Ubuntu-22.04
+wsl --install Debian
 ```
 
 查看当前安装的子系统和版本：
 ```sh
-PS C:\Windows\system32> wsl -l -v
-  NAME            STATE           VERSION
-* Ubuntu-22.04    Stopped         2
+wsl -l -v
 ```
 
-- 安装好之后，你也许需要：[[Linux 镜像源#Ubuntu]]
+- 安装好之后，你也许需要：[[Linux 镜像源]]
 - 使用文件资源管理器访问子系统路径：`\\wsl$`
 
 ## WSL 备份还原
