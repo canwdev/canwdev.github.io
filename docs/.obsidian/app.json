@@ -3,5 +3,6 @@
   "attachmentFolderPath": "./assets",
   "showLineNumber": false,
   "showUnsupportedFiles": true,
-  "promptDelete": false
+  "promptDelete": false,
+  "spellcheck": false
 }
