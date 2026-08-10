@@ -6,28 +6,28 @@
       
       
       
-        <link rel="prev" href="../Alpine%20Linux%20Notes/">
+        <link rel="prev" href="../WSL%202%20%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF%E4%BB%A5%E5%8F%8A%E5%B8%B8%E9%A9%BB%E5%90%8E%E5%8F%B0/">
       
       
-        <link rel="next" href="../Linux%20%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4%E6%B1%87%E6%80%BB/">
+        <link rel="next" href="../WSL%20%E9%85%8D%E7%BD%AE%E6%8C%87%E5%8D%97/">
       
       
         
       
       
-      <link rel="icon" href="../../assets/images/favicon.png">
+      <link rel="icon" href="../../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
-        <title>Comparison - Canwdev's Blog</title>
+        <title>WSL 2 新建并挂载 VHDX 本地开发分区 - Canwdev's Blog</title>
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.ec1eaa64.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -46,13 +46,13 @@
       
     
     
-    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
     
     
-  <link href="../../assets/stylesheets/glightbox.min.css" rel="stylesheet"><script src="../../assets/javascripts/glightbox.min.js"></script><style id="glightbox-style">
+  <link href="../../../assets/stylesheets/glightbox.min.css" rel="stylesheet"><script src="../../../assets/javascripts/glightbox.min.js"></script><style id="glightbox-style">
             html.glightbox-open { overflow: initial; height: 100%; }
             .gslide-title { margin-top: 0px; user-select: text; }
             .gslide-desc { color: #666; user-select: text; }
@@ -80,11 +80,6 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
-        
-        <a href="#虚拟机" class="md-skip">
-          跳转至
-        </a>
-      
     </div>
     <div data-md-component="announce">
       
@@ -97,7 +92,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="页眉">
-    <a href="../.." title="Canwdev's Blog" class="md-header__button md-logo" aria-label="Canwdev's Blog" data-md-component="logo">
+    <a href="../../.." title="Canwdev's Blog" class="md-header__button md-logo" aria-label="Canwdev's Blog" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
@@ -117,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Comparison
+              WSL 2 新建并挂载 VHDX 本地开发分区
             
           </span>
         </div>
@@ -245,7 +240,7 @@
 
 <nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="Canwdev's Blog" class="md-nav__button md-logo" aria-label="Canwdev's Blog" data-md-component="logo">
+    <a href="../../.." title="Canwdev's Blog" class="md-nav__button md-logo" aria-label="Canwdev's Blog" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
@@ -275,7 +270,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../.." class="md-nav__link">
+      <a href="../../.." class="md-nav__link">
         
   
   
@@ -302,7 +297,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tags/" class="md-nav__link">
+      <a href="../../../tags/" class="md-nav__link">
         
   
   
@@ -376,7 +371,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../AI/AI/" class="md-nav__link">
+      <a href="../../../AI/AI/" class="md-nav__link">
         
   
   
@@ -404,7 +399,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../AI/Stable%20Diffusion/" class="md-nav__link">
+      <a href="../../../AI/Stable%20Diffusion/" class="md-nav__link">
         
   
   
@@ -488,7 +483,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../Alpine%20Linux%20Notes/" class="md-nav__link">
+      <a href="../../Alpine%20Linux%20Notes/" class="md-nav__link">
         
   
   
@@ -513,103 +508,10 @@
                 
   
   
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Comparison
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Comparison
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="目录">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      目录
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
-      
-        <li class="md-nav__item">
-  <a href="#虚拟机" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        虚拟机
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#桌面环境" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        桌面环境
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
   
   
     <li class="md-nav__item">
-      <a href="../Linux%20%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4%E6%B1%87%E6%80%BB/" class="md-nav__link">
+      <a href="../../Linux%20%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4%E6%B1%87%E6%80%BB/" class="md-nav__link">
         
   
   
@@ -637,7 +539,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../Linux%20%E9%95%9C%E5%83%8F%E6%BA%90/" class="md-nav__link">
+      <a href="../../Linux%20%E9%95%9C%E5%83%8F%E6%BA%90/" class="md-nav__link">
         
   
   
@@ -665,7 +567,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../Termux%20%E9%85%8D%E7%BD%AE%E7%AC%94%E8%AE%B0/" class="md-nav__link">
+      <a href="../../Termux%20%E9%85%8D%E7%BD%AE%E7%AC%94%E8%AE%B0/" class="md-nav__link">
         
   
   
@@ -693,7 +595,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../fstab%20%E6%96%87%E4%BB%B6%E5%86%85%E5%AE%B9%E5%8F%8A%E9%87%8A%E4%B9%89/" class="md-nav__link">
+      <a href="../../fstab%20%E6%96%87%E4%BB%B6%E5%86%85%E5%AE%B9%E5%8F%8A%E9%87%8A%E4%B9%89/" class="md-nav__link">
         
   
   
@@ -721,7 +623,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../git%20%E5%8C%BA%E5%88%86%E5%B7%A5%E4%BD%9C%E5%92%8C%E4%B8%AA%E4%BA%BA%E7%94%A8%E6%88%B7%E5%90%8D%E5%92%8C%E9%82%AE%E7%AE%B1/" class="md-nav__link">
+      <a href="../../git%20%E5%8C%BA%E5%88%86%E5%B7%A5%E4%BD%9C%E5%92%8C%E4%B8%AA%E4%BA%BA%E7%94%A8%E6%88%B7%E5%90%8D%E5%92%8C%E9%82%AE%E7%AE%B1/" class="md-nav__link">
         
   
   
@@ -749,7 +651,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../git%20%E7%AC%94%E8%AE%B0/" class="md-nav__link">
+      <a href="../../git%20%E7%AC%94%E8%AE%B0/" class="md-nav__link">
         
   
   
@@ -777,7 +679,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../iSH%20%26%20a-shell/" class="md-nav__link">
+      <a href="../../iSH%20%26%20a-shell/" class="md-nav__link">
         
   
   
@@ -805,7 +707,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ssh%20%E7%AC%94%E8%AE%B0/" class="md-nav__link">
+      <a href="../../ssh%20%E7%AC%94%E8%AE%B0/" class="md-nav__link">
         
   
   
@@ -833,7 +735,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../%E4%BD%BF%E7%94%A8%20rsync%20%E5%85%8B%E9%9A%86%20Linux%20%E5%B9%B6%E4%BF%AE%E5%A4%8D%20GRUB%20%E5%BC%95%E5%AF%BC/" class="md-nav__link">
+      <a href="../../%E4%BD%BF%E7%94%A8%20rsync%20%E5%85%8B%E9%9A%86%20Linux%20%E5%B9%B6%E4%BF%AE%E5%A4%8D%20GRUB%20%E5%BC%95%E5%AF%BC/" class="md-nav__link">
         
   
   
@@ -841,6 +743,34 @@
     
   
     使用 rsync 克隆 Linux 并修复 GRUB 引导
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../%E8%99%9A%E6%8B%9F%E6%9C%BA%E3%80%81%E6%A1%8C%E9%9D%A2%E7%8E%AF%E5%A2%83%E3%80%81Linux%20%E5%8F%91%E8%A1%8C%E7%89%88%E5%AF%B9%E6%AF%94/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    虚拟机、桌面环境、Linux 发行版对比
   
 
     
@@ -908,7 +838,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ArchLinux/Arch%20Linux%20Btrfs%20%E8%BF%81%E7%A7%BB%E6%8C%87%E5%8D%97/" class="md-nav__link">
+      <a href="../../ArchLinux/Arch%20Linux%20Btrfs%20%E8%BF%81%E7%A7%BB%E6%8C%87%E5%8D%97/" class="md-nav__link">
         
   
   
@@ -936,7 +866,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ArchLinux/Arch%20Linux%20%E5%AE%89%E8%A3%85%E6%8C%87%E5%8D%97/" class="md-nav__link">
+      <a href="../../ArchLinux/Arch%20Linux%20%E5%AE%89%E8%A3%85%E6%8C%87%E5%8D%97/" class="md-nav__link">
         
   
   
@@ -964,7 +894,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ArchLinux/ArchLinux%20%E5%BC%80%E5%90%AF%20swap%20%E5%88%86%E5%8C%BA%E4%B8%8E%E4%BC%91%E7%9C%A0/" class="md-nav__link">
+      <a href="../../ArchLinux/ArchLinux%20%E5%BC%80%E5%90%AF%20swap%20%E5%88%86%E5%8C%BA%E4%B8%8E%E4%BC%91%E7%9C%A0/" class="md-nav__link">
         
   
   
@@ -992,7 +922,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ArchLinux/ArchLinux/" class="md-nav__link">
+      <a href="../../ArchLinux/ArchLinux/" class="md-nav__link">
         
   
   
@@ -1020,7 +950,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ArchLinux/Archlinux%20%E5%AE%89%E8%A3%85%20linux-surface%20%E5%B9%B6%E8%AE%BE%E4%B8%BA%E9%BB%98%E8%AE%A4%E5%86%85%E6%A0%B8/" class="md-nav__link">
+      <a href="../../ArchLinux/Archlinux%20%E5%AE%89%E8%A3%85%20linux-surface%20%E5%B9%B6%E8%AE%BE%E4%B8%BA%E9%BB%98%E8%AE%A4%E5%86%85%E6%A0%B8/" class="md-nav__link">
         
   
   
@@ -1048,7 +978,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ArchLinux/ManjaroLinux%28KDE%29%20%E5%AE%89%E8%A3%85%E8%AE%B0%E5%BD%95/" class="md-nav__link">
+      <a href="../../ArchLinux/ManjaroLinux%28KDE%29%20%E5%AE%89%E8%A3%85%E8%AE%B0%E5%BD%95/" class="md-nav__link">
         
   
   
@@ -1076,7 +1006,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ArchLinux/grub%20%E5%A6%82%E4%BD%95%E6%B7%BB%E5%8A%A0%E5%B7%B2%E6%9C%89%E7%9A%84win%E7%B3%BB%E7%BB%9F/" class="md-nav__link">
+      <a href="../../ArchLinux/grub%20%E5%A6%82%E4%BD%95%E6%B7%BB%E5%8A%A0%E5%B7%B2%E6%9C%89%E7%9A%84win%E7%B3%BB%E7%BB%9F/" class="md-nav__link">
         
   
   
@@ -1104,7 +1034,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ArchLinux/%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%AE%89%E8%A3%85%20ArchLinux%20%E8%AE%B0%E5%BD%95/" class="md-nav__link">
+      <a href="../../ArchLinux/%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%AE%89%E8%A3%85%20ArchLinux%20%E8%AE%B0%E5%BD%95/" class="md-nav__link">
         
   
   
@@ -1187,14 +1117,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../Debian_Ubuntu/Debian/" class="md-nav__link">
+      <a href="../../Debian_Ubuntu/Debian%20%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Debian
+    Debian 常用命令
   
 
     
@@ -1215,7 +1145,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../Debian_Ubuntu/Ubuntu%20Server%20%E5%AE%89%E8%A3%85%20TigerVNC%20%2B%20Xfce4%20%E6%A1%8C%E9%9D%A2%E7%8E%AF%E5%A2%83/" class="md-nav__link">
+      <a href="../../Debian_Ubuntu/Ubuntu%20Server%20%E5%AE%89%E8%A3%85%20TigerVNC%20%2B%20Xfce4%20%E6%A1%8C%E9%9D%A2%E7%8E%AF%E5%A2%83/" class="md-nav__link">
         
   
   
@@ -1243,14 +1173,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../Debian_Ubuntu/Ubuntu/" class="md-nav__link">
+      <a href="../../Debian_Ubuntu/Ubuntu%20%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Ubuntu
+    Ubuntu 常用命令
   
 
     
@@ -1326,7 +1256,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../Docker/Docker%20%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/" class="md-nav__link">
+      <a href="../../Docker/Docker%20%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/" class="md-nav__link">
         
   
   
@@ -1354,7 +1284,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../Docker/Docker%E7%AC%94%E8%AE%B0/" class="md-nav__link">
+      <a href="../../Docker/Docker%E7%AC%94%E8%AE%B0/" class="md-nav__link">
         
   
   
@@ -1382,7 +1312,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../Docker/Ubuntu%20%E5%9C%A8%20Docker%20%E5%AE%B9%E5%99%A8%E5%86%85%E8%BF%90%E8%A1%8C%20VNC%2BXfce%20%E6%A1%8C%E9%9D%A2%E7%8E%AF%E5%A2%83/" class="md-nav__link">
+      <a href="../../Docker/Ubuntu%20%E5%9C%A8%20Docker%20%E5%AE%B9%E5%99%A8%E5%86%85%E8%BF%90%E8%A1%8C%20VNC%2BXfce%20%E6%A1%8C%E9%9D%A2%E7%8E%AF%E5%A2%83/" class="md-nav__link">
         
   
   
@@ -1410,7 +1340,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../Docker/%E4%BD%BF%E7%94%A8%20Docker%20%E8%BF%90%E8%A1%8C%20Windows/" class="md-nav__link">
+      <a href="../../Docker/%E4%BD%BF%E7%94%A8%20Docker%20%E8%BF%90%E8%A1%8C%20Windows/" class="md-nav__link">
         
   
   
@@ -1438,7 +1368,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../Docker/%E5%9F%BA%E4%BA%8E%20Docker%20%E5%88%B6%E4%BD%9C%E4%B8%80%E4%B8%AA%20Debian%2BXfce4%2BKasmVNC%20%E5%AE%B9%E5%99%A8/" class="md-nav__link">
+      <a href="../../Docker/%E5%9F%BA%E4%BA%8E%20Docker%20%E5%88%B6%E4%BD%9C%E4%B8%80%E4%B8%AA%20Debian%2BXfce4%2BKasmVNC%20%E5%AE%B9%E5%99%A8/" class="md-nav__link">
         
   
   
@@ -1521,7 +1451,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../LUKS%E7%A3%81%E7%9B%98%E5%8A%A0%E5%AF%86/how-to-encrypt-your-home-directory-in-arch-linux/" class="md-nav__link">
+      <a href="../../LUKS%E7%A3%81%E7%9B%98%E5%8A%A0%E5%AF%86/how-to-encrypt-your-home-directory-in-arch-linux/" class="md-nav__link">
         
   
   
@@ -1549,7 +1479,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../LUKS%E7%A3%81%E7%9B%98%E5%8A%A0%E5%AF%86/%E4%BD%BF%E7%94%A8%20LUKS%20%E5%8A%A0%E5%AF%86%20home%20%E7%9B%AE%E5%BD%95%E5%B9%B6%E5%9C%A8%E5%BC%80%E6%9C%BA%E6%97%B6%E8%87%AA%E5%8A%A8%E8%A7%A3%E5%AF%86/" class="md-nav__link">
+      <a href="../../LUKS%E7%A3%81%E7%9B%98%E5%8A%A0%E5%AF%86/%E4%BD%BF%E7%94%A8%20LUKS%20%E5%8A%A0%E5%AF%86%20home%20%E7%9B%AE%E5%BD%95%E5%B9%B6%E5%9C%A8%E5%BC%80%E6%9C%BA%E6%97%B6%E8%87%AA%E5%8A%A8%E8%A7%A3%E5%AF%86/" class="md-nav__link">
         
   
   
@@ -1577,7 +1507,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../LUKS%E7%A3%81%E7%9B%98%E5%8A%A0%E5%AF%86/%E4%BD%BF%E7%94%A8cryptsetup%E5%88%9B%E5%BB%BA%E5%8A%A0%E5%AF%86%E7%A3%81%E7%9B%98/" class="md-nav__link">
+      <a href="../../LUKS%E7%A3%81%E7%9B%98%E5%8A%A0%E5%AF%86/%E4%BD%BF%E7%94%A8cryptsetup%E5%88%9B%E5%BB%BA%E5%8A%A0%E5%AF%86%E7%A3%81%E7%9B%98/" class="md-nav__link">
         
   
   
@@ -1605,7 +1535,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../LUKS%E7%A3%81%E7%9B%98%E5%8A%A0%E5%AF%86/%E4%BF%9D%E6%8A%A4%E6%95%B0%E6%8D%AE%EF%BC%8C%E7%94%A8%20LUKS%20%E7%BB%99%E7%A3%81%E7%9B%98%E5%85%A8%E7%9B%98%E5%8A%A0%E5%AF%86/" class="md-nav__link">
+      <a href="../../LUKS%E7%A3%81%E7%9B%98%E5%8A%A0%E5%AF%86/%E4%BF%9D%E6%8A%A4%E6%95%B0%E6%8D%AE%EF%BC%8C%E7%94%A8%20LUKS%20%E7%BB%99%E7%A3%81%E7%9B%98%E5%85%A8%E7%9B%98%E5%8A%A0%E5%AF%86/" class="md-nav__link">
         
   
   
@@ -1688,7 +1618,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../Others/LinuxDeploy%20%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/" class="md-nav__link">
+      <a href="../../Others/LinuxDeploy%20%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B/" class="md-nav__link">
         
   
   
@@ -1763,7 +1693,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../Others/Kali%20Linux/WiFi%20%E5%AE%89%E5%85%A8/" class="md-nav__link">
+      <a href="../../Others/Kali%20Linux/WiFi%20%E5%AE%89%E5%85%A8/" class="md-nav__link">
         
   
   
@@ -1804,6 +1734,183 @@
                 
   
   
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_17" checked="">
+        
+          
+          <label class="md-nav__link" for="__nav_4_17" id="__nav_4_17_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    WSL
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_17_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4_17">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    WSL
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix="">
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../WSL%202%20%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF%E4%BB%A5%E5%8F%8A%E5%B8%B8%E9%A9%BB%E5%90%8E%E5%8F%B0/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    WSL 2 开机自启以及常驻后台
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    WSL 2 新建并挂载 VHDX 本地开发分区
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../WSL%20%E9%85%8D%E7%BD%AE%E6%8C%87%E5%8D%97/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    WSL 配置指南
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../wslg%28wsl2%29%20%E9%85%8D%E7%BD%AE%E5%B9%B6%E5%BC%80%E5%90%AF%E8%BF%9C%E7%A8%8B%E6%A1%8C%E9%9D%A2%28xrdp%29/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wslg(wsl2) 配置并开启远程桌面(xrdp)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
   
   
     
@@ -1815,10 +1922,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_17">
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_18">
         
           
-          <label class="md-nav__link" for="__nav_4_17" id="__nav_4_17_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_18" id="__nav_4_18_label" tabindex="0">
             
   
   
@@ -1836,8 +1943,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_17_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_17">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_18_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_18">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1854,7 +1961,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../vim/vim%20%E7%AC%94%E8%AE%B0/" class="md-nav__link">
+      <a href="../../vim/vim%20%E7%AC%94%E8%AE%B0/" class="md-nav__link">
         
   
   
@@ -1882,7 +1989,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../vim/%E5%8D%B3%E5%B0%87%E5%A4%B1%E5%82%B3%E7%9A%84%E5%8F%A4%E8%80%81%E6%8A%80%E8%97%9DVim/" class="md-nav__link">
+      <a href="../../vim/%E5%8D%B3%E5%B0%87%E5%A4%B1%E5%82%B3%E7%9A%84%E5%8F%A4%E8%80%81%E6%8A%80%E8%97%9DVim/" class="md-nav__link">
         
   
   
@@ -1972,7 +2079,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Scripts/git%20%E8%84%9A%E6%9C%AC/" class="md-nav__link">
+      <a href="../../../Scripts/git%20%E8%84%9A%E6%9C%AC/" class="md-nav__link">
         
   
   
@@ -2000,7 +2107,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Scripts/%E4%BD%BF%E7%94%A8%20ffmpeg%20%E6%89%B9%E9%87%8F%E6%88%AA%E5%8F%96%E8%A7%86%E9%A2%91%E5%B0%81%E9%9D%A2/" class="md-nav__link">
+      <a href="../../../Scripts/%E4%BD%BF%E7%94%A8%20ffmpeg%20%E6%89%B9%E9%87%8F%E6%88%AA%E5%8F%96%E8%A7%86%E9%A2%91%E5%B0%81%E9%9D%A2/" class="md-nav__link">
         
   
   
@@ -2075,7 +2182,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Scripts/Windows%20%E5%8F%8C%E5%87%BB%E8%A7%A3%E5%8E%8B/" class="md-nav__link">
+      <a href="../../../Scripts/Windows%20%E5%8F%8C%E5%87%BB%E8%A7%A3%E5%8E%8B/" class="md-nav__link">
         
   
   
@@ -2150,7 +2257,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Scripts/Windows%20%E5%8F%8C%E5%87%BB%E8%A7%A3%E5%8E%8B/build/" class="md-nav__link">
+      <a href="../../../Scripts/Windows%20%E5%8F%8C%E5%87%BB%E8%A7%A3%E5%8E%8B/build/" class="md-nav__link">
         
   
   
@@ -2241,7 +2348,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Scripts/python_batch_encode/batch_encode_README/" class="md-nav__link">
+      <a href="../../../Scripts/python_batch_encode/batch_encode_README/" class="md-nav__link">
         
   
   
@@ -2324,7 +2431,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Scripts/rclone/rclone%20serve%20%E5%8D%8F%E8%AE%AE%E4%BD%BF%E7%94%A8%E6%89%8B%E5%86%8C/" class="md-nav__link">
+      <a href="../../../Scripts/rclone/rclone%20serve%20%E5%8D%8F%E8%AE%AE%E4%BD%BF%E7%94%A8%E6%89%8B%E5%86%8C/" class="md-nav__link">
         
   
   
@@ -2352,7 +2459,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Scripts/rclone/rclone%20%E6%8C%82%E8%BD%BD%E5%9D%9A%E6%9E%9C%E4%BA%91%20WebDAV/" class="md-nav__link">
+      <a href="../../../Scripts/rclone/rclone%20%E6%8C%82%E8%BD%BD%E5%9D%9A%E6%9E%9C%E4%BA%91%20WebDAV/" class="md-nav__link">
         
   
   
@@ -2380,7 +2487,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Scripts/rclone/rclone/" class="md-nav__link">
+      <a href="../../../Scripts/rclone/rclone/" class="md-nav__link">
         
   
   
@@ -2470,7 +2577,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Web%20%E5%BC%80%E5%8F%91/Node.js%20%E7%AC%94%E8%AE%B0/" class="md-nav__link">
+      <a href="../../../Web%20%E5%BC%80%E5%8F%91/Node.js%20%E7%AC%94%E8%AE%B0/" class="md-nav__link">
         
   
   
@@ -2498,7 +2605,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Web%20%E5%BC%80%E5%8F%91/Nuxt.js%20%E9%AB%98%E7%BA%A7%E7%94%A8%E6%B3%95/" class="md-nav__link">
+      <a href="../../../Web%20%E5%BC%80%E5%8F%91/Nuxt.js%20%E9%AB%98%E7%BA%A7%E7%94%A8%E6%B3%95/" class="md-nav__link">
         
   
   
@@ -2526,7 +2633,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Web%20%E5%BC%80%E5%8F%91/Web%20%E5%89%8D%E7%AB%AF%E6%8A%80%E6%9C%AF%E6%A0%88%EF%BC%88%E6%97%A7%EF%BC%89/" class="md-nav__link">
+      <a href="../../../Web%20%E5%BC%80%E5%8F%91/Web%20%E5%89%8D%E7%AB%AF%E6%8A%80%E6%9C%AF%E6%A0%88%EF%BC%88%E6%97%A7%EF%BC%89/" class="md-nav__link">
         
   
   
@@ -2554,7 +2661,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Web%20%E5%BC%80%E5%8F%91/%E5%A6%82%E4%BD%95%E8%B0%83%E8%AF%95%E5%B7%B2%E6%89%93%E5%8C%85%E7%9A%84%20Electron%20%E7%A8%8B%E5%BA%8F/" class="md-nav__link">
+      <a href="../../../Web%20%E5%BC%80%E5%8F%91/%E5%A6%82%E4%BD%95%E8%B0%83%E8%AF%95%E5%B7%B2%E6%89%93%E5%8C%85%E7%9A%84%20Electron%20%E7%A8%8B%E5%BA%8F/" class="md-nav__link">
         
   
   
@@ -2582,7 +2689,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Web%20%E5%BC%80%E5%8F%91/%E5%AE%89%E8%A3%85%20Python/" class="md-nav__link">
+      <a href="../../../Web%20%E5%BC%80%E5%8F%91/%E5%AE%89%E8%A3%85%20Python/" class="md-nav__link">
         
   
   
@@ -2657,7 +2764,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Web%20%E5%BC%80%E5%8F%91/JS-Snippets/Inputmask/" class="md-nav__link">
+      <a href="../../../Web%20%E5%BC%80%E5%8F%91/JS-Snippets/Inputmask/" class="md-nav__link">
         
   
   
@@ -2685,7 +2792,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Web%20%E5%BC%80%E5%8F%91/JS-Snippets/Snippets/" class="md-nav__link">
+      <a href="../../../Web%20%E5%BC%80%E5%8F%91/JS-Snippets/Snippets/" class="md-nav__link">
         
   
   
@@ -2713,7 +2820,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Web%20%E5%BC%80%E5%8F%91/JS-Snippets/Vite%20%E5%A4%9A%E5%85%A5%E5%8F%A3%E6%9E%84%E5%BB%BA/" class="md-nav__link">
+      <a href="../../../Web%20%E5%BC%80%E5%8F%91/JS-Snippets/Vite%20%E5%A4%9A%E5%85%A5%E5%8F%A3%E6%9E%84%E5%BB%BA/" class="md-nav__link">
         
   
   
@@ -2741,7 +2848,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Web%20%E5%BC%80%E5%8F%91/JS-Snippets/dynamicLoadScript/" class="md-nav__link">
+      <a href="../../../Web%20%E5%BC%80%E5%8F%91/JS-Snippets/dynamicLoadScript/" class="md-nav__link">
         
   
   
@@ -2824,7 +2931,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Web%20%E5%BC%80%E5%8F%91/JavaScript/ES6%20%E4%B8%AD%E7%9A%84%20Symbol%20%E7%B1%BB%E5%9E%8B/" class="md-nav__link">
+      <a href="../../../Web%20%E5%BC%80%E5%8F%91/JavaScript/ES6%20%E4%B8%AD%E7%9A%84%20Symbol%20%E7%B1%BB%E5%9E%8B/" class="md-nav__link">
         
   
   
@@ -2852,7 +2959,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Web%20%E5%BC%80%E5%8F%91/JavaScript/HTML%2BCSS%E5%9F%BA%E7%A1%80%E7%94%A8%E6%B3%95%E6%94%B6%E9%9B%86/" class="md-nav__link">
+      <a href="../../../Web%20%E5%BC%80%E5%8F%91/JavaScript/HTML%2BCSS%E5%9F%BA%E7%A1%80%E7%94%A8%E6%B3%95%E6%94%B6%E9%9B%86/" class="md-nav__link">
         
   
   
@@ -2880,7 +2987,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Web%20%E5%BC%80%E5%8F%91/JavaScript/JS%20Prototype%20%E5%8E%9F%E5%9E%8B%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" class="md-nav__link">
+      <a href="../../../Web%20%E5%BC%80%E5%8F%91/JavaScript/JS%20Prototype%20%E5%8E%9F%E5%9E%8B%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" class="md-nav__link">
         
   
   
@@ -2908,7 +3015,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Web%20%E5%BC%80%E5%8F%91/JavaScript/JS%20%E5%AF%B9%E8%B1%A1%E5%AE%9E%E7%8E%B0%E7%BB%A7%E6%89%BF%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E6%B3%95%E4%BB%A5%E5%8F%8A%E4%BC%98%E7%BC%BA%E7%82%B9/" class="md-nav__link">
+      <a href="../../../Web%20%E5%BC%80%E5%8F%91/JavaScript/JS%20%E5%AF%B9%E8%B1%A1%E5%AE%9E%E7%8E%B0%E7%BB%A7%E6%89%BF%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E6%B3%95%E4%BB%A5%E5%8F%8A%E4%BC%98%E7%BC%BA%E7%82%B9/" class="md-nav__link">
         
   
   
@@ -2936,7 +3043,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Web%20%E5%BC%80%E5%8F%91/JavaScript/JS%20%E7%9A%84%E8%8A%82%E6%B5%81%E4%B8%8E%E9%98%B2%E6%8A%96%E5%87%BD%E6%95%B0/" class="md-nav__link">
+      <a href="../../../Web%20%E5%BC%80%E5%8F%91/JavaScript/JS%20%E7%9A%84%E8%8A%82%E6%B5%81%E4%B8%8E%E9%98%B2%E6%8A%96%E5%87%BD%E6%95%B0/" class="md-nav__link">
         
   
   
@@ -2964,7 +3071,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Web%20%E5%BC%80%E5%8F%91/JavaScript/JavaScript%20AJAX%20%E8%AF%B7%E6%B1%82%E6%95%B0%E6%8D%AE%E7%9A%84%E5%90%84%E7%A7%8D%E5%86%99%E6%B3%95/" class="md-nav__link">
+      <a href="../../../Web%20%E5%BC%80%E5%8F%91/JavaScript/JavaScript%20AJAX%20%E8%AF%B7%E6%B1%82%E6%95%B0%E6%8D%AE%E7%9A%84%E5%90%84%E7%A7%8D%E5%86%99%E6%B3%95/" class="md-nav__link">
         
   
   
@@ -2992,7 +3099,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Web%20%E5%BC%80%E5%8F%91/JavaScript/JavaScript%20%E5%9F%BA%E7%A1%80/" class="md-nav__link">
+      <a href="../../../Web%20%E5%BC%80%E5%8F%91/JavaScript/JavaScript%20%E5%9F%BA%E7%A1%80/" class="md-nav__link">
         
   
   
@@ -3020,7 +3127,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Web%20%E5%BC%80%E5%8F%91/JavaScript/decodeURI/" class="md-nav__link">
+      <a href="../../../Web%20%E5%BC%80%E5%8F%91/JavaScript/decodeURI/" class="md-nav__link">
         
   
   
@@ -3048,7 +3155,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Web%20%E5%BC%80%E5%8F%91/JavaScript/jsonp/" class="md-nav__link">
+      <a href="../../../Web%20%E5%BC%80%E5%8F%91/JavaScript/jsonp/" class="md-nav__link">
         
   
   
@@ -3076,7 +3183,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Web%20%E5%BC%80%E5%8F%91/JavaScript/script%20tag%20async%20defer%20%E5%8C%BA%E5%88%AB/" class="md-nav__link">
+      <a href="../../../Web%20%E5%BC%80%E5%8F%91/JavaScript/script%20tag%20async%20defer%20%E5%8C%BA%E5%88%AB/" class="md-nav__link">
         
   
   
@@ -3104,7 +3211,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Web%20%E5%BC%80%E5%8F%91/JavaScript/%E5%AE%9E%E7%8E%B0%20Promise.all%28%29/" class="md-nav__link">
+      <a href="../../../Web%20%E5%BC%80%E5%8F%91/JavaScript/%E5%AE%9E%E7%8E%B0%20Promise.all%28%29/" class="md-nav__link">
         
   
   
@@ -3132,7 +3239,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Web%20%E5%BC%80%E5%8F%91/JavaScript/%E5%AE%9E%E7%8E%B0%20Promise/" class="md-nav__link">
+      <a href="../../../Web%20%E5%BC%80%E5%8F%91/JavaScript/%E5%AE%9E%E7%8E%B0%20Promise/" class="md-nav__link">
         
   
   
@@ -3160,7 +3267,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Web%20%E5%BC%80%E5%8F%91/JavaScript/%E5%AE%9E%E7%8E%B0%20instanceof/" class="md-nav__link">
+      <a href="../../../Web%20%E5%BC%80%E5%8F%91/JavaScript/%E5%AE%9E%E7%8E%B0%20instanceof/" class="md-nav__link">
         
   
   
@@ -3188,7 +3295,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Web%20%E5%BC%80%E5%8F%91/JavaScript/%E5%AE%9E%E7%8E%B0%20new/" class="md-nav__link">
+      <a href="../../../Web%20%E5%BC%80%E5%8F%91/JavaScript/%E5%AE%9E%E7%8E%B0%20new/" class="md-nav__link">
         
   
   
@@ -3216,7 +3323,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Web%20%E5%BC%80%E5%8F%91/JavaScript/%E5%AE%9E%E7%8E%B0%E5%8F%91%E5%B8%83%E8%AE%A2%E9%98%85%E6%A8%A1%E5%BC%8F/" class="md-nav__link">
+      <a href="../../../Web%20%E5%BC%80%E5%8F%91/JavaScript/%E5%AE%9E%E7%8E%B0%E5%8F%91%E5%B8%83%E8%AE%A2%E9%98%85%E6%A8%A1%E5%BC%8F/" class="md-nav__link">
         
   
   
@@ -3244,7 +3351,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Web%20%E5%BC%80%E5%8F%91/JavaScript/%E6%89%8B%E5%86%99%E4%B8%80%E4%B8%AA%20apply/" class="md-nav__link">
+      <a href="../../../Web%20%E5%BC%80%E5%8F%91/JavaScript/%E6%89%8B%E5%86%99%E4%B8%80%E4%B8%AA%20apply/" class="md-nav__link">
         
   
   
@@ -3272,7 +3379,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Web%20%E5%BC%80%E5%8F%91/JavaScript/%E6%89%8B%E5%86%99%E4%B8%80%E4%B8%AA%20bind/" class="md-nav__link">
+      <a href="../../../Web%20%E5%BC%80%E5%8F%91/JavaScript/%E6%89%8B%E5%86%99%E4%B8%80%E4%B8%AA%20bind/" class="md-nav__link">
         
   
   
@@ -3300,7 +3407,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Web%20%E5%BC%80%E5%8F%91/JavaScript/%E6%89%8B%E5%86%99%E4%B8%80%E4%B8%AA%20call/" class="md-nav__link">
+      <a href="../../../Web%20%E5%BC%80%E5%8F%91/JavaScript/%E6%89%8B%E5%86%99%E4%B8%80%E4%B8%AA%20call/" class="md-nav__link">
         
   
   
@@ -3390,7 +3497,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Windows/AutoHotKey/" class="md-nav__link">
+      <a href="../../../Windows/AutoHotKey/" class="md-nav__link">
         
   
   
@@ -3418,7 +3525,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Windows/Bitlocker%20%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/" class="md-nav__link">
+      <a href="../../../Windows/Bitlocker%20%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/" class="md-nav__link">
         
   
   
@@ -3446,7 +3553,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Windows/PowerShell%20pwsh%20%E9%85%8D%E7%BD%AE%E7%AC%94%E8%AE%B0/" class="md-nav__link">
+      <a href="../../../Windows/PowerShell%20pwsh%20%E9%85%8D%E7%BD%AE%E7%AC%94%E8%AE%B0/" class="md-nav__link">
         
   
   
@@ -3474,7 +3581,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Windows/RDP%20%E5%9C%A8%E8%BF%9C%E7%A8%8B%E6%A1%8C%E9%9D%A2%E8%BF%9E%E6%8E%A5%E6%9C%8D%E5%8A%A1%E4%B8%AD%E4%BD%BF%E7%94%A8%E8%87%AA%E5%AE%9A%E4%B9%89%E8%AF%81%E4%B9%A6%E5%8A%A0%E5%AF%86/" class="md-nav__link">
+      <a href="../../../Windows/RDP%20%E5%9C%A8%E8%BF%9C%E7%A8%8B%E6%A1%8C%E9%9D%A2%E8%BF%9E%E6%8E%A5%E6%9C%8D%E5%8A%A1%E4%B8%AD%E4%BD%BF%E7%94%A8%E8%87%AA%E5%AE%9A%E4%B9%89%E8%AF%81%E4%B9%A6%E5%8A%A0%E5%AF%86/" class="md-nav__link">
         
   
   
@@ -3502,7 +3609,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Windows/RDP%20%E8%BF%9C%E7%A8%8B%E6%A1%8C%E9%9D%A2%E8%BF%9E%E6%8E%A5/" class="md-nav__link">
+      <a href="../../../Windows/RDP%20%E8%BF%9C%E7%A8%8B%E6%A1%8C%E9%9D%A2%E8%BF%9E%E6%8E%A5/" class="md-nav__link">
         
   
   
@@ -3530,7 +3637,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Windows/WezTerm%20%E9%85%8D%E7%BD%AE/" class="md-nav__link">
+      <a href="../../../Windows/WezTerm%20%E9%85%8D%E7%BD%AE/" class="md-nav__link">
         
   
   
@@ -3558,7 +3665,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Windows/Win10%20%E4%BF%AE%E6%94%B9%E5%A3%B0%E9%9F%B3%E4%B8%BB%E9%A2%98%E4%B8%BA%20Win7/" class="md-nav__link">
+      <a href="../../../Windows/Win10%20%E4%BF%AE%E6%94%B9%E5%A3%B0%E9%9F%B3%E4%B8%BB%E9%A2%98%E4%B8%BA%20Win7/" class="md-nav__link">
         
   
   
@@ -3586,7 +3693,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Windows/Win11%20%E4%BF%AE%E6%94%B9/" class="md-nav__link">
+      <a href="../../../Windows/Win11%20%E4%BF%AE%E6%94%B9/" class="md-nav__link">
         
   
   
@@ -3614,7 +3721,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Windows/Windows%20UEFI%20BCD%20%E5%BC%95%E5%AF%BC%E4%BF%AE%E5%A4%8D/" class="md-nav__link">
+      <a href="../../../Windows/Windows%20UEFI%20BCD%20%E5%BC%95%E5%AF%BC%E4%BF%AE%E5%A4%8D/" class="md-nav__link">
         
   
   
@@ -3642,7 +3749,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Windows/Windows%20%E4%BD%BF%E7%94%A8%20VHD%20%E9%95%9C%E5%83%8F%E6%97%A0%E6%8D%9F%E5%A4%87%E4%BB%BD%E6%81%A2%E5%A4%8D%E7%B3%BB%E7%BB%9F/" class="md-nav__link">
+      <a href="../../../Windows/Windows%20%E4%BD%BF%E7%94%A8%20VHD%20%E9%95%9C%E5%83%8F%E6%97%A0%E6%8D%9F%E5%A4%87%E4%BB%BD%E6%81%A2%E5%A4%8D%E7%B3%BB%E7%BB%9F/" class="md-nav__link">
         
   
   
@@ -3670,7 +3777,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Windows/Windows%20%E5%8F%8C%E7%BD%91%E5%8D%A1%28WLAN%20%26%20LAN%29%E9%80%89%E6%8B%A9%E4%BC%98%E5%85%88%E7%BA%A7%E9%AB%98%E7%9A%84%E4%B8%8A%E7%BD%91/" class="md-nav__link">
+      <a href="../../../Windows/Windows%20%E5%8F%8C%E7%BD%91%E5%8D%A1%28WLAN%20%26%20LAN%29%E9%80%89%E6%8B%A9%E4%BC%98%E5%85%88%E7%BA%A7%E9%AB%98%E7%9A%84%E4%B8%8A%E7%BD%91/" class="md-nav__link">
         
   
   
@@ -3698,7 +3805,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Windows/Windows%20%E6%9B%B4%E6%96%B0%E7%9A%84%E7%9B%B8%E5%85%B3%E8%AE%BE%E7%BD%AE/" class="md-nav__link">
+      <a href="../../../Windows/Windows%20%E6%9B%B4%E6%96%B0%E7%9A%84%E7%9B%B8%E5%85%B3%E8%AE%BE%E7%BD%AE/" class="md-nav__link">
         
   
   
@@ -3726,7 +3833,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Windows/Windows%20%E6%B3%A8%E5%86%8C%E8%A1%A8%E4%BF%AE%E6%94%B9/" class="md-nav__link">
+      <a href="../../../Windows/Windows%20%E6%B3%A8%E5%86%8C%E8%A1%A8%E4%BF%AE%E6%94%B9/" class="md-nav__link">
         
   
   
@@ -3754,7 +3861,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Windows/Windows%20%E8%84%9A%E6%9C%AC%20%2B%20%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/" class="md-nav__link">
+      <a href="../../../Windows/Windows%20%E8%84%9A%E6%9C%AC%20%2B%20%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/" class="md-nav__link">
         
   
   
@@ -3782,7 +3889,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Windows/Windows%20%E8%AE%BE%E5%A4%87%E5%A6%82%E4%BD%95%E5%9C%A8%E4%BD%BF%E7%94%A8%20Android%20%E6%89%8B%E6%9C%BA%20USB%20%E5%85%B1%E4%BA%AB%E4%B8%8A%E7%BD%91%E7%9A%84%E6%83%85%E5%86%B5%E4%B8%8B%EF%BC%8C%E5%9C%A8%E5%B1%80%E5%9F%9F%E7%BD%91%E8%BF%9B%E8%A1%8C%E8%BF%9C%E7%A8%8B%E6%A1%8C%E9%9D%A2%E8%BF%9E%E6%8E%A5%28RDP%29/" class="md-nav__link">
+      <a href="../../../Windows/Windows%20%E8%AE%BE%E5%A4%87%E5%A6%82%E4%BD%95%E5%9C%A8%E4%BD%BF%E7%94%A8%20Android%20%E6%89%8B%E6%9C%BA%20USB%20%E5%85%B1%E4%BA%AB%E4%B8%8A%E7%BD%91%E7%9A%84%E6%83%85%E5%86%B5%E4%B8%8B%EF%BC%8C%E5%9C%A8%E5%B1%80%E5%9F%9F%E7%BD%91%E8%BF%9B%E8%A1%8C%E8%BF%9C%E7%A8%8B%E6%A1%8C%E9%9D%A2%E8%BF%9E%E6%8E%A5%28RDP%29/" class="md-nav__link">
         
   
   
@@ -3810,7 +3917,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Windows/Windows%20%E8%BF%81%E7%A7%BB%E7%B3%BB%E7%BB%9F%E5%90%8E%E9%BB%91%E5%B1%8F%E5%8F%AA%E6%9C%89%E9%BC%A0%E6%A0%87%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" class="md-nav__link">
+      <a href="../../../Windows/Windows%20%E8%BF%81%E7%A7%BB%E7%B3%BB%E7%BB%9F%E5%90%8E%E9%BB%91%E5%B1%8F%E5%8F%AA%E6%9C%89%E9%BC%A0%E6%A0%87%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" class="md-nav__link">
         
   
   
@@ -3838,7 +3945,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Windows/Windows%20%E9%80%9A%E8%BF%87%20New-NetNat%20%E7%BB%99%E5%85%B6%E4%BB%96%E7%BD%91%E5%8D%A1%E5%85%B1%E4%BA%AB%E7%BD%91%E7%BB%9C/" class="md-nav__link">
+      <a href="../../../Windows/Windows%20%E9%80%9A%E8%BF%87%20New-NetNat%20%E7%BB%99%E5%85%B6%E4%BB%96%E7%BD%91%E5%8D%A1%E5%85%B1%E4%BA%AB%E7%BD%91%E7%BB%9C/" class="md-nav__link">
         
   
   
@@ -3866,7 +3973,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Windows/Windows/" class="md-nav__link">
+      <a href="../../../Windows/Windows/" class="md-nav__link">
         
   
   
@@ -3894,7 +4001,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Windows/Windows11%20ReFS/" class="md-nav__link">
+      <a href="../../../Windows/Windows11%20ReFS/" class="md-nav__link">
         
   
   
@@ -3922,7 +4029,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Windows/%E4%BF%AE%E6%94%B9%20Windows%20%E7%BD%91%E7%BB%9C%E7%B1%BB%E5%9E%8B%E5%85%AC%E7%94%A8%E4%B8%BA%E4%B8%93%E7%94%A8%E7%BD%91%E7%BB%9C/" class="md-nav__link">
+      <a href="../../../Windows/%E4%BF%AE%E6%94%B9%20Windows%20%E7%BD%91%E7%BB%9C%E7%B1%BB%E5%9E%8B%E5%85%AC%E7%94%A8%E4%B8%BA%E4%B8%93%E7%94%A8%E7%BD%91%E7%BB%9C/" class="md-nav__link">
         
   
   
@@ -3950,7 +4057,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Windows/%E5%9C%A8%20Windows%20%E4%B8%8A%E5%AE%89%E8%A3%85%20sftp%E3%80%81ssh%20%E6%9C%8D%E5%8A%A1%E5%99%A8/" class="md-nav__link">
+      <a href="../../../Windows/%E5%9C%A8%20Windows%20%E4%B8%8A%E5%AE%89%E8%A3%85%20sftp%E3%80%81ssh%20%E6%9C%8D%E5%8A%A1%E5%99%A8/" class="md-nav__link">
         
   
   
@@ -3978,7 +4085,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Windows/%E5%9C%A8%20vhdx%20%E8%99%9A%E6%8B%9F%E7%A3%81%E7%9B%98%E4%B8%8A%E5%AE%89%E8%A3%85%20Windows/" class="md-nav__link">
+      <a href="../../../Windows/%E5%9C%A8%20vhdx%20%E8%99%9A%E6%8B%9F%E7%A3%81%E7%9B%98%E4%B8%8A%E5%AE%89%E8%A3%85%20Windows/" class="md-nav__link">
         
   
   
@@ -4006,7 +4113,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Windows/%E5%A6%82%E4%BD%95%E5%9C%A8%20Linux%20or%20Windows%20%E4%B8%8B%E8%AE%BE%E7%BD%AE%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F/" class="md-nav__link">
+      <a href="../../../Windows/%E5%A6%82%E4%BD%95%E5%9C%A8%20Linux%20or%20Windows%20%E4%B8%8B%E8%AE%BE%E7%BD%AE%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F/" class="md-nav__link">
         
   
   
@@ -4034,7 +4141,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Windows/%E6%89%8B%E5%8A%A8%E6%81%A2%E5%A4%8D%E6%96%87%E4%BB%B6%E5%A4%B9%E5%8F%B3%E9%94%AE%E8%8F%9C%E5%8D%95VSCode%E5%92%8C%E7%BB%88%E7%AB%AF/" class="md-nav__link">
+      <a href="../../../Windows/%E6%89%8B%E5%8A%A8%E6%81%A2%E5%A4%8D%E6%96%87%E4%BB%B6%E5%A4%B9%E5%8F%B3%E9%94%AE%E8%8F%9C%E5%8D%95VSCode%E5%92%8C%E7%BB%88%E7%AB%AF/" class="md-nav__link">
         
   
   
@@ -4062,7 +4169,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../Windows/%E9%98%BB%E6%AD%A2%E7%A8%8B%E5%BA%8F%E8%BF%90%E8%A1%8C/" class="md-nav__link">
+      <a href="../../../Windows/%E9%98%BB%E6%AD%A2%E7%A8%8B%E5%BA%8F%E8%BF%90%E8%A1%8C/" class="md-nav__link">
         
   
   
@@ -4144,7 +4251,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E5%85%B6%E4%BB%96/Android%20%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/" class="md-nav__link">
+      <a href="../../../%E5%85%B6%E4%BB%96/Android%20%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/" class="md-nav__link">
         
   
   
@@ -4172,7 +4279,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E5%85%B6%E4%BB%96/Excel%20%E6%8A%80%E5%B7%A7/" class="md-nav__link">
+      <a href="../../../%E5%85%B6%E4%BB%96/Excel%20%E6%8A%80%E5%B7%A7/" class="md-nav__link">
         
   
   
@@ -4200,7 +4307,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E5%85%B6%E4%BB%96/Music/" class="md-nav__link">
+      <a href="../../../%E5%85%B6%E4%BB%96/Music/" class="md-nav__link">
         
   
   
@@ -4228,7 +4335,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E5%85%B6%E4%BB%96/Sunshine%20Moonlight%20%E4%B8%B2%E6%B5%81/" class="md-nav__link">
+      <a href="../../../%E5%85%B6%E4%BB%96/Sunshine%20Moonlight%20%E4%B8%B2%E6%B5%81/" class="md-nav__link">
         
   
   
@@ -4256,7 +4363,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E5%85%B6%E4%BB%96/%E5%B8%B8%E7%94%A8%E5%8E%8B%E7%BC%A9%E3%80%81%E8%A7%A3%E5%8E%8B%E5%91%BD%E4%BB%A4/" class="md-nav__link">
+      <a href="../../../%E5%85%B6%E4%BB%96/%E5%B8%B8%E7%94%A8%E5%8E%8B%E7%BC%A9%E3%80%81%E8%A7%A3%E5%8E%8B%E5%91%BD%E4%BB%A4/" class="md-nav__link">
         
   
   
@@ -4284,7 +4391,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E5%85%B6%E4%BB%96/%E6%9D%82%E9%A1%B9/" class="md-nav__link">
+      <a href="../../../%E5%85%B6%E4%BB%96/%E6%9D%82%E9%A1%B9/" class="md-nav__link">
         
   
   
@@ -4312,7 +4419,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E5%85%B6%E4%BB%96/%E8%BD%AF%E4%BB%B6%E6%8E%A8%E8%8D%90/" class="md-nav__link">
+      <a href="../../../%E5%85%B6%E4%BB%96/%E8%BD%AF%E4%BB%B6%E6%8E%A8%E8%8D%90/" class="md-nav__link">
         
   
   
@@ -4387,7 +4494,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E5%85%B6%E4%BB%96/%E6%B8%B8%E6%88%8F/Minecraft/" class="md-nav__link">
+      <a href="../../../%E5%85%B6%E4%BB%96/%E6%B8%B8%E6%88%8F/Minecraft/" class="md-nav__link">
         
   
   
@@ -4415,7 +4522,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E5%85%B6%E4%BB%96/%E6%B8%B8%E6%88%8F/%E6%89%B9%E9%87%8F%E4%BF%AE%E6%94%B9%20Playnite%20%E7%9A%84%E6%B8%B8%E6%88%8F%E8%B7%AF%E5%BE%84%EF%BC%88%E4%BF%AE%E6%94%B9%20LiteDB%20%E6%95%B0%E6%8D%AE%E5%BA%93%EF%BC%89/" class="md-nav__link">
+      <a href="../../../%E5%85%B6%E4%BB%96/%E6%B8%B8%E6%88%8F/%E6%89%B9%E9%87%8F%E4%BF%AE%E6%94%B9%20Playnite%20%E7%9A%84%E6%B8%B8%E6%88%8F%E8%B7%AF%E5%BE%84%EF%BC%88%E4%BF%AE%E6%94%B9%20LiteDB%20%E6%95%B0%E6%8D%AE%E5%BA%93%EF%BC%89/" class="md-nav__link">
         
   
   
@@ -4498,7 +4605,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E5%85%B6%E4%BB%96/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/Books%20%26%20Videos/" class="md-nav__link">
+      <a href="../../../%E5%85%B6%E4%BB%96/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/Books%20%26%20Videos/" class="md-nav__link">
         
   
   
@@ -4526,7 +4633,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E5%85%B6%E4%BB%96/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/%E4%BD%8D%E8%BF%90%E7%AE%97/" class="md-nav__link">
+      <a href="../../../%E5%85%B6%E4%BB%96/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/%E4%BD%8D%E8%BF%90%E7%AE%97/" class="md-nav__link">
         
   
   
@@ -4554,7 +4661,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E5%85%B6%E4%BB%96/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/%E6%96%90%E6%B3%A2%E9%82%A3%E5%A5%91%E6%95%B0%E5%88%97/" class="md-nav__link">
+      <a href="../../../%E5%85%B6%E4%BB%96/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/%E6%96%90%E6%B3%A2%E9%82%A3%E5%A5%91%E6%95%B0%E5%88%97/" class="md-nav__link">
         
   
   
@@ -4582,7 +4689,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E5%85%B6%E4%BB%96/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/%E8%BF%9B%E5%88%B6%E8%BD%AC%E6%8D%A2/" class="md-nav__link">
+      <a href="../../../%E5%85%B6%E4%BB%96/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/%E8%BF%9B%E5%88%B6%E8%BD%AC%E6%8D%A2/" class="md-nav__link">
         
   
   
@@ -4672,7 +4779,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E6%9C%8D%E5%8A%A1%E5%99%A8/Debian%2012%20%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%AE%BE%E7%BD%AE%20Swap%20%E6%96%B9%E6%B3%95/" class="md-nav__link">
+      <a href="../../../%E6%9C%8D%E5%8A%A1%E5%99%A8/Debian%2012%20%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%AE%BE%E7%BD%AE%20Swap%20%E6%96%B9%E6%B3%95/" class="md-nav__link">
         
   
   
@@ -4700,7 +4807,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E6%9C%8D%E5%8A%A1%E5%99%A8/RustDesk/" class="md-nav__link">
+      <a href="../../../%E6%9C%8D%E5%8A%A1%E5%99%A8/RustDesk/" class="md-nav__link">
         
   
   
@@ -4728,7 +4835,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E6%9C%8D%E5%8A%A1%E5%99%A8/setup-frp/" class="md-nav__link">
+      <a href="../../../%E6%9C%8D%E5%8A%A1%E5%99%A8/setup-frp/" class="md-nav__link">
         
   
   
@@ -4756,7 +4863,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E6%9C%8D%E5%8A%A1%E5%99%A8/setup-mongodb/" class="md-nav__link">
+      <a href="../../../%E6%9C%8D%E5%8A%A1%E5%99%A8/setup-mongodb/" class="md-nav__link">
         
   
   
@@ -4784,7 +4891,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E6%9C%8D%E5%8A%A1%E5%99%A8/setup-mysql/" class="md-nav__link">
+      <a href="../../../%E6%9C%8D%E5%8A%A1%E5%99%A8/setup-mysql/" class="md-nav__link">
         
   
   
@@ -4812,7 +4919,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E6%9C%8D%E5%8A%A1%E5%99%A8/setup-nginx/" class="md-nav__link">
+      <a href="../../../%E6%9C%8D%E5%8A%A1%E5%99%A8/setup-nginx/" class="md-nav__link">
         
   
   
@@ -4840,7 +4947,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E6%9C%8D%E5%8A%A1%E5%99%A8/setup-pm2/" class="md-nav__link">
+      <a href="../../../%E6%9C%8D%E5%8A%A1%E5%99%A8/setup-pm2/" class="md-nav__link">
         
   
   
@@ -4868,7 +4975,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E6%9C%8D%E5%8A%A1%E5%99%A8/setup-samba/" class="md-nav__link">
+      <a href="../../../%E6%9C%8D%E5%8A%A1%E5%99%A8/setup-samba/" class="md-nav__link">
         
   
   
@@ -4896,7 +5003,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E6%9C%8D%E5%8A%A1%E5%99%A8/setup-vnc/" class="md-nav__link">
+      <a href="../../../%E6%9C%8D%E5%8A%A1%E5%99%A8/setup-vnc/" class="md-nav__link">
         
   
   
@@ -4924,7 +5031,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E6%9C%8D%E5%8A%A1%E5%99%A8/wget/" class="md-nav__link">
+      <a href="../../../%E6%9C%8D%E5%8A%A1%E5%99%A8/wget/" class="md-nav__link">
         
   
   
@@ -4952,7 +5059,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E6%9C%8D%E5%8A%A1%E5%99%A8/%E4%BD%BF%E7%94%A8%20mkcert%20%E7%94%9F%E6%88%90%E5%B9%B6%E4%BF%A1%E4%BB%BB%E8%87%AA%E7%AD%BE%E5%90%8D%20SSL%20%E8%AF%81%E4%B9%A6/" class="md-nav__link">
+      <a href="../../../%E6%9C%8D%E5%8A%A1%E5%99%A8/%E4%BD%BF%E7%94%A8%20mkcert%20%E7%94%9F%E6%88%90%E5%B9%B6%E4%BF%A1%E4%BB%BB%E8%87%AA%E7%AD%BE%E5%90%8D%20SSL%20%E8%AF%81%E4%B9%A6/" class="md-nav__link">
         
   
   
@@ -4980,7 +5087,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E6%9C%8D%E5%8A%A1%E5%99%A8/%E5%85%8D%E8%B4%B9%20SSL%20%E8%AF%81%E4%B9%A6%E7%94%9F%E6%88%90%E4%B8%8E%E9%85%8D%E7%BD%AE/" class="md-nav__link">
+      <a href="../../../%E6%9C%8D%E5%8A%A1%E5%99%A8/%E5%85%8D%E8%B4%B9%20SSL%20%E8%AF%81%E4%B9%A6%E7%94%9F%E6%88%90%E4%B8%8E%E9%85%8D%E7%BD%AE/" class="md-nav__link">
         
   
   
@@ -5008,7 +5115,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E6%9C%8D%E5%8A%A1%E5%99%A8/%E5%9B%BE%E8%A7%A3HTTP-%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" class="md-nav__link">
+      <a href="../../../%E6%9C%8D%E5%8A%A1%E5%99%A8/%E5%9B%BE%E8%A7%A3HTTP-%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" class="md-nav__link">
         
   
   
@@ -5036,7 +5143,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E6%9C%8D%E5%8A%A1%E5%99%A8/%E5%A4%9A%E5%B9%B3%E5%8F%B0%E6%8C%82%E8%BD%BD%20webdav/" class="md-nav__link">
+      <a href="../../../%E6%9C%8D%E5%8A%A1%E5%99%A8/%E5%A4%9A%E5%B9%B3%E5%8F%B0%E6%8C%82%E8%BD%BD%20webdav/" class="md-nav__link">
         
   
   
@@ -5064,7 +5171,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E6%9C%8D%E5%8A%A1%E5%99%A8/%E5%B1%80%E5%9F%9F%E7%BD%91%E6%96%87%E4%BB%B6%E4%BC%A0%E8%BE%93%E5%B7%A5%E5%85%B7/" class="md-nav__link">
+      <a href="../../../%E6%9C%8D%E5%8A%A1%E5%99%A8/%E5%B1%80%E5%9F%9F%E7%BD%91%E6%96%87%E4%BB%B6%E4%BC%A0%E8%BE%93%E5%B7%A5%E5%85%B7/" class="md-nav__link">
         
   
   
@@ -5146,7 +5253,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E7%94%B5%E5%AD%90%E4%BA%A7%E5%93%81/LG%20G8X%20%E5%88%B7%E6%9C%BA/" class="md-nav__link">
+      <a href="../../../%E7%94%B5%E5%AD%90%E4%BA%A7%E5%93%81/LG%20G8X%20%E5%88%B7%E6%9C%BA/" class="md-nav__link">
         
   
   
@@ -5174,7 +5281,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E7%94%B5%E5%AD%90%E4%BA%A7%E5%93%81/NUC11%20%E5%AE%89%E8%A3%85%20ArchLinux/" class="md-nav__link">
+      <a href="../../../%E7%94%B5%E5%AD%90%E4%BA%A7%E5%93%81/NUC11%20%E5%AE%89%E8%A3%85%20ArchLinux/" class="md-nav__link">
         
   
   
@@ -5202,7 +5309,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E7%94%B5%E5%AD%90%E4%BA%A7%E5%93%81/SurfacePro7/" class="md-nav__link">
+      <a href="../../../%E7%94%B5%E5%AD%90%E4%BA%A7%E5%93%81/SurfacePro7/" class="md-nav__link">
         
   
   
@@ -5230,7 +5337,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E7%94%B5%E5%AD%90%E4%BA%A7%E5%93%81/SurfacePro7%E4%BD%9C%E4%B8%BA%E6%95%B0%E4%BD%8D%E6%9D%BF%E4%BD%BF%E7%94%A8/" class="md-nav__link">
+      <a href="../../../%E7%94%B5%E5%AD%90%E4%BA%A7%E5%93%81/SurfacePro7%E4%BD%9C%E4%B8%BA%E6%95%B0%E4%BD%8D%E6%9D%BF%E4%BD%BF%E7%94%A8/" class="md-nav__link">
         
   
   
@@ -5258,7 +5365,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E7%94%B5%E5%AD%90%E4%BA%A7%E5%93%81/SurfacePro7%E5%AE%89%E8%A3%85Linux%E6%8C%87%E5%8D%97/" class="md-nav__link">
+      <a href="../../../%E7%94%B5%E5%AD%90%E4%BA%A7%E5%93%81/SurfacePro7%E5%AE%89%E8%A3%85Linux%E6%8C%87%E5%8D%97/" class="md-nav__link">
         
   
   
@@ -5286,7 +5393,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E7%94%B5%E5%AD%90%E4%BA%A7%E5%93%81/Xiaomi%20Book%2012.4%20%E4%BA%8C%E5%90%88%E4%B8%80/" class="md-nav__link">
+      <a href="../../../%E7%94%B5%E5%AD%90%E4%BA%A7%E5%93%81/Xiaomi%20Book%2012.4%20%E4%BA%8C%E5%90%88%E4%B8%80/" class="md-nav__link">
         
   
   
@@ -5314,7 +5421,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E7%94%B5%E5%AD%90%E4%BA%A7%E5%93%81/%E4%B8%80%E5%8A%A0%206T%20%E5%88%B7%20Win11ARM%20%E6%8C%87%E5%8D%97/" class="md-nav__link">
+      <a href="../../../%E7%94%B5%E5%AD%90%E4%BA%A7%E5%93%81/%E4%B8%80%E5%8A%A0%206T%20%E5%88%B7%20Win11ARM%20%E6%8C%87%E5%8D%97/" class="md-nav__link">
         
   
   
@@ -5342,7 +5449,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E7%94%B5%E5%AD%90%E4%BA%A7%E5%93%81/%E4%BF%AE%E6%94%B9%E7%8B%BC%E6%B4%BE%20A89%20CIY%20%E5%B0%8F%E9%94%AE%E7%9B%98%E5%8C%BA%E6%8C%89%E9%94%AE%E6%98%A0%E5%B0%84%EF%BC%88AHK%E8%84%9A%E6%9C%AC%EF%BC%89/" class="md-nav__link">
+      <a href="../../../%E7%94%B5%E5%AD%90%E4%BA%A7%E5%93%81/%E4%BF%AE%E6%94%B9%E7%8B%BC%E6%B4%BE%20A89%20CIY%20%E5%B0%8F%E9%94%AE%E7%9B%98%E5%8C%BA%E6%8C%89%E9%94%AE%E6%98%A0%E5%B0%84%EF%BC%88AHK%E8%84%9A%E6%9C%AC%EF%BC%89/" class="md-nav__link">
         
   
   
@@ -5370,7 +5477,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E7%94%B5%E5%AD%90%E4%BA%A7%E5%93%81/%E5%B0%8F%E7%B1%B3%20MI6%20%E5%88%B7%E6%9C%BA%E6%97%A5%E5%BF%97/" class="md-nav__link">
+      <a href="../../../%E7%94%B5%E5%AD%90%E4%BA%A7%E5%93%81/%E5%B0%8F%E7%B1%B3%20MI6%20%E5%88%B7%E6%9C%BA%E6%97%A5%E5%BF%97/" class="md-nav__link">
         
   
   
@@ -5398,7 +5505,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E7%94%B5%E5%AD%90%E4%BA%A7%E5%93%81/%E6%91%84%E5%BD%B1/" class="md-nav__link">
+      <a href="../../../%E7%94%B5%E5%AD%90%E4%BA%A7%E5%93%81/%E6%91%84%E5%BD%B1/" class="md-nav__link">
         
   
   
@@ -5473,7 +5580,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E7%94%B5%E5%AD%90%E4%BA%A7%E5%93%81/Mindows/Mindows%20%E5%88%87%E6%8D%A2%E5%8E%9F%E7%90%86%E5%88%86%E6%9E%90/" class="md-nav__link">
+      <a href="../../../%E7%94%B5%E5%AD%90%E4%BA%A7%E5%93%81/Mindows/Mindows%20%E5%88%87%E6%8D%A2%E5%8E%9F%E7%90%86%E5%88%86%E6%9E%90/" class="md-nav__link">
         
   
   
@@ -5501,7 +5608,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E7%94%B5%E5%AD%90%E4%BA%A7%E5%93%81/Mindows/Mindows%20%E5%B7%A5%E5%85%B7%E7%AE%B1%E5%8E%9F%E7%90%86/" class="md-nav__link">
+      <a href="../../../%E7%94%B5%E5%AD%90%E4%BA%A7%E5%93%81/Mindows/Mindows%20%E5%B7%A5%E5%85%B7%E7%AE%B1%E5%8E%9F%E7%90%86/" class="md-nav__link">
         
   
   
@@ -5529,7 +5636,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E7%94%B5%E5%AD%90%E4%BA%A7%E5%93%81/Mindows/WoA%E5%AD%A6%E4%B9%A0%E6%8C%87%E5%8D%97/" class="md-nav__link">
+      <a href="../../../%E7%94%B5%E5%AD%90%E4%BA%A7%E5%93%81/Mindows/WoA%E5%AD%A6%E4%B9%A0%E6%8C%87%E5%8D%97/" class="md-nav__link">
         
   
   
@@ -5619,7 +5726,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E7%94%B5%E5%B7%A5/3.5mm%E8%80%B3%E6%9C%BA%E9%9F%B3%E9%A2%91%E7%BA%BF%E5%BC%95%E8%84%9A%E5%AE%9A%E4%B9%89/" class="md-nav__link">
+      <a href="../../../%E7%94%B5%E5%B7%A5/3.5mm%E8%80%B3%E6%9C%BA%E9%9F%B3%E9%A2%91%E7%BA%BF%E5%BC%95%E8%84%9A%E5%AE%9A%E4%B9%89/" class="md-nav__link">
         
   
   
@@ -5647,7 +5754,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E7%94%B5%E5%B7%A5/ESP-IDF%E7%AC%94%E8%AE%B0/" class="md-nav__link">
+      <a href="../../../%E7%94%B5%E5%B7%A5/ESP-IDF%E7%AC%94%E8%AE%B0/" class="md-nav__link">
         
   
   
@@ -5675,7 +5782,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E7%94%B5%E5%B7%A5/ESPlay%20Micro%20%E5%88%B6%E4%BD%9C%E8%AE%B0/" class="md-nav__link">
+      <a href="../../../%E7%94%B5%E5%B7%A5/ESPlay%20Micro%20%E5%88%B6%E4%BD%9C%E8%AE%B0/" class="md-nav__link">
         
   
   
@@ -5703,7 +5810,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E7%94%B5%E5%B7%A5/IKBC%20C87%20%E9%94%AE%E7%9B%98%E6%94%B9%E9%80%A0%E8%AE%B0%E5%BD%95/" class="md-nav__link">
+      <a href="../../../%E7%94%B5%E5%B7%A5/IKBC%20C87%20%E9%94%AE%E7%9B%98%E6%94%B9%E9%80%A0%E8%AE%B0%E5%BD%95/" class="md-nav__link">
         
   
   
@@ -5778,7 +5885,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E7%94%B5%E5%B7%A5/%E7%94%B5%E5%B7%A5%E7%9F%A5%E8%AF%86/%E4%B8%87%E7%94%A8%E8%A1%A8/" class="md-nav__link">
+      <a href="../../../%E7%94%B5%E5%B7%A5/%E7%94%B5%E5%B7%A5%E7%9F%A5%E8%AF%86/%E4%B8%87%E7%94%A8%E8%A1%A8/" class="md-nav__link">
         
   
   
@@ -5806,7 +5913,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E7%94%B5%E5%B7%A5/%E7%94%B5%E5%B7%A5%E7%9F%A5%E8%AF%86/%E6%8D%A2%E7%AE%97/" class="md-nav__link">
+      <a href="../../../%E7%94%B5%E5%B7%A5/%E7%94%B5%E5%B7%A5%E7%9F%A5%E8%AF%86/%E6%8D%A2%E7%AE%97/" class="md-nav__link">
         
   
   
@@ -5834,7 +5941,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E7%94%B5%E5%B7%A5/%E7%94%B5%E5%B7%A5%E7%9F%A5%E8%AF%86/%E6%95%B0%E7%A0%81%E7%AE%A1/" class="md-nav__link">
+      <a href="../../../%E7%94%B5%E5%B7%A5/%E7%94%B5%E5%B7%A5%E7%9F%A5%E8%AF%86/%E6%95%B0%E7%A0%81%E7%AE%A1/" class="md-nav__link">
         
   
   
@@ -5862,7 +5969,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E7%94%B5%E5%B7%A5/%E7%94%B5%E5%B7%A5%E7%9F%A5%E8%AF%86/%E7%9B%AE%E5%BD%95/" class="md-nav__link">
+      <a href="../../../%E7%94%B5%E5%B7%A5/%E7%94%B5%E5%B7%A5%E7%9F%A5%E8%AF%86/%E7%9B%AE%E5%BD%95/" class="md-nav__link">
         
   
   
@@ -5952,7 +6059,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E8%99%9A%E6%8B%9F%E5%8C%96/ESXi%20vmfs%20%E6%89%8B%E5%8A%A8%E5%88%86%E5%8C%BA/" class="md-nav__link">
+      <a href="../../../%E8%99%9A%E6%8B%9F%E5%8C%96/ESXi%20vmfs%20%E6%89%8B%E5%8A%A8%E5%88%86%E5%8C%BA/" class="md-nav__link">
         
   
   
@@ -5980,7 +6087,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E8%99%9A%E6%8B%9F%E5%8C%96/ProxmoxVE/" class="md-nav__link">
+      <a href="../../../%E8%99%9A%E6%8B%9F%E5%8C%96/ProxmoxVE/" class="md-nav__link">
         
   
   
@@ -6008,7 +6115,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E8%99%9A%E6%8B%9F%E5%8C%96/VMware%20Workstation/" class="md-nav__link">
+      <a href="../../../%E8%99%9A%E6%8B%9F%E5%8C%96/VMware%20Workstation/" class="md-nav__link">
         
   
   
@@ -6036,7 +6143,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E8%99%9A%E6%8B%9F%E5%8C%96/VirtualBox/" class="md-nav__link">
+      <a href="../../../%E8%99%9A%E6%8B%9F%E5%8C%96/VirtualBox/" class="md-nav__link">
         
   
   
@@ -6064,7 +6171,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E8%99%9A%E6%8B%9F%E5%8C%96/%E5%8E%8B%E7%BC%A9%E8%99%9A%E6%8B%9F%E7%A3%81%E7%9B%98%E6%96%87%E4%BB%B6%E5%A4%A7%E5%B0%8F/" class="md-nav__link">
+      <a href="../../../%E8%99%9A%E6%8B%9F%E5%8C%96/%E5%8E%8B%E7%BC%A9%E8%99%9A%E6%8B%9F%E7%A3%81%E7%9B%98%E6%96%87%E4%BB%B6%E5%A4%A7%E5%B0%8F/" class="md-nav__link">
         
   
   
@@ -6139,7 +6246,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E8%99%9A%E6%8B%9F%E5%8C%96/Hyper-V/Hyper-V%20%E5%85%B6%E4%BB%96/" class="md-nav__link">
+      <a href="../../../%E8%99%9A%E6%8B%9F%E5%8C%96/Hyper-V/Hyper-V%20%E5%85%B6%E4%BB%96/" class="md-nav__link">
         
   
   
@@ -6167,7 +6274,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E8%99%9A%E6%8B%9F%E5%8C%96/Hyper-V/Hyper-V%20%E5%91%BD%E4%BB%A4%E8%A1%8C/" class="md-nav__link">
+      <a href="../../../%E8%99%9A%E6%8B%9F%E5%8C%96/Hyper-V/Hyper-V%20%E5%91%BD%E4%BB%A4%E8%A1%8C/" class="md-nav__link">
         
   
   
@@ -6195,7 +6302,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E8%99%9A%E6%8B%9F%E5%8C%96/Hyper-V/Hyper-V%20%E5%9B%BA%E5%AE%9A%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%BD%91%E7%BB%9C%20IP%20%E5%9C%B0%E5%9D%80%20%E9%85%8D%E7%BD%91%E6%8C%87%E5%8D%97/" class="md-nav__link">
+      <a href="../../../%E8%99%9A%E6%8B%9F%E5%8C%96/Hyper-V/Hyper-V%20%E5%9B%BA%E5%AE%9A%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%BD%91%E7%BB%9C%20IP%20%E5%9C%B0%E5%9D%80%20%E9%85%8D%E7%BD%91%E6%8C%87%E5%8D%97/" class="md-nav__link">
         
   
   
@@ -6223,7 +6330,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E8%99%9A%E6%8B%9F%E5%8C%96/Hyper-V/Hyper-V%20%E6%98%BE%E5%8D%A1%E7%9B%B4%E9%80%9A/" class="md-nav__link">
+      <a href="../../../%E8%99%9A%E6%8B%9F%E5%8C%96/Hyper-V/Hyper-V%20%E6%98%BE%E5%8D%A1%E7%9B%B4%E9%80%9A/" class="md-nav__link">
         
   
   
@@ -6251,7 +6358,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E8%99%9A%E6%8B%9F%E5%8C%96/Hyper-V/Hyper-V%20%E8%A3%85%20Win7%20%E9%A9%B1%E5%8A%A8%E9%97%AE%E9%A2%98/" class="md-nav__link">
+      <a href="../../../%E8%99%9A%E6%8B%9F%E5%8C%96/Hyper-V/Hyper-V%20%E8%A3%85%20Win7%20%E9%A9%B1%E5%8A%A8%E9%97%AE%E9%A2%98/" class="md-nav__link">
         
   
   
@@ -6279,7 +6386,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E8%99%9A%E6%8B%9F%E5%8C%96/Hyper-V/Windows%20%E6%B2%99%E7%9B%92/" class="md-nav__link">
+      <a href="../../../%E8%99%9A%E6%8B%9F%E5%8C%96/Hyper-V/Windows%20%E6%B2%99%E7%9B%92/" class="md-nav__link">
         
   
   
@@ -6333,7 +6440,7 @@
   <span class="md-ellipsis">
     
   
-    WSL
+    Qemu
   
 
     
@@ -6349,117 +6456,6 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    WSL
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix="">
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../%E8%99%9A%E6%8B%9F%E5%8C%96/WSL/WSL%20%E9%85%8D%E7%BD%AE%E6%8C%87%E5%8D%97/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    WSL 配置指南
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../%E8%99%9A%E6%8B%9F%E5%8C%96/WSL/wsl2%20wslg%20%E9%85%8D%E7%BD%AE%E5%B9%B6%E5%BC%80%E5%90%AF%E8%BF%9C%E7%A8%8B%E6%A1%8C%E9%9D%A2%28xrdp%29/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Wsl2 wslg 配置并开启远程桌面(xrdp)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12_8">
-        
-          
-          <label class="md-nav__link" for="__nav_12_8" id="__nav_12_8_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Qemu
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_12_8_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_12_8">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
     Qemu
   
 
@@ -6473,7 +6469,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E8%99%9A%E6%8B%9F%E5%8C%96/qemu/qemu-linux/" class="md-nav__link">
+      <a href="../../../%E8%99%9A%E6%8B%9F%E5%8C%96/qemu/qemu-linux/" class="md-nav__link">
         
   
   
@@ -6501,7 +6497,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E8%99%9A%E6%8B%9F%E5%8C%96/qemu/qemu-windows/" class="md-nav__link">
+      <a href="../../../%E8%99%9A%E6%8B%9F%E5%8C%96/qemu/qemu-windows/" class="md-nav__link">
         
   
   
@@ -6537,10 +6533,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12_8_3">
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_12_7_3">
         
           
-          <label class="md-nav__link" for="__nav_12_8_3" id="__nav_12_8_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_12_7_3" id="__nav_12_7_3_label" tabindex="0">
             
   
   
@@ -6558,8 +6554,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_12_8_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_12_8_3">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_12_7_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_12_7_3">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6576,7 +6572,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../%E8%99%9A%E6%8B%9F%E5%8C%96/qemu/scripts/qemu%20nodejs%20dev/" class="md-nav__link">
+      <a href="../../../%E8%99%9A%E6%8B%9F%E5%8C%96/qemu/scripts/qemu%20nodejs%20dev/" class="md-nav__link">
         
   
   
@@ -6638,36 +6634,6 @@
   
   
   
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      目录
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
-      
-        <li class="md-nav__item">
-  <a href="#虚拟机" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        虚拟机
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#桌面环境" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        桌面环境
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
 </nav>
                   </div>
                 </div>
@@ -6683,7 +6649,7 @@
 
 
   
-    <a href="https://github.com/canwdev/canwdev.github.io/edit/main/docs/Linux/Comparison.md" title="编辑此页" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/canwdev/canwdev.github.io/edit/main/docs/Linux/WSL/WSL 2 新建并挂载 VHDX 本地开发分区.md" title="编辑此页" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"></path></svg>
     </a>
@@ -6691,99 +6657,175 @@
   
 
 
-  <h1>Comparison</h1>
+  <h1>WSL 2 新建并挂载 VHDX 本地开发分区</h1>
 
-<h2 id="虚拟机">虚拟机<a class="headerlink" href="#虚拟机" title="Permanent link">¶</a></h2>
-<table>
-<thead>
-<tr>
-<th>名称</th>
-<th>速度</th>
-<th>图形支持</th>
-<th>易用性</th>
-<th>使用场景</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Virtual Box</td>
-<td>中</td>
-<td>还行</td>
-<td>好</td>
-<td>二类虚拟机，性能有损耗，但图形支持还行，因此可以进行一些轻办公和 GUI 开发</td>
-</tr>
-<tr>
-<td>VMware Workstation</td>
-<td>中</td>
-<td>还行</td>
-<td>好</td>
-<td>同上</td>
-</tr>
-<tr>
-<td>Hyper-V</td>
-<td>快</td>
-<td>差</td>
-<td>差</td>
-<td>一类虚拟机，CPU性能强劲。Windows 10/11 虚拟化，使用 mstsc 连接达到可用水平；<br>Linux 无图形加速，只建议使用 ssh 连接的命令行</td>
-</tr>
-<tr>
-<td>QEMU (KVM)</td>
-<td>快</td>
-<td>差</td>
-<td>差</td>
-<td>需要折腾，不建议普通用户使用</td>
-</tr>
-</tbody>
-</table>
-<h2 id="桌面环境">桌面环境<a class="headerlink" href="#桌面环境" title="Permanent link">¶</a></h2>
-<table>
-<thead>
-<tr>
-<th>桌面环境</th>
-<th>重量级</th>
-<th>主观易用性</th>
-<th>运行速度</th>
-<th>建议</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Gnome 3</td>
-<td>超重型</td>
-<td>#</td>
-<td>中</td>
-<td>多任务处理UI低效，不推荐</td>
-</tr>
-<tr>
-<td>KDE Plasma</td>
-<td>重型</td>
-<td>####</td>
-<td>中</td>
-<td>推荐</td>
-</tr>
-<tr>
-<td>Xfce</td>
-<td>中型</td>
-<td>###</td>
-<td>快</td>
-<td>推荐</td>
-</tr>
-<tr>
-<td>LXQT</td>
-<td>轻型</td>
-<td>#</td>
-<td>极快</td>
-<td>建议极低配置使用</td>
-</tr>
-<tr>
-<td>Windows 11</td>
-<td>超重型</td>
-<td>#####</td>
-<td>中-慢</td>
-<td>在13代英特尔以后的 PC 上使用Win11，<br>否则建议使用Win10或更早版本以提升性能</td>
-</tr>
-</tbody>
-</table>
+<blockquote>
+<p>已验证所有命令，放心使用。</p>
+</blockquote>
+<p>新建 vhdx</p>
+<div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Bash</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1">1</a></span>
+<span class="normal"><a href="#__codelineno-0-2">2</a></span>
+<span class="normal"><a href="#__codelineno-0-3">3</a></span>
+<span class="normal"><a href="#__codelineno-0-4">4</a></span>
+<span class="normal"><a href="#__codelineno-0-5">5</a></span>
+<span class="normal"><a href="#__codelineno-0-6">6</a></span>
+<span class="normal"><a href="#__codelineno-0-7">7</a></span>
+<span class="normal"><a href="#__codelineno-0-8">8</a></span>
+<span class="normal"><a href="#__codelineno-0-9">9</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1"></a>New-Item<span class="w"> </span>-ItemType<span class="w"> </span>Directory<span class="w"> </span>-Path<span class="w"> </span><span class="s2">"D:\Projects\wsl"</span><span class="w"> </span>-Force
+<a id="__codelineno-0-2" name="__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3"></a><span class="c1"># New-VHD -Path "D:\Projects\wsl\dev_drive.vhdx" -SizeBytes 128GB -Dynamic</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4"></a><span class="c1"># 当 New-VHD 不可用时，改用 diskpart 交互式命令</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5"></a>diskpart
+<a id="__codelineno-0-6" name="__codelineno-0-6"></a>
+<a id="__codelineno-0-7" name="__codelineno-0-7"></a>DISKPART&gt;<span class="w"> </span>create<span class="w"> </span>vdisk<span class="w"> </span><span class="nv">file</span><span class="o">=</span><span class="s2">"D:\Projects\wsl\dev_drive.vhdx"</span><span class="w"> </span><span class="nv">maximum</span><span class="o">=</span><span class="m">131072</span><span class="w"> </span><span class="nv">type</span><span class="o">=</span>expandable
+<a id="__codelineno-0-8" name="__codelineno-0-8"></a>
+<a id="__codelineno-0-9" name="__codelineno-0-9"></a>DISKPART&gt;<span class="w"> </span><span class="nb">exit</span>
+</code></pre></div></td></tr></tbody></table></div>
+<p>挂载虚拟磁盘到 wsl </p>
+<div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Bash</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-1-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1"></a>wsl<span class="w"> </span>--mount<span class="w"> </span>--vhd<span class="w"> </span><span class="s2">"D:\Projects\wsl\dev_drive.vhdx"</span><span class="w"> </span>--name<span class="w"> </span>dev-drive<span class="w"> </span>--bare
+</code></pre></div></td></tr></tbody></table></div>
+<p>初次使用，在 wsl 中格式化并挂载</p>
+<div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Bash</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-2-1"> 1</a></span>
+<span class="normal"><a href="#__codelineno-2-2"> 2</a></span>
+<span class="normal"><a href="#__codelineno-2-3"> 3</a></span>
+<span class="normal"><a href="#__codelineno-2-4"> 4</a></span>
+<span class="normal"><a href="#__codelineno-2-5"> 5</a></span>
+<span class="normal"><a href="#__codelineno-2-6"> 6</a></span>
+<span class="normal"><a href="#__codelineno-2-7"> 7</a></span>
+<span class="normal"><a href="#__codelineno-2-8"> 8</a></span>
+<span class="normal"><a href="#__codelineno-2-9"> 9</a></span>
+<span class="normal"><a href="#__codelineno-2-10">10</a></span>
+<span class="normal"><a href="#__codelineno-2-11">11</a></span>
+<span class="normal"><a href="#__codelineno-2-12">12</a></span>
+<span class="normal"><a href="#__codelineno-2-13">13</a></span>
+<span class="normal"><a href="#__codelineno-2-14">14</a></span>
+<span class="normal"><a href="#__codelineno-2-15">15</a></span>
+<span class="normal"><a href="#__codelineno-2-16">16</a></span>
+<span class="normal"><a href="#__codelineno-2-17">17</a></span>
+<span class="normal"><a href="#__codelineno-2-18">18</a></span>
+<span class="normal"><a href="#__codelineno-2-19">19</a></span>
+<span class="normal"><a href="#__codelineno-2-20">20</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1"></a><span class="c1"># 查看分区（每次重启分区名可能会变，这里是 sdd）</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2"></a>lsblk
+<a id="__codelineno-2-3" name="__codelineno-2-3"></a>
+<a id="__codelineno-2-4" name="__codelineno-2-4"></a><span class="c1"># NAME MAJ:MIN RM   SIZE RO TYPE MOUNTPOINTS</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5"></a><span class="c1"># sda    8:0    0 356.9M  1 disk</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6"></a><span class="c1"># sdb    8:16   0 159.4M  1 disk</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7"></a><span class="c1"># sdc    8:32   0     4G  0 disk [SWAP]</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8"></a><span class="c1"># sdd    8:48   0   128G  0 disk</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9"></a>
+<a id="__codelineno-2-10" name="__codelineno-2-10"></a>
+<a id="__codelineno-2-11" name="__codelineno-2-11"></a><span class="c1"># 注意！确保是正确的分区名，格式化为 ext4</span>
+<a id="__codelineno-2-12" name="__codelineno-2-12"></a>sudo<span class="w"> </span>mkfs.ext4<span class="w"> </span>/dev/sdd
+<a id="__codelineno-2-13" name="__codelineno-2-13"></a>
+<a id="__codelineno-2-14" name="__codelineno-2-14"></a>sudo<span class="w"> </span>mkdir<span class="w"> </span>-p<span class="w"> </span>/mnt/dev-drive
+<a id="__codelineno-2-15" name="__codelineno-2-15"></a>sudo<span class="w"> </span>mount<span class="w"> </span>/dev/sdd<span class="w"> </span>/mnt/dev-drive/
+<a id="__codelineno-2-16" name="__codelineno-2-16"></a>sudo<span class="w"> </span>chown<span class="w"> </span>-R<span class="w"> </span><span class="nv">$USER</span>:<span class="nv">$USER</span><span class="w"> </span>/mnt/dev-drive/
+<a id="__codelineno-2-17" name="__codelineno-2-17"></a>
+<a id="__codelineno-2-18" name="__codelineno-2-18"></a><span class="c1"># 验证</span>
+<a id="__codelineno-2-19" name="__codelineno-2-19"></a><span class="nb">echo</span><span class="w"> </span>ok<span class="w"> </span>&gt;<span class="w"> </span>/mnt/dev-drive/test.txt
+<a id="__codelineno-2-20" name="__codelineno-2-20"></a>ls<span class="w"> </span>-la<span class="w"> </span>/mnt/dev-drive
+</code></pre></div></td></tr></tbody></table></div>
+<p>wsl 开机自动挂载</p>
+<div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Bash</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-3-1"> 1</a></span>
+<span class="normal"><a href="#__codelineno-3-2"> 2</a></span>
+<span class="normal"><a href="#__codelineno-3-3"> 3</a></span>
+<span class="normal"><a href="#__codelineno-3-4"> 4</a></span>
+<span class="normal"><a href="#__codelineno-3-5"> 5</a></span>
+<span class="normal"><a href="#__codelineno-3-6"> 6</a></span>
+<span class="normal"><a href="#__codelineno-3-7"> 7</a></span>
+<span class="normal"><a href="#__codelineno-3-8"> 8</a></span>
+<span class="normal"><a href="#__codelineno-3-9"> 9</a></span>
+<span class="normal"><a href="#__codelineno-3-10">10</a></span>
+<span class="normal"><a href="#__codelineno-3-11">11</a></span>
+<span class="normal"><a href="#__codelineno-3-12">12</a></span>
+<span class="normal"><a href="#__codelineno-3-13">13</a></span>
+<span class="normal"><a href="#__codelineno-3-14">14</a></span>
+<span class="normal"><a href="#__codelineno-3-15">15</a></span>
+<span class="normal"><a href="#__codelineno-3-16">16</a></span>
+<span class="normal"><a href="#__codelineno-3-17">17</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1"></a><span class="c1"># 查看UUID</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2"></a>sudo<span class="w"> </span>blkid<span class="w"> </span>/dev/sdd
+<a id="__codelineno-3-3" name="__codelineno-3-3"></a><span class="c1"># /dev/sde: UUID="bda008e8-d550-4647-9fc5-6c9742883c7b" BLOCK_SIZE="4096" TYPE="ext4"</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4"></a>
+<a id="__codelineno-3-5" name="__codelineno-3-5"></a><span class="c1"># 修改 `/etc/fstab` 文件</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6"></a>sudo<span class="w"> </span>vim<span class="w"> </span>/etc/fstab
+<a id="__codelineno-3-7" name="__codelineno-3-7"></a>
+<a id="__codelineno-3-8" name="__codelineno-3-8"></a><span class="c1"># 在文件最下方追加一行（替换你实际获取到的 UUID）：</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9"></a><span class="nv">UUID</span><span class="o">=</span>bda008e8-d550-4647-9fc5-6c9742883c7b<span class="w">  </span>/mnt/dev-drive<span class="w">  </span>ext4<span class="w">  </span>defaults,nofail<span class="w">  </span><span class="m">0</span><span class="w">  </span><span class="m">2</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10"></a>
+<a id="__codelineno-3-11" name="__codelineno-3-11"></a><span class="c1"># 回到 Windows 下验证：</span>
+<a id="__codelineno-3-12" name="__codelineno-3-12"></a>wsl<span class="w"> </span>--shutdown
+<a id="__codelineno-3-13" name="__codelineno-3-13"></a><span class="c1"># 每次关机后必须手动挂载</span>
+<a id="__codelineno-3-14" name="__codelineno-3-14"></a>wsl<span class="w"> </span>--mount<span class="w"> </span>--vhd<span class="w"> </span><span class="s2">"D:\Projects\wsl\dev_drive.vhdx"</span><span class="w"> </span>--name<span class="w"> </span>dev-drive<span class="w"> </span>--bare
+<a id="__codelineno-3-15" name="__codelineno-3-15"></a>
+<a id="__codelineno-3-16" name="__codelineno-3-16"></a><span class="c1"># 回到 wsl 验证</span>
+<a id="__codelineno-3-17" name="__codelineno-3-17"></a>ls<span class="w"> </span>/mnt/dev-drive/
+</code></pre></div></td></tr></tbody></table></div>
+<p>Windows 自动挂载脚本</p>
+<p><code>mount.ps1</code><br>
+</p><div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">PowerShell</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-4-1">1</a></span>
+<span class="normal"><a href="#__codelineno-4-2">2</a></span>
+<span class="normal"><a href="#__codelineno-4-3">3</a></span>
+<span class="normal"><a href="#__codelineno-4-4">4</a></span>
+<span class="normal"><a href="#__codelineno-4-5">5</a></span>
+<span class="normal"><a href="#__codelineno-4-6">6</a></span>
+<span class="normal"><a href="#__codelineno-4-7">7</a></span>
+<span class="normal"><a href="#__codelineno-4-8">8</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1"></a><span class="nv">$vhdxPath</span> <span class="p">=</span> <span class="s2">"D:\Projects\wsl\dev_drive.vhdx"</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2"></a>
+<a id="__codelineno-4-3" name="__codelineno-4-3"></a><span class="k">if</span> <span class="p">(</span><span class="nb">Test-Path</span> <span class="nv">$vhdxPath</span><span class="p">)</span> <span class="p">{</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4"></a>    <span class="nv">$res</span> <span class="p">=</span> <span class="n">wsl</span> <span class="p">-</span><span class="n">-mount</span> <span class="p">-</span><span class="n">-vhd</span> <span class="nv">$vhdxPath</span> <span class="p">-</span><span class="n">-name</span> <span class="n">dev-drive</span> <span class="p">-</span><span class="n">-bare</span> <span class="n">2</span><span class="p">&gt;&amp;</span><span class="n">1</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5"></a>    <span class="nb">Write-Host</span> <span class="s2">"Mount result: $res"</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6"></a><span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7"></a>    <span class="nb">Write-Host</span> <span class="s2">"Error: file not found $vhdxPath"</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8"></a><span class="p">}</span>
+</code></pre></div></td></tr></tbody></table></div><br>
+执行方法：<code>powershell mount.ps1</code><p></p>
+<p>开机自动执行挂载（计划任务）以管理员权限执行：</p>
+<div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">PowerShell</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-5-1"> 1</a></span>
+<span class="normal"><a href="#__codelineno-5-2"> 2</a></span>
+<span class="normal"><a href="#__codelineno-5-3"> 3</a></span>
+<span class="normal"><a href="#__codelineno-5-4"> 4</a></span>
+<span class="normal"><a href="#__codelineno-5-5"> 5</a></span>
+<span class="normal"><a href="#__codelineno-5-6"> 6</a></span>
+<span class="normal"><a href="#__codelineno-5-7"> 7</a></span>
+<span class="normal"><a href="#__codelineno-5-8"> 8</a></span>
+<span class="normal"><a href="#__codelineno-5-9"> 9</a></span>
+<span class="normal"><a href="#__codelineno-5-10">10</a></span>
+<span class="normal"><a href="#__codelineno-5-11">11</a></span>
+<span class="normal"><a href="#__codelineno-5-12">12</a></span>
+<span class="normal"><a href="#__codelineno-5-13">13</a></span>
+<span class="normal"><a href="#__codelineno-5-14">14</a></span>
+<span class="normal"><a href="#__codelineno-5-15">15</a></span>
+<span class="normal"><a href="#__codelineno-5-16">16</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1"></a><span class="nv">$action</span> <span class="p">=</span> <span class="nb">New-ScheduledTaskAction</span> <span class="n">-Execute</span> <span class="s2">"powershell.exe"</span> <span class="n">-Argument</span> <span class="s2">"-NoProfile -WindowStyle Hidden -File </span><span class="se">`"</span><span class="s2">D:\Projects\wsl\mount.ps1</span><span class="se">`"</span><span class="s2">"</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2"></a><span class="nv">$trigger</span> <span class="p">=</span> <span class="nb">New-ScheduledTaskTrigger</span> <span class="n">-AtStartup</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3"></a><span class="nv">$principal</span> <span class="p">=</span> <span class="nb">New-ScheduledTaskPrincipal</span> <span class="n">-UserId</span> <span class="s2">"$env:USERDOMAIN\$env:USERNAME"</span> <span class="n">-LogonType</span> <span class="n">Interactive</span> <span class="n">-RunLevel</span> <span class="n">Highest</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4"></a><span class="nb">Register-ScheduledTask</span> <span class="n">-TaskName</span> <span class="s2">"WSL Mount dev-drive"</span> <span class="n">-Action</span> <span class="nv">$action</span> <span class="n">-Trigger</span> <span class="nv">$trigger</span> <span class="n">-Principal</span> <span class="nv">$principal</span> <span class="n">-Description</span> <span class="s2">"Auto mount WSL dev-drive when startup"</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5"></a>
+<a id="__codelineno-5-6" name="__codelineno-5-6"></a><span class="c"># 验证任务已创建</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7"></a><span class="nb">Get-ScheduledTask</span> <span class="n">-TaskName</span> <span class="s2">"WSL Mount dev-drive"</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8"></a>
+<a id="__codelineno-5-9" name="__codelineno-5-9"></a><span class="c"># 手动触发</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10"></a><span class="nb">Start-ScheduledTask</span> <span class="n">-TaskName</span> <span class="s2">"WSL Mount dev-drive"</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11"></a>
+<a id="__codelineno-5-12" name="__codelineno-5-12"></a><span class="c"># 打开计划任务程序验证</span>
+<a id="__codelineno-5-13" name="__codelineno-5-13"></a><span class="n">taskschd</span><span class="p">.</span><span class="n">msc</span>
+<a id="__codelineno-5-14" name="__codelineno-5-14"></a>
+<a id="__codelineno-5-15" name="__codelineno-5-15"></a><span class="c"># 如需删除</span>
+<a id="__codelineno-5-16" name="__codelineno-5-16"></a><span class="c"># Unregister-ScheduledTask -TaskName "WSL Mount dev-drive" -Confirm:$false</span>
+</code></pre></div></td></tr></tbody></table></div>
+<p>可能还需要：<a href="../WSL%202%20%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF%E4%BB%A5%E5%8F%8A%E5%B8%B8%E9%A9%BB%E5%90%8E%E5%8F%B0/">WSL 2 开机自启以及常驻后台</a></p>
+<p>卸载分区（非必要）</p>
+<div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Bash</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-6-1">1</a></span>
+<span class="normal"><a href="#__codelineno-6-2">2</a></span>
+<span class="normal"><a href="#__codelineno-6-3">3</a></span>
+<span class="normal"><a href="#__codelineno-6-4">4</a></span>
+<span class="normal"><a href="#__codelineno-6-5">5</a></span>
+<span class="normal"><a href="#__codelineno-6-6">6</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1"></a><span class="c1"># 卸载分区（在 wsl 中）</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2"></a>sudo<span class="w"> </span>umount<span class="w"> </span>/mnt/dev-drive/
+<a id="__codelineno-6-3" name="__codelineno-6-3"></a><span class="c1"># 手动删除 `/etc/fstab` 配置</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4"></a>
+<a id="__codelineno-6-5" name="__codelineno-6-5"></a><span class="c1"># 卸载分区（在 Windows 中）</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6"></a>wsl<span class="w"> </span>--unmount<span class="w"> </span><span class="s2">"D:\Projects\wsl\dev_drive.vhdx"</span>
+</code></pre></div></td></tr></tbody></table></div>
 
 
 
@@ -6806,7 +6848,7 @@
     <span class="md-icon" title="最后更新">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"></path></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-datetime" title="2024年7月30日 17:45:07 CST">2024年7月30日 17:45:07</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-datetime" title="2026年8月10日 10:55:18 CST">2026年8月10日 10:55:18</span>
   </span>
 
     
@@ -6816,7 +6858,7 @@
     <span class="md-icon" title="创建日期">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14.47 15.08 11 13V7h1.5v5.25l3.08 1.83c-.41.28-.79.62-1.11 1m-1.39 4.84c-.36.05-.71.08-1.08.08-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8c0 .37-.03.72-.08 1.08.69.1 1.33.32 1.92.64.1-.56.16-1.13.16-1.72 0-5.5-4.5-10-10-10S2 6.5 2 12s4.47 10 10 10c.59 0 1.16-.06 1.72-.16-.32-.59-.54-1.23-.64-1.92M18 15v3h-3v2h3v3h2v-3h3v-2h-3v-3z"></path></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-datetime" title="2024年7月30日 17:45:07 CST">2024年7月30日 17:45:07</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-datetime" title="2026年8月10日 10:55:18 CST">2026年8月10日 10:55:18</span>
   </span>
 
     
@@ -6851,7 +6893,7 @@
       <nav class="md-footer__inner md-grid" aria-label="页脚">
         
           
-          <a href="../Alpine%20Linux%20Notes/" class="md-footer__link md-footer__link--prev" aria-label="上一页: Alpine Linux Notes">
+          <a href="../WSL%202%20%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF%E4%BB%A5%E5%8F%8A%E5%B8%B8%E9%A9%BB%E5%90%8E%E5%8F%B0/" class="md-footer__link md-footer__link--prev" aria-label="上一页: WSL 2 开机自启以及常驻后台">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
@@ -6861,20 +6903,20 @@
                 上一页
               </span>
               <div class="md-ellipsis">
-                Alpine Linux Notes
+                WSL 2 开机自启以及常驻后台
               </div>
             </div>
           </a>
         
         
           
-          <a href="../Linux%20%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4%E6%B1%87%E6%80%BB/" class="md-footer__link md-footer__link--next" aria-label="下一页: Linux 常用命令汇总">
+          <a href="../WSL%20%E9%85%8D%E7%BD%AE%E6%8C%87%E5%8D%97/" class="md-footer__link md-footer__link--next" aria-label="下一页: WSL 配置指南">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 下一页
               </span>
               <div class="md-ellipsis">
-                Linux 常用命令汇总
+                WSL 配置指南
               </div>
             </div>
             <div class="md-footer__button md-icon">
@@ -6927,10 +6969,10 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["content.code.copy", "content.code.annotate", "content.action.edit", "navigation.instant", "navigation.tracking", "navigation.top", "navigation.footer", "toc.follow", "search.highlight", "search.suggest"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["content.code.copy", "content.code.annotate", "content.action.edit", "navigation.instant", "navigation.tracking", "navigation.top", "navigation.footer", "toc.follow", "search.highlight", "search.suggest"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   
