@@ -1,9 +1,10 @@
 WSL 2 在关闭终端后会自动休眠退出，无法直接常驻后台，这会影响后台服务与 Docker 的持续运行。因此，需要将其配置为开机自启并保持后台常驻。
 
 以管理员身份运行：
+
 ```powershell
 $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-WindowStyle Hidden -NoProfile -Command `"wsl --distribution Debian`""
-$trigger = New-ScheduledTaskTrigger -AtStartup
+$trigger = New-ScheduledTaskTrigger -AtLogOn -User "$env:USERDOMAIN\$env:USERNAME" -Delay (New-TimeSpan -Seconds 3)
 $principal = New-ScheduledTaskPrincipal -UserId "$env:USERDOMAIN\$env:USERNAME" -LogonType Interactive -RunLevel Highest
 Register-ScheduledTask -TaskName "WSL Auto Start Debian" -Action $action -Trigger $trigger -Principal $principal -Description "Keep WSL Debian running"
 

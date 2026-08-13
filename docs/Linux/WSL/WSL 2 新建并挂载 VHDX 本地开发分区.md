@@ -15,7 +15,7 @@ DISKPART> exit
 
 ```
 
-挂载虚拟磁盘到 wsl 
+挂载虚拟磁盘到 wsl
 
 ```shell
 wsl --mount --vhd "D:\Projects\wsl\dev_drive.vhdx" --name dev-drive --bare
@@ -68,10 +68,10 @@ wsl --mount --vhd "D:\Projects\wsl\dev_drive.vhdx" --name dev-drive --bare
 ls /mnt/dev-drive/
 ```
 
-
 Windows 自动挂载脚本
 
 `mount.ps1`
+
 ```powershell
 $vhdxPath = "D:\Projects\wsl\dev_drive.vhdx"
 
@@ -83,13 +83,14 @@ if (Test-Path $vhdxPath) {
 }
 
 ```
+
 执行方法：`powershell mount.ps1`
 
 开机自动执行挂载（计划任务）以管理员权限执行：
 
 ```powershell
 $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoProfile -WindowStyle Hidden -File `"D:\Projects\wsl\mount.ps1`""
-$trigger = New-ScheduledTaskTrigger -AtStartup
+$trigger = New-ScheduledTaskTrigger -AtLogOn -User "$env:USERDOMAIN\$env:USERNAME" -Delay (New-TimeSpan -Seconds 6)
 $principal = New-ScheduledTaskPrincipal -UserId "$env:USERDOMAIN\$env:USERNAME" -LogonType Interactive -RunLevel Highest
 Register-ScheduledTask -TaskName "WSL Mount dev-drive" -Action $action -Trigger $trigger -Principal $principal -Description "Auto mount WSL dev-drive when startup"
 
