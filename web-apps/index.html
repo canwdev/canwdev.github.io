@@ -4,14 +4,31 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="自己开发的网页工具" />
+  <meta name="description" content="自研网页小工具合集：Emoji Finder、MDI 图标搜索、MP3 封面提取、文件搜索、图片拼版、歌词排版、二维码生成、提前退休计算器等，全部免费、不收集数据、可离线使用。" />
+  <meta name="keywords" content="网页工具,在线工具,Emoji Finder,MDI Finder,二维码,MP3封面提取,文件搜索,歌词排版,提前退休计算器,canwdev" />
+  <meta name="author" content="canwdev" />
+  <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#3498db">
   <link rel="icon" type="image/png" href="favicon.png" />
-  <title>网页工具合集</title>
+  <link rel="canonical" href="https://canwdev.github.io/web-apps/" />
+
+  <title>网页小工具合集</title>
 
   <script>
     // 工具数据数组
     const toolsData = [
+      {
+        name: "Emoji Finder",
+        description: "本地模糊搜索 emoji，点击即可复制",
+        url: "emoji-finder.html",
+        icon: "😀",
+      },
+      {
+        name: "MDI Finder",
+        description: "本地模糊搜索 Material Design Icons",
+        url: "mdi-finder.html",
+        icon: "🎨",
+      },
       {
         name: "MP3 封面提取工具",
         description: "用于提取音频文件的封面和元数据",
@@ -249,6 +266,22 @@
       right: 16px;
     }
 
+    .site-footer {
+      text-align: center;
+      margin: 24px auto 8px;
+      font-size: 0.9rem;
+    }
+
+    .site-footer a {
+      color: #7f8c8d;
+      text-decoration: none;
+    }
+
+    .site-footer a:hover {
+      color: #3498db;
+      text-decoration: underline;
+    }
+
     /* 响应式设计 */
     @media (max-width: 768px) {
       body {
@@ -275,11 +308,15 @@
 <body>
   <div class="container">
     <div class="header">
-      <h1>网页工具合集</h1>
-      <p>自己开发的网页工具 - <a href="https://github.com/canwdev">Github</a></p>
+      <h1>网页小工具合集</h1>
     </div>
     <div class="tools-grid" id="toolsGrid"></div>
   </div>
+
+  <footer class="site-footer">
+    大多数都是单文件HTML应用，不收集任何数据。<br>
+    Made with ❤️ by <a href="https://github.com/canwdev" target="_blank" >canwdev</a> · <a href="https://github.com/canwdev/canwdev.github.io/tree/main/docs/web-apps" target="_blank">Source code</a>
+  </footer>
 
   <script>
     document.addEventListener("DOMContentLoaded", function () {
