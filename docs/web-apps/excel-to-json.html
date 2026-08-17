@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Excel to JSON</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --panel: #fafafa;
+    --border: #e4e4e7;
+    --text: #18181b;
+    --muted: #71717a;
+    --accent: #77bbdd;
+    --accent-fg: #ffffff;
+    --palette-1: #77bbdd;
+    --palette-2: #ff8899;
+    --palette-3: #77dd77;
+    --palette-4: #ffdd88;
+    --palette-5: #7777aa;
+    --mono: "SF Mono", "Cascadia Code", "JetBrains Mono", "Consolas", "Monaco",
+      "Roboto Mono", "DejaVu Sans Mono", monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+      "Microsoft YaHei", sans-serif;
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .tool-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel);
+  }
+  .tool-header .label { color: var(--muted); font-weight: 600; }
+  .tool-header .title { font-weight: 700; }
+  .tool-header .file-name { color: var(--muted); font-size: 12px; font-family: var(--mono); }
+
+  .mygo-button {
+    border: 1px solid var(--border);
+    background: #fff;
+    color: var(--text);
+    border-radius: 6px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  .mygo-button:hover { background: #f4f4f5; }
+  .mygo-button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+  .mygo-button.primary:hover { filter: brightness(1.05); }
+  .mygo-button:disabled { opacity: 0.5; cursor: not-allowed; }
+  .mygo-button:disabled:hover { background: #fff; filter: none; }
+
+  .btn-group { display: inline-flex; gap: 8px; margin-left: auto; align-items: center; }
+
+  .main { flex: 1; display: flex; flex-direction: column; min-height: 0; overflow: auto; }
+
+  /* dropzone */
+  .dropzone {
+    margin: 16px;
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 40px 16px;
+    text-align: center;
+    color: var(--muted);
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    background: #fff;
+  }
+  .dropzone:hover { background: #f7fbfd; }
+  .dropzone.dragover { border-color: var(--accent); background: #eef7fb; color: var(--text); }
+  .dropzone .big { font-size: 2rem; margin-bottom: 8px; }
+  .dropzone .hint { font-size: 12px; margin-top: 6px; }
+
+  /* sheet tabs */
+  .sheet-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 8px 12px 0;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel);
+  }
+  .sheet-tab {
+    border: 1px solid var(--border);
+    border-bottom: none;
+    background: #fff;
+    color: var(--muted);
+    padding: 6px 14px;
+    cursor: pointer;
+    font-size: 13px;
+    border-radius: 8px 8px 0 0;
+    margin-bottom: -1px;
+  }
+  .sheet-tab:hover { background: #f4f4f5; }
+  .sheet-tab.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-fg);
+    font-weight: 600;
+  }
+
+  /* table */
+  .excel-table-container {
+    position: relative;
+    flex: 1;
+    width: 100%;
+    overflow: auto;
+    min-height: 0;
+    padding: 0;
+  }
+  .excel-table-container table { border-collapse: collapse; }
+  .excel-table-container td {
+    height: 25px;
+    padding: 5px 10px;
+    min-width: 100px;
+    vertical-align: baseline;
+  }
+  .excel-table-container table,
+  .excel-table-container th,
+  .excel-table-container td {
+    border: 1px solid #aeaeae;
+    word-wrap: break-word;
+  }
+  .excel-table-container th { background: #f4f4f5; font-weight: 600; }
+  .excel-table-container td:hover,
+  .excel-table-container th:hover { background-color: rgba(141, 141, 141, 0.3); }
+
+  .hidden { display: none !important; }
+
+  /* export dropdown */
+  .export-wrap { position: relative; }
+  .menu {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 6px);
+    min-width: 240px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    z-index: 50;
+    overflow: hidden;
+  }
+  .menu .menu-group-title {
+    padding: 8px 12px 4px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .menu .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    border: none;
+    background: #fff;
+    color: var(--text);
+    text-align: left;
+    padding: 9px 14px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  .menu .menu-item:hover { background: #f4f4f5; }
+  .menu .menu-sep { height: 1px; background: var(--border); margin: 4px 0; }
+
+  /* full-screen drag overlay */
+  .drop-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(119, 187, 221, 0.15);
+    border: 3px dashed var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    pointer-events: none;
+  }
+  .drop-overlay .inner {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 40px;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  #toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: #18181b;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+    z-index: 1000;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  #toast.error { background: var(--palette-2); color: var(--accent-fg); }
+</style>
+  <!-- XLSX.js (SheetJS) loaded synchronously from CDN; exposes window.XLSX -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+  <div class="tool-header">
+    <span class="title">📊 Excel to JSON</span>
+    <span class="label">· open / drop excel</span>
+    <span class="file-name" id="fileName"></span>
+
+    <div class="btn-group">
+      <div class="export-wrap">
+        <button class="mygo-button primary" id="btnExport" disabled>📥 Export ▾</button>
+        <div class="menu hidden" id="exportMenu">
+          <div class="menu-group-title">🧩 Current Sheet</div>
+          <button class="menu-item" data-action="export-current">📤 Export JSON</button>
+          <button class="menu-item" data-action="copy-current">📋 Copy JSON</button>
+          <button class="menu-item" data-action="console-current">💻 Print to Console</button>
+          <div class="menu-sep"></div>
+          <div class="menu-group-title">📗 All Sheets</div>
+          <button class="menu-item" data-action="export-all">📤 Export All JSON</button>
+          <button class="menu-item" data-action="copy-all">📋 Copy All JSON</button>
+          <button class="menu-item" data-action="console-all">💻 Print All to Console</button>
+        </div>
+      </div>
+
+      <button class="mygo-button primary" id="btnOpen" disabled>📂 Open Excel</button>
+      <button class="mygo-button primary hidden" id="btnClose">✕ Close</button>
+      <button class="mygo-button" id="btnDemo" disabled>✨ Demo</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="dropzone" id="dropzone">
+      <div class="big">⬇️</div>
+      <div>Drop an <strong>.xls / .xlsx</strong> file here, or click to choose</div>
+      <div class="hint">Supported: XLS / XLSX (Excel 97–2003 &amp; 2007+)</div>
+    </div>
+
+    <div class="sheet-tabs hidden" id="sheetTabs"></div>
+    <div class="excel-table-container hidden" id="tableContainer"></div>
+  </div>
+
+  <div class="drop-overlay hidden" id="dropOverlay"><div class="inner">⬇️ Drop Excel file here</div></div>
+  <div id="toast"></div>
+
+<script>
+  // --- state ---
+  let isReady = false;
+  let workbook = null;
+  let sheetNames = [];
+  let sheetIndex = 0;
+  let currentFile = null;
+
+  // --- DOM ---
+  const $ = (id) => document.getElementById(id);
+  const dropzone = $('dropzone');
+  const sheetTabs = $('sheetTabs');
+  const tableContainer = $('tableContainer');
+  const dropOverlay = $('dropOverlay');
+  const fileNameEl = $('fileName');
+  const btnOpen = $('btnOpen');
+  const btnClose = $('btnClose');
+  const btnDemo = $('btnDemo');
+  const btnExport = $('btnExport');
+  const exportMenu = $('exportMenu');
+
+  // --- toast ---
+  function toast(msg, isError = false) {
+    const t = $('toast');
+    t.textContent = msg;
+    t.classList.toggle('error', isError);
+    t.classList.add('show');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => t.classList.remove('show'), 1600);
+  }
+
+  function enableUI() {
+    btnOpen.disabled = false;
+    btnDemo.disabled = false;
+  }
+
+  // --- workbook helpers ---
+  function getWorksheet() {
+    return workbook.Sheets[sheetNames[sheetIndex]];
+  }
+  function renderWorkbook() {
+    if (!workbook) { tableContainer.innerHTML = ''; return; }
+    const html = window.XLSX.utils.sheet_to_html(getWorksheet());
+    tableContainer.innerHTML = html;
+    // keep horizontal scroll reasonable
+    tableContainer.scrollTop = 0;
+  }
+  function renderTabs() {
+    sheetTabs.innerHTML = '';
+    sheetNames.forEach((name, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'sheet-tab' + (i === sheetIndex ? ' active' : '');
+      btn.textContent = name;
+      btn.addEventListener('click', () => {
+        if (sheetIndex === i) return;
+        sheetIndex = i;
+        renderTabs();
+        renderWorkbook();
+      });
+      sheetTabs.appendChild(btn);
+    });
+  }
+
+  function showTableUI() {
+    dropzone.classList.add('hidden');
+    sheetTabs.classList.remove('hidden');
+    tableContainer.classList.remove('hidden');
+    btnOpen.classList.add('hidden');
+    btnClose.classList.remove('hidden');
+    btnExport.disabled = false;
+    fileNameEl.textContent = currentFile ? '· ' + currentFile.name : '';
+  }
+  function clearWorkbook() {
+    workbook = null;
+    sheetNames = [];
+    sheetIndex = 0;
+    currentFile = null;
+    tableContainer.innerHTML = '';
+    sheetTabs.classList.add('hidden');
+    sheetTabs.innerHTML = '';
+    tableContainer.classList.add('hidden');
+    dropzone.classList.remove('hidden');
+    btnOpen.classList.remove('hidden');
+    btnClose.classList.add('hidden');
+    btnExport.disabled = true;
+    fileNameEl.textContent = '';
+  }
+
+  // --- import ---
+  function handleImport(file) {
+    if (!isReady) { toast('XLSX not ready', true); return; }
+    if (!/\.xlsx?$/i.test(file.name)) { toast('Only supports .xls / .xlsx format!', true); return; }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        sheetIndex = 0;
+        workbook = window.XLSX.read(e.target.result, { type: 'binary' });
+        sheetNames = workbook.SheetNames;
+        currentFile = file;
+        renderTabs();
+        renderWorkbook();
+        showTableUI();
+        toast('Loaded: ' + file.name);
+      } catch (err) {
+        console.error(err);
+        toast('Failed to parse Excel file', true);
+      }
+    };
+    reader.onerror = () => toast('Failed to read file', true);
+    reader.readAsBinaryString(file);
+  }
+
+  function chooseFile() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.xls,.xlsx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+    input.onchange = (e) => {
+      const files = e.target.files;
+      if (files.length) handleImport(files[0]);
+    };
+    input.click();
+  }
+
+  // --- JSON extraction ---
+  function getSheetsJson(currentOnly) {
+    if (!workbook) { toast('Open Excel file first!', true); throw new Error('No workbook'); }
+    if (currentOnly) {
+      return window.XLSX.utils.sheet_to_json(getWorksheet());
+    }
+    const result = {};
+    workbook.SheetNames.forEach((name) => {
+      const arr = window.XLSX.utils.sheet_to_json(workbook.Sheets[name]);
+      if (arr.length) result[name] = arr;
+    });
+    return result;
+  }
+
+  // --- actions ---
+  async function copyJSON(json) {
+    const text = JSON.stringify(json, null, 2);
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch (err) {
+      // fallback
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); document.body.removeChild(ta); return true; }
+      catch (e2) { document.body.removeChild(ta); return false; }
+    }
+  }
+
+  function downloadJSON(json, suffix) {
+    let base = currentFile ? currentFile.name.replace(/\.[^.]+$/, '') : 'excel_sheet_export';
+    const suggested = base + '_' + suffix;
+    const name = (window.prompt('Save JSON as:', suggested) || suggested).trim() || suggested;
+    const blob = new Blob([JSON.stringify(json, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = name.endsWith('.json') ? name : name + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function doAction(action) {
+    try {
+      switch (action) {
+        case 'export-current': {
+          const json = getSheetsJson(true);
+          downloadJSON(json, sheetNames[sheetIndex]);
+          toast('Exported current sheet JSON');
+          break;
+        }
+        case 'copy-current': {
+          const json = getSheetsJson(true);
+          copyJSON(json).then((ok) => toast(ok ? 'Current sheet JSON copied!' : 'Copy failed', !ok));
+          break;
+        }
+        case 'console-current': {
+          const json = getSheetsJson(true);
+          console.log('[Excel to JSON] Current sheet:', sheetNames[sheetIndex], json);
+          toast('Printed to console');
+          break;
+        }
+        case 'export-all': {
+          const json = getSheetsJson(false);
+          downloadJSON(json, 'all_sheets');
+          toast('Exported all sheets JSON');
+          break;
+        }
+        case 'copy-all': {
+          const json = getSheetsJson(false);
+          copyJSON(json).then((ok) => toast(ok ? 'All sheets JSON copied!' : 'Copy failed', !ok));
+          break;
+        }
+        case 'console-all': {
+          const json = getSheetsJson(false);
+          console.log('[Excel to JSON] All sheets:', json);
+          toast('Printed all to console');
+          break;
+        }
+      }
+    } catch (err) {
+      console.error(err);
+    }
+    closeMenu();
+  }
+
+  // --- demo data (mirrors reference demo) ---
+  function loadDemo() {
+    if (!isReady) { toast('XLSX not ready', true); return; }
+    window.demo_aoa_to_sheet = [
+      ['Name', 'Value', 'Num', 'Time', '✨Tips'],
+      ['test001', 'line1\nline2', 123, new Date(), 'Set window.demo_aoa_to_sheet = [] to generate!'],
+      ['test001', 'line1\n\nline3', -1, new Date(), 'window.demo_aoa_to_sheet'],
+    ];
+    window.demo_json_to_sheet = [
+      { region: 'DE', product_name: 'Test1', code: '123456', url: 'http://localhost:8080', tips: '✨ Set window.demo_json_to_sheet = [] to generate!' },
+      { region: 'FR', product_name: 'Test2', code: '7890', url: 'https://example.com', tips: 'window.demo_json_to_sheet' },
+    ];
+    const sheet1 = window.XLSX.utils.aoa_to_sheet(window.demo_aoa_to_sheet);
+    const sheet2 = window.XLSX.utils.json_to_sheet(window.demo_json_to_sheet);
+    const wb = window.XLSX.utils.book_new();
+    window.XLSX.utils.book_append_sheet(wb, sheet1, 'aoa_to_sheet');
+    window.XLSX.utils.book_append_sheet(wb, sheet2, 'json_to_sheet');
+    workbook = wb;
+    sheetNames = wb.SheetNames;
+    sheetIndex = 0;
+    currentFile = null;
+    renderTabs();
+    renderWorkbook();
+    showTableUI();
+    toast('Demo workbook loaded');
+  }
+
+  // --- export menu toggle ---
+  function openMenu() { exportMenu.classList.remove('hidden'); }
+  function closeMenu() { exportMenu.classList.add('hidden'); }
+  btnExport.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (exportMenu.classList.contains('hidden')) openMenu(); else closeMenu();
+  });
+  exportMenu.addEventListener('click', (e) => {
+    const item = e.target.closest('.menu-item');
+    if (item) doAction(item.dataset.action);
+  });
+  document.addEventListener('click', (e) => {
+    if (!exportMenu.contains(e.target) && e.target !== btnExport) closeMenu();
+  });
+
+  // --- events ---
+  dropzone.addEventListener('click', chooseFile);
+  btnOpen.addEventListener('click', chooseFile);
+  btnClose.addEventListener('click', clearWorkbook);
+  btnDemo.addEventListener('click', loadDemo);
+
+  // full-screen drag overlay — always available (drop replaces current file)
+  let dragDepth = 0;
+  const hasFiles = (e) =>
+    e.dataTransfer && Array.from(e.dataTransfer.types || []).includes('Files');
+
+  window.addEventListener('dragenter', (e) => {
+    if (!hasFiles(e)) return;
+    e.preventDefault();
+    dragDepth++;
+    dropOverlay.classList.remove('hidden');
+  });
+  window.addEventListener('dragover', (e) => {
+    if (!hasFiles(e)) return;
+    e.preventDefault();
+  });
+  window.addEventListener('dragleave', (e) => {
+    if (!hasFiles(e)) return;
+    dragDepth = Math.max(0, dragDepth - 1);
+    if (dragDepth === 0) dropOverlay.classList.add('hidden');
+  });
+  window.addEventListener('drop', (e) => {
+    if (!hasFiles(e)) return;
+    e.preventDefault();
+    dragDepth = 0;
+    dropOverlay.classList.add('hidden');
+    const file = e.dataTransfer.files && e.dataTransfer.files[0];
+    if (file) handleImport(file);
+    else toast('No file found in drop', true);
+  });
+
+  // init — XLSX is loaded synchronously via <script> in <head>
+  if (window.XLSX) {
+    isReady = true;
+    enableUI();
+    console.log('XLSX ready', window.XLSX);
+  } else {
+    console.error('XLSX failed to load from CDN');
+    toast('Could not load XLSX.js from CDN', true);
+  }
+</script>
+</body>
+</html>
