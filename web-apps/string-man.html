@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>String Manipulation</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --panel: #fafafa;
+    --border: #e4e4e7;
+    --text: #18181b;
+    --muted: #71717a;
+    --accent: #77bbdd;
+    --accent-fg: #ffffff;
+    --palette-1: #77bbdd;
+    --palette-2: #ff8899;
+    --palette-3: #77dd77;
+    --palette-4: #ffdd88;
+    --palette-5: #7777aa;
+    --mono: "SF Mono", "Cascadia Code", "JetBrains Mono", "Consolas", "Monaco",
+      "Roboto Mono", "DejaVu Sans Mono", monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+      "Microsoft YaHei", sans-serif;
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .tool-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel);
+  }
+  .tool-header .label { color: var(--muted); font-weight: 600; }
+  .tool-header .title { font-weight: 700; }
+
+  .mygo-button {
+    border: 1px solid var(--border);
+    background: #fff;
+    color: var(--text);
+    border-radius: 6px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  .mygo-button:hover { background: #f4f4f5; }
+  .mygo-button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+  .mygo-button.primary:hover { filter: brightness(1.05); }
+
+  .btn-group { display: inline-flex; gap: 8px; margin-left: auto; }
+
+  .main { flex: 1; display: flex; flex-direction: column; min-height: 0; overflow: auto; }
+  .pane-tip {
+    padding: 6px 16px;
+    font-size: 12px;
+    color: var(--muted);
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    letter-spacing: 0.02em;
+  }
+
+  textarea.input-text {
+    width: 100%;
+    height: 140px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    resize: vertical;
+    padding: 12px 16px;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--text);
+    background: #fcfcfc;
+    white-space: pre-wrap;
+    overflow: auto;
+  }
+  textarea.input-text:focus { outline: none; border-color: var(--accent); }
+  .input-wrap { padding: 16px; }
+
+  /* result rows */
+  .stats { padding: 16px; display: flex; flex-direction: column; gap: 8px; max-width: 720px; }
+  .stat-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 10px;
+    background: var(--panel);
+  }
+  .stat-row .k { color: var(--muted); min-width: 120px; font-weight: 600; align-self: center; }
+  .stat-row .v { font-family: var(--mono); font-size: 13px; flex: 1; word-break: break-all; white-space: pre-wrap; }
+  .stat-row .v.empty { color: var(--muted); }
+  .stat-row .copy {
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 6px;
+    padding: 4px 10px;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--text);
+    white-space: nowrap;
+    align-self: center;
+  }
+  .stat-row .copy:hover { background: #f4f4f5; }
+
+  #toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: #18181b;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  #toast.error { background: var(--palette-2); color: var(--accent-fg); }
+</style>
+</head>
+<body>
+  <div class="tool-header">
+    <span class="title">🧶 String Manipulation</span>
+    <span class="label">· type to transform</span>
+
+    <div class="btn-group">
+      <button class="mygo-button" id="btnCopyAll" title="Copy all results">📋 Copy All</button>
+      <button class="mygo-button" id="btnClear" title="Clear">Clear</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="pane-tip">Input text</div>
+    <div class="input-wrap">
+      <textarea id="input" class="input-text" spellcheck="false"
+        placeholder="Type or paste text…">The five boxing wizards jump quickly</textarea>
+    </div>
+
+    <div class="pane-tip">Output</div>
+    <div class="stats" id="output"></div>
+  </div>
+
+  <div id="toast"></div>
+
+<script>
+  // ===== bundled change-case (faithful port of change-case@4.1.2) =====
+  function lowerCase(str) { return str.toLowerCase(); }
+  function upperCase(str) { return str.toUpperCase(); }
+  function upperCaseFirst(input) { return input.charAt(0).toUpperCase() + input.substr(1); }
+
+  // no-case
+  var DEFAULT_SPLIT_REGEXP = [/([a-z0-9])([A-Z])/g, /([A-Z])([A-Z][a-z])/g];
+  var DEFAULT_STRIP_REGEXP = /[^A-Z0-9]+/gi;
+  function replace(input, re, value) {
+    if (re instanceof RegExp) return input.replace(re, value);
+    return re.reduce(function (input, re) { return input.replace(re, value); }, input);
+  }
+  function noCase(input, options) {
+    options = options || {};
+    var splitRegexp = options.splitRegexp !== undefined ? options.splitRegexp : DEFAULT_SPLIT_REGEXP;
+    var stripRegexp = options.stripRegexp !== undefined ? options.stripRegexp : DEFAULT_STRIP_REGEXP;
+    var transform = options.transform !== undefined ? options.transform : lowerCase;
+    var delimiter = options.delimiter !== undefined ? options.delimiter : " ";
+    var result = replace(replace(input, splitRegexp, "$1\0$2"), stripRegexp, "\0");
+    var start = 0;
+    var end = result.length;
+    while (result.charAt(start) === "\0") start++;
+    while (result.charAt(end - 1) === "\0") end--;
+    return result.slice(start, end).split("\0").map(transform).join(delimiter);
+  }
+
+  // pascal-case
+  function pascalCaseTransform(input, index) {
+    var firstChar = input.charAt(0);
+    var lowerChars = input.substr(1).toLowerCase();
+    if (index > 0 && firstChar >= "0" && firstChar <= "9") {
+      return "_" + firstChar + lowerChars;
+    }
+    return "" + firstChar.toUpperCase() + lowerChars;
+  }
+  function pascalCaseTransformMerge(input) {
+    return input.charAt(0).toUpperCase() + input.slice(1).toLowerCase();
+  }
+  function pascalCase(input, options) {
+    options = options || {};
+    return noCase(input, Object.assign({ delimiter: "", transform: pascalCaseTransform }, options));
+  }
+
+  // dot-case
+  function dotCase(input, options) {
+    options = options || {};
+    return noCase(input, Object.assign({ delimiter: "." }, options));
+  }
+
+  // camel-case
+  function camelCaseTransform(input, index) {
+    if (index === 0) return input.toLowerCase();
+    return pascalCaseTransform(input, index);
+  }
+  function camelCase(input, options) {
+    options = options || {};
+    return pascalCase(input, Object.assign({ transform: camelCaseTransform }, options));
+  }
+
+  // capital-case
+  function capitalCaseTransform(input) { return upperCaseFirst(input.toLowerCase()); }
+  function capitalCase(input, options) {
+    options = options || {};
+    return noCase(input, Object.assign({ delimiter: " ", transform: capitalCaseTransform }, options));
+  }
+
+  // constant-case
+  function constantCase(input, options) {
+    options = options || {};
+    return noCase(input, Object.assign({ delimiter: "_", transform: upperCase }, options));
+  }
+
+  // header-case
+  function headerCase(input, options) {
+    options = options || {};
+    return capitalCase(input, Object.assign({ delimiter: "-" }, options));
+  }
+
+  // param-case
+  function paramCase(input, options) {
+    options = options || {};
+    return dotCase(input, Object.assign({ delimiter: "-" }, options));
+  }
+
+  // path-case
+  function pathCase(input, options) {
+    options = options || {};
+    return dotCase(input, Object.assign({ delimiter: "/" }, options));
+  }
+
+  // sentence-case
+  function sentenceCaseTransform(input, index) {
+    var result = input.toLowerCase();
+    if (index === 0) return upperCaseFirst(result);
+    return result;
+  }
+  function sentenceCase(input, options) {
+    options = options || {};
+    return noCase(input, Object.assign({ delimiter: " ", transform: sentenceCaseTransform }, options));
+  }
+
+  // snake-case
+  function snakeCase(input, options) {
+    options = options || {};
+    return dotCase(input, Object.assign({ delimiter: "_" }, options));
+  }
+
+  const changeCase = {
+    paramCase, snakeCase, camelCase, pascalCase, constantCase,
+    dotCase, headerCase, pathCase, capitalCase, sentenceCase, noCase,
+  };
+
+  // Transform each line independently so newlines are detected and preserved.
+  // (change-case itself strips non-alphanumeric chars like \n, so we split first.)
+  function transformText(type, text) {
+    return text.split("\n").map((line) => changeCase[type](line)).join("\n");
+  }
+
+  // ===== UI =====
+  const OPS = [
+    "paramCase", "snakeCase", "camelCase", "pascalCase", "constantCase",
+    "dotCase", "headerCase", "pathCase", "capitalCase", "sentenceCase", "noCase",
+  ];
+
+  const $ = (id) => document.getElementById(id);
+  const input = $("input");
+  const output = $("output");
+
+  // build rows + the display label per op (mirrors reference: changeCase[type](type))
+  const rows = OPS.map((type) => {
+    const label = changeCase[type](type);
+    const row = document.createElement("div");
+    row.className = "stat-row";
+    row.innerHTML =
+      `<span class="k">${label}</span>` +
+      `<span class="v" id="v_${type}">—</span>` +
+      `<button class="copy" data-key="${type}">Copy</button>`;
+    output.appendChild(row);
+    return { type, v: row.querySelector(".v") };
+  });
+
+  function render() {
+    const text = input.value || "";
+    rows.forEach(({ type, v }) => {
+      const result = transformText(type, text);
+      if (result === "") {
+        v.textContent = "—";
+        v.classList.add("empty");
+      } else {
+        v.textContent = result;
+        v.classList.remove("empty");
+      }
+    });
+  }
+
+  // --- toast + clipboard ---
+  function toast(msg, isError = false) {
+    const t = $("toast");
+    t.textContent = msg;
+    t.classList.toggle("error", isError);
+    t.classList.add("show");
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => t.classList.remove("show"), 1500);
+  }
+  async function writeClipboard(text, showValue = false) {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast("Copied" + (showValue ? ": " + text : ""));
+    } catch (err) {
+      toast("Copy failed — select and copy manually", true);
+    }
+  }
+
+  // --- events ---
+  input.addEventListener("input", render);
+
+  $("btnClear").addEventListener("click", () => {
+    input.value = "";
+    render();
+    input.focus();
+  });
+
+  // per-row copy
+  output.addEventListener("click", (e) => {
+    const btn = e.target.closest(".copy");
+    if (!btn) return;
+    const type = btn.dataset.key;
+    const text = input.value || "";
+    const result = transformText(type, text);
+    if (result === "") { toast("Nothing to copy", true); return; }
+    writeClipboard(result, true);
+  });
+
+  // copy all (newline separated)
+  $("btnCopyAll").addEventListener("click", async () => {
+    const text = input.value || "";
+    if (text.trim() === "") { toast("Nothing to copy", true); return; }
+    const all = OPS.map((type) => `${changeCase[type](type)}: ${transformText(type, text)}`).join("\n");
+    writeClipboard(all, false);
+  });
+
+  render();
+</script>
+</body>
+</html>
