@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Font Demo</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --panel: #fafafa;
+    --border: #e4e4e7;
+    --text: #18181b;
+    --muted: #71717a;
+    --accent: #77bbdd;
+    --accent-fg: #ffffff;
+    --palette-1: #77bbdd;
+    --palette-2: #ff8899;
+    --palette-3: #77dd77;
+    --palette-4: #ffdd88;
+    --palette-5: #7777aa;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+      "Microsoft YaHei", sans-serif;
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .tool-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel);
+  }
+  .tool-header .label { color: var(--muted); font-weight: 600; white-space: nowrap; }
+
+  .mygo-button {
+    border: 1px solid var(--border);
+    background: #fff;
+    color: var(--text);
+    border-radius: 6px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+  .mygo-button:hover { background: #f4f4f5; }
+  .mygo-button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+  .mygo-button.primary:hover { filter: brightness(1.05); }
+
+  .mygo-select, .text-input {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 13px;
+    color: var(--text);
+    background: #fff;
+  }
+  .mygo-select { min-width: 240px; max-width: 360px; }
+  .text-input { flex: 1; min-width: 200px; }
+  .text-input:focus, .mygo-select:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+
+  .status { color: var(--muted); font-size: 12px; margin-left: auto; }
+
+  .main { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+  .pane-tip {
+    padding: 6px 16px;
+    font-size: 12px;
+    color: var(--muted);
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    letter-spacing: 0.02em;
+  }
+
+  .demo-scroll { flex: 1; overflow: auto; padding: 16px; }
+
+  .section-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 4px 0 10px;
+  }
+  .demo-section + .demo-section { margin-top: 28px; }
+
+  /* Style variant grid */
+  .variant-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 12px;
+  }
+  .variant {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    background: #fff;
+  }
+  .variant .tag {
+    display: inline-block;
+    font-size: 11px;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 1px 8px;
+    margin-bottom: 8px;
+  }
+  .sample {
+    color: var(--text);
+    line-height: 1.4;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+
+  /* Size ladder */
+  .size-row {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    padding: 6px 0;
+    border-bottom: 1px dashed var(--border);
+  }
+  .size-row:last-child { border-bottom: none; }
+  .size-label {
+    flex: 0 0 64px;
+    font-size: 11px;
+    color: var(--muted);
+    font-family: var(--mono, monospace);
+    text-align: right;
+  }
+  .size-sample { flex: 1; }
+  .weight-sample { flex: 1; }
+
+  /* Custom preview controls */
+  .preview-controls {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .slider-wrap { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; }
+  .slider-wrap input[type="range"] { width: 180px; }
+  .custom-preview {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    background: #fff;
+    min-height: 80px;
+    line-height: 1.4;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+
+  #toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: #18181b;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  #toast.error { background: var(--palette-2); color: var(--accent-fg); }
+</style>
+</head>
+<body>
+  <div class="tool-header">
+    <span class="label">Select Font Family:</span>
+    <input id="fontFilter" class="text-input" style="flex:0 0 160px;min-width:120px" placeholder="Filter fonts…" />
+    <select id="fontSelect" class="mygo-select"></select>
+    <button class="mygo-button" id="btnCopy" title="Copy selected font family">Copy</button>
+    <button class="mygo-button" id="btnReload" title="Reload system fonts">🔄 Reload</button>
+    <span id="fontStatus" class="status"></span>
+  </div>
+
+  <div class="tool-header" style="border-top:none">
+    <span class="label">Input Text:</span>
+    <input id="textInput" class="text-input" value="The five boxing wizards jump quickly. 中国智造，慧及全球。1234567890" spellcheck="false" />
+  </div>
+
+  <div class="main">
+    <div class="pane-tip" id="fontFamilyTip">Font Demo — different sizes &amp; styles</div>
+    <div class="demo-scroll" id="demo"></div>
+  </div>
+
+  <div id="toast"></div>
+
+<script>
+  const WEB_SAFE = [];
+
+  const SIZES = [12, 14, 16, 18, 20, 24, 28, 32, 40, 48, 64];
+  const WEIGHTS = [100, 200, 300, 400, 500, 600, 700, 800, 900];
+
+  let fonts = [];          // unique family names (sorted)
+  let selectedFont = "";
+  let loaded = false;
+  let loading = false;
+
+  // custom-preview state (kept outside the DOM so re-render is stateless)
+  const custom = { weight: false, italic: false, underline: false, strike: false, size: 32 };
+
+  const $ = (id) => document.getElementById(id);
+  const fontFilter = $("fontFilter");
+  const fontSelect = $("fontSelect");
+  const textInput = $("textInput");
+  const demo = $("demo");
+  const fontStatus = $("fontStatus");
+  const fontFamilyTip = $("fontFamilyTip");
+
+  function escapeHTML(str) {
+    return str.replace(/[&<>"']/g, (c) =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])
+    );
+  }
+
+  function quoteFont(name) {
+    const GENERIC = ["sans-serif", "serif", "monospace", "cursive", "fantasy", "system-ui"];
+    return GENERIC.includes(name) ? name : `'${name}'`;
+  }
+
+  function decoration() {
+    const parts = [];
+    if (custom.underline) parts.push("underline");
+    if (custom.strike) parts.push("line-through");
+    return parts.join(" ");
+  }
+
+  // style for custom preview + size ladder (ladder keeps its own font-size)
+  function sampleStyle(size) {
+    const parts = [
+      `font-family:${selectedFont ? quoteFont(selectedFont) : "sans-serif"}`,
+      `font-size:${size}px`,
+      `font-weight:${custom.weight ? 700 : 400}`,
+      `font-style:${custom.italic ? "italic" : "normal"}`,
+    ];
+    const deco = decoration();
+    if (deco) parts.push(`text-decoration:${deco}`);
+    return parts.join(";");
+  }
+
+  // style for weight ladder (keeps its own weight, follows custom size/italic/decoration)
+  function weightStyle(w) {
+    const parts = [
+      `font-family:${selectedFont ? quoteFont(selectedFont) : "sans-serif"}`,
+      `font-size:${custom.size}px`,
+      `font-weight:${w}`,
+      `font-style:${custom.italic ? "italic" : "normal"}`,
+    ];
+    const deco = decoration();
+    if (deco) parts.push(`text-decoration:${deco}`);
+    return parts.join(";");
+  }
+
+  async function loadFonts() {
+    if (loading) return;
+    loading = true;
+    fontStatus.textContent = "Loading fonts…";
+    try {
+      let list = [];
+      if ("queryLocalFonts" in window) {
+        list = await window.queryLocalFonts();
+      }
+      const famSet = new Set();
+      list.forEach((f) => { if (f.family) famSet.add(f.family); });
+      fonts = [...famSet].sort((a, b) => a.localeCompare(b));
+    } catch (e) {
+      console.warn("queryLocalFonts failed:", e);
+      fonts = WEB_SAFE.slice();
+    } finally {
+      loaded = true;
+      loading = false;
+      fontStatus.textContent = fonts.length ? `${fonts.length} system fonts` : "No fonts available";
+      populateSelect();
+    }
+  }
+
+  function populateSelect() {
+    const q = fontFilter.value.trim().toLowerCase();
+    const filtered = q ? fonts.filter((f) => f.toLowerCase().includes(q)) : fonts;
+
+    fontSelect.innerHTML = "";
+    if (filtered.length === 0) {
+      const opt = document.createElement("option");
+      opt.value = "";
+      opt.disabled = true;
+      opt.textContent = fonts.length ? "No matches" : "No fonts available";
+      fontSelect.appendChild(opt);
+    } else {
+      filtered.forEach((f) => {
+        const opt = document.createElement("option");
+        opt.value = f;
+        opt.textContent = f;
+        fontSelect.appendChild(opt);
+      });
+    }
+
+    if (filtered.includes(selectedFont)) {
+      fontSelect.value = selectedFont;
+    } else if (filtered.length) {
+      selectedFont = filtered[0];
+      fontSelect.value = selectedFont;
+    } else {
+      selectedFont = "";
+    }
+    renderDemo();
+  }
+
+  function renderDemo() {
+    const text = textInput.value || " ";
+    const ff = selectedFont ? quoteFont(selectedFont) : "sans-serif";
+    fontFamilyTip.textContent = selectedFont
+      ? `Font Demo — ${selectedFont}`
+      : "Font Demo — no font selected";
+
+    // 1) Style variants: Regular / Bold / Italic / Bold Italic
+    const variants = [
+      { tag: "Regular", w: 400, i: "normal" },
+      { tag: "Bold", w: 700, i: "normal" },
+      { tag: "Italic", w: 400, i: "italic" },
+      { tag: "Bold Italic", w: 700, i: "italic" },
+    ];
+    const variantHTML = variants.map((v) => `
+      <div class="variant">
+        <span class="tag">${v.tag}</span>
+        <div class="sample" style="font-family:${ff};font-weight:${v.w};font-style:${v.i}">${escapeHTML(text)}</div>
+      </div>`).join("");
+
+    // 2) Custom preview (interactive)
+    const customHTML = `
+      <div class="preview-controls">
+        <label class="toggle"><input type="checkbox" id="cbWeight" ${custom.weight ? "checked" : ""}/> Bold</label>
+        <label class="toggle"><input type="checkbox" id="cbItalic" ${custom.italic ? "checked" : ""}/> Italic</label>
+        <label class="toggle"><input type="checkbox" id="cbUnderline" ${custom.underline ? "checked" : ""}/> Underline</label>
+        <label class="toggle"><input type="checkbox" id="cbStrike" ${custom.strike ? "checked" : ""}/> Strike</label>
+        <span class="slider-wrap">Size <input type="range" id="sizeRange" min="8" max="120" value="${custom.size}"/> <b id="sizeVal">${custom.size}px</b></span>
+      </div>
+      <div class="custom-preview sample" id="customPreview" style="${sampleStyle(custom.size)}">${escapeHTML(text)}</div>`;
+
+    // 3) Size ladder — follows custom weight/italic/decoration
+    const sizeHTML = SIZES.map((s) => `
+      <div class="size-row">
+        <span class="size-label">${s}px</span>
+        <div class="size-sample sample" style="${sampleStyle(s)}">${escapeHTML(text)}</div>
+      </div>`).join("");
+
+    // 4) Weight ladder — varies weight, follows custom size/italic/decoration
+    const weightHTML = WEIGHTS.map((w) => `
+      <div class="size-row">
+        <span class="size-label">${w}</span>
+        <div class="weight-sample sample" style="${weightStyle(w)}">${escapeHTML(text)}</div>
+      </div>`).join("");
+
+    demo.innerHTML = `
+      <div class="demo-section">
+        <div class="section-title">Style Variants</div>
+        <div class="variant-grid">${variantHTML}</div>
+      </div>
+      <div class="demo-section">
+        <div class="section-title">Custom Preview</div>
+        ${customHTML}
+      </div>
+      <div class="demo-section">
+        <div class="section-title">Size Ladder</div>
+        ${sizeHTML}
+      </div>
+      <div class="demo-section">
+        <div class="section-title">Weight Ladder</div>
+        ${weightHTML}
+      </div>`;
+
+    // wire up custom preview controls — update state + styles without full re-render
+    $("cbWeight").addEventListener("change", (e) => { custom.weight = e.target.checked; updateStyles(); });
+    $("cbItalic").addEventListener("change", (e) => { custom.italic = e.target.checked; updateStyles(); });
+    $("cbUnderline").addEventListener("change", (e) => { custom.underline = e.target.checked; updateStyles(); });
+    $("cbStrike").addEventListener("change", (e) => { custom.strike = e.target.checked; updateStyles(); });
+    $("sizeRange").addEventListener("input", (e) => { custom.size = +e.target.value; updateStyles(); });
+  }
+
+  function updateStyles() {
+    const deco = decoration();
+    const p = $("customPreview");
+    if (p) {
+      p.style.fontWeight = custom.weight ? 700 : 400;
+      p.style.fontStyle = custom.italic ? "italic" : "normal";
+      p.style.textDecoration = deco;
+      p.style.fontSize = custom.size + "px";
+    }
+    document.querySelectorAll(".size-sample").forEach((el) => {
+      el.style.fontWeight = custom.weight ? 700 : 400;
+      el.style.fontStyle = custom.italic ? "italic" : "normal";
+      el.style.textDecoration = deco;
+    });
+    document.querySelectorAll(".weight-sample").forEach((el) => {
+      el.style.fontStyle = custom.italic ? "italic" : "normal";
+      el.style.textDecoration = deco;
+      el.style.fontSize = custom.size + "px";
+    });
+    const sv = $("sizeVal");
+    if (sv) sv.textContent = custom.size + "px";
+  }
+
+  // --- toast + clipboard ---
+  function toast(msg, isError = false) {
+    const t = $("toast");
+    t.textContent = msg;
+    t.classList.toggle("error", isError);
+    t.classList.add("show");
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => t.classList.remove("show"), 1500);
+  }
+  async function writeClipboard(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast("Copied: " + text);
+    } catch (err) {
+      toast("Copy failed — select and copy manually", true);
+    }
+  }
+
+  function loadOnFirstInteraction(e) {
+    if (loaded) return;
+    e.preventDefault();
+    loadFonts();
+  }
+
+  // --- events ---
+  fontSelect.addEventListener("mousedown", loadOnFirstInteraction);
+  fontSelect.addEventListener("touchstart", loadOnFirstInteraction);
+  fontSelect.addEventListener("keydown", (e) => {
+    if (loaded) return;
+    if (e.key === "Enter" || e.key === " " || e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      loadFonts();
+    }
+  });
+  fontSelect.addEventListener("focus", () => { if (!loaded) loadFonts(); });
+  fontFilter.addEventListener("input", populateSelect);
+  fontSelect.addEventListener("change", () => { selectedFont = fontSelect.value; renderDemo(); });
+  textInput.addEventListener("input", renderDemo);
+  $("btnCopy").addEventListener("click", () => writeClipboard(selectedFont));
+  $("btnReload").addEventListener("click", loadFonts);
+
+  fontStatus.textContent = "Click the dropdown to load fonts";
+  populateSelect();
+</script>
+</body>
+</html>

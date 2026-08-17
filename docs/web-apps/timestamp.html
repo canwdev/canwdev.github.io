@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Timestamp Converter</title>
+  <style>
+    :root {
+      --accent: #77bbdd;
+      --accent-fg: #fff;
+      --palette-1: #77bbdd;
+      --palette-2: #ff8899;
+      --palette-3: #77dd77;
+      --palette-4: #ffdd88;
+      --palette-5: #7777aa;
+      --border: #e3e8ee;
+      --muted: #6b7280;
+      --bg: #ffffff;
+      --fg: #1f2937;
+      --hover: #eaf4fb;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      background: var(--bg);
+      color: var(--fg);
+      font-size: 14px;
+      -webkit-font-smoothing: antialiased;
+    }
+    .time-converter {
+      height: 100vh;
+      padding: 16px;
+      overflow: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      max-width: 920px;
+      margin: 0 auto;
+    }
+    .flex-rows {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .block { display: flex; flex-direction: column; gap: 8px; }
+    .block-title {
+      margin: 0 0 4px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent);
+    }
+    .split { border: none; border-top: 1px solid var(--border); margin: 4px 0; }
+    .field-label { color: var(--muted); }
+    .result-label { color: var(--muted); font-size: 12px; margin-top: 2px; }
+    .mygo-input.full { width: 100%; flex: none; }
+    .f-label {
+      width: 90px;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+    .mygo-input {
+      flex: 1;
+      min-width: 200px;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg);
+      color: var(--fg);
+      font: inherit;
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .mygo-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(119, 187, 221, .18);
+    }
+    .output {
+      width: 100%;
+      min-height: 118px;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg);
+      color: var(--fg);
+      font: inherit;
+      line-height: 1.5;
+      white-space: pre;
+      resize: vertical;
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .output:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(119, 187, 221, .18);
+    }
+    .arrow {
+      color: var(--accent);
+      font-weight: bold;
+    }
+    .hint {
+      color: var(--muted);
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="time-converter">
+    <section class="block">
+      <h2 class="block-title">Current Time</h2>
+      <textarea id="curOutput" class="output" rows="6" readonly></textarea>
+    </section>
+
+    <hr class="split" />
+
+    <section class="block">
+      <h2 class="block-title">Convert</h2>
+      <label class="field-label" for="inInput">Input (timestamp / new Date() param)</label>
+      <input
+        id="inInput"
+        class="mygo-input full"
+        placeholder="e.g. 1786954928420 or 2026-08-25T00:00:00-07:00"
+      />
+      <label class="field-label" for="tzSelect">Timezone</label>
+      <select id="tzSelect" class="mygo-input full"></select>
+      <div class="result-label">Output:</div>
+      <textarea id="outOutput" class="output" rows="6" readonly></textarea>
+    </section>
+
+    <div class="hint">
+      Input is parsed directly via <code>new Date(...)</code>.
+    </div>
+  </div>
+
+  <script>
+    const inInput = document.getElementById('inInput')
+    const curOutput = document.getElementById('curOutput')
+    const outOutput = document.getElementById('outOutput')
+    const tzSelect = document.getElementById('tzSelect')
+
+    const pad = (n, len = 2) => String(n).padStart(len, '0')
+    const currentTz = Intl.DateTimeFormat().resolvedOptions().timeZone
+
+    function partsInZone(d, timeZone) {
+      const dtf = new Intl.DateTimeFormat('en-US', {
+        timeZone,
+        hourCycle: 'h23',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+      })
+      const m = {}
+      for (const p of dtf.formatToParts(d)) m[p.type] = p.value
+      return m
+    }
+
+    function localDateTime(d, timeZone) {
+      const p = partsInZone(d, timeZone)
+      return p.year + '-' + p.month + '-' + p.day + ' ' + p.hour + ':' + p.minute + ':' + p.second
+    }
+
+    function zoneOffsetMin(d, timeZone) {
+      const p = partsInZone(d, timeZone)
+      const asUTC = Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute, +p.second)
+      return Math.round((asUTC - d.getTime()) / 60000)
+    }
+
+    function formatOffset(min) {
+      const sign = min >= 0 ? '+' : '-'
+      const abs = Math.abs(min)
+      return sign + pad(Math.floor(abs / 60)) + ':' + pad(abs % 60)
+    }
+
+    function isoLocal(d, timeZone) {
+      return localDateTime(d, timeZone).replace(' ', 'T') + formatOffset(zoneOffsetMin(d, timeZone))
+    }
+
+    function tzLabel(d, timeZone) {
+      return timeZone + ' (GMT' + formatOffset(zoneOffsetMin(d, timeZone)) + ')'
+    }
+
+    function renderOutput(d, timeZone) {
+      if (!(d instanceof Date) || isNaN(d.getTime())) return 'Invalid Date'
+      const ms = d.getTime()
+      const rows = [
+        ['Timestamp', String(ms)],
+        ['Local Time', localDateTime(d, timeZone)],
+        ['ISO 8601', isoLocal(d, timeZone)],
+        ['Timezone', tzLabel(d, timeZone)],
+      ]
+      const width = Math.max(...rows.map((r) => r[0].length))
+      return rows.map(([k, v]) => k.padEnd(width) + '  ' + v).join('\n')
+    }
+
+    function updateCurrent() {
+      curOutput.value = renderOutput(new Date(), currentTz)
+    }
+
+    function updateFromInput() {
+      const raw = inInput.value.trim()
+      if (!raw) {
+        outOutput.value = ''
+        return
+      }
+      const d = /^\d+$/.test(raw) ? new Date(Number(raw)) : new Date(raw)
+      outOutput.value = renderOutput(d, tzSelect.value)
+    }
+
+    inInput.addEventListener('input', updateFromInput)
+    tzSelect.addEventListener('change', updateFromInput)
+
+    // ---- Timezone select ----
+    function getTimeZones() {
+      if (typeof Intl.supportedValuesOf === 'function') {
+        try { return Intl.supportedValuesOf('timeZone') } catch (_) {}
+      }
+      return [
+        'UTC', 'America/New_York', 'America/Chicago', 'America/Denver', 'America/Los_Angeles',
+        'America/Sao_Paulo', 'Europe/London', 'Europe/Paris', 'Europe/Berlin', 'Europe/Madrid',
+        'Europe/Moscow', 'Asia/Dubai', 'Asia/Kolkata', 'Asia/Shanghai', 'Asia/Singapore',
+        'Asia/Tokyo', 'Asia/Seoul', 'Australia/Sydney', 'Pacific/Auckland',
+      ]
+    }
+
+    const tzList = getTimeZones().slice().sort()
+    const now = new Date()
+    for (const tz of tzList) {
+      const opt = document.createElement('option')
+      opt.value = tz
+      opt.textContent = tz + ' (GMT' + formatOffset(zoneOffsetMin(now, tz)) + ')'
+      tzSelect.appendChild(opt)
+    }
+    tzSelect.value = currentTz
+
+    // ---- Init + 1s tick ----
+    updateCurrent()
+    updateFromInput()
+    setInterval(updateCurrent, 1000)
+  </script>
+</body>
+</html>

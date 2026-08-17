@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Multi-line Transformer</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --panel: #fafafa;
+    --border: #e4e4e7;
+    --text: #18181b;
+    --muted: #71717a;
+    --accent: #77bbdd;
+    --accent-fg: #ffffff;
+    --palette-1: #77bbdd;
+    --palette-2: #ff8899;
+    --palette-3: #77dd77;
+    --palette-4: #ffdd88;
+    --palette-5: #7777aa;
+    --mono: "SF Mono", "Cascadia Code", "JetBrains Mono", "Consolas", "Monaco",
+      "Roboto Mono", "DejaVu Sans Mono", monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+      "Microsoft YaHei", sans-serif;
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .tool-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel);
+  }
+  .tool-header .label { color: var(--muted); font-weight: 600; }
+
+  /* segmented mode switch */
+  .seg {
+    display: inline-flex;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .seg button {
+    border: none;
+    background: transparent;
+    color: var(--text);
+    padding: 6px 14px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  .seg button + button { border-left: 1px solid var(--border); }
+  .seg button.active { background: var(--accent); color: var(--accent-fg); }
+
+  .checkbox { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); }
+
+  input.mygo-input {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 13px;
+    background: #fff;
+    color: var(--text);
+    min-width: 120px;
+  }
+  input.mygo-input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+
+  .btn-group { display: inline-flex; gap: 8px; margin-left: auto; }
+  .mygo-button {
+    border: 1px solid var(--border);
+    background: #fff;
+    color: var(--text);
+    border-radius: 6px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  .mygo-button:hover { background: #f4f4f5; }
+  .mygo-button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+  .mygo-button.primary:hover { filter: brightness(1.05); }
+
+  /* main: top input / bottom output */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .pane { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+  .pane + .pane { border-top: 1px solid var(--border); }
+  .pane-tip {
+    padding: 6px 16px;
+    font-size: 12px;
+    color: var(--muted);
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    letter-spacing: 0.02em;
+  }
+  textarea.input-text {
+    flex: 1;
+    width: 100%;
+    border: none;
+    resize: none;
+    padding: 12px 16px;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text);
+    background: #fff;
+    white-space: pre;
+    overflow: auto;
+  }
+  textarea.input-text:focus { outline: none; }
+  #output { background: #fcfcfc; }
+
+  /* toast */
+  #toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: #18181b;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+  <div class="tool-header">
+    <span class="label">Convert to:</span>
+    <div class="seg" id="modeSwitch">
+      <button data-mode="text">Text</button>
+      <button data-mode="html">HTML</button>
+      <button data-mode="json" class="active">JSON</button>
+    </div>
+
+    <label class="checkbox">
+      <input type="checkbox" id="trimEmpty" checked />
+      <span>Trim empty lines</span>
+    </label>
+
+    <input class="mygo-input" id="htmlTag" placeholder="HTML Tag Name" style="display:none" />
+    <input class="mygo-input" id="htmlAttrs" placeholder="HTML Attrs" style="display:none" />
+
+    <div class="btn-group">
+      <button class="mygo-button primary" id="btnAuto" title="Paste then copy">Paste+Copy</button>
+      <button class="mygo-button" id="btnPaste" title="Paste">Paste</button>
+      <button class="mygo-button" id="btnCopy" title="Copy result">Copy</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="pane">
+      <div class="pane-tip">Text Input</div>
+      <textarea class="input-text" id="input" placeholder="Text Input" spellcheck="false"></textarea>
+    </div>
+    <div class="pane">
+      <div class="pane-tip" id="outputTip">Text Output: text</div>
+      <textarea class="input-text" id="output" placeholder="Output" readonly spellcheck="false"></textarea>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+<script>
+  // --- conversion core (ported from @/utils/mc-utils/text-convert) ---
+  const TextConvertMode = {
+    DISABLED: 'disabled',
+    NUMBER: 'number',
+    TEXT: 'text',
+    HTML: 'html',
+    JSON: 'json',
+  };
+
+  function textConvertMultipleLine(str, mode = TextConvertMode.TEXT, options = {}) {
+    if (mode === TextConvertMode.DISABLED) return str;
+    const { isTrimEmptyLines = false, isTrimQuotes = false, htmlTagName = '', htmlAttrs = '' } = options;
+    str = (str || '').trim().replace(/\u00A0/gi, ' '); // replace NBSP
+
+    if (isTrimEmptyLines) {
+      str = str.replace(/^\s*[\r\n]/gm, '');
+    }
+    if (isTrimQuotes) {
+      if (str.charAt(0) === str.charAt(str.length - 1)) {
+        str = str.replace(/^['"`]+|['"`]+$/g, '');
+      }
+    }
+    if (mode === TextConvertMode.TEXT) return str;
+
+    let arr = str.split('\n').map((i) => i.trim());
+
+    if (mode === TextConvertMode.JSON) {
+      if (arr.length === 1) return JSON.stringify(arr[0]);
+      return JSON.stringify(arr, null, 2);
+    }
+    if (mode === TextConvertMode.HTML) {
+      if (htmlTagName) {
+        return arr
+          .map((item) => `<${htmlTagName}${htmlAttrs ? ` ${htmlAttrs}` : ''}>${item}</${htmlTagName}>`)
+          .join('\n');
+      }
+      return arr.join('<br>');
+    }
+    return '';
+  }
+
+  // --- state + DOM ---
+  const $ = (id) => document.getElementById(id);
+  const input = $('input');
+  const output = $('output');
+  const modeSwitch = $('modeSwitch');
+  const trimEmpty = $('trimEmpty');
+  const htmlTag = $('htmlTag');
+  const htmlAttrs = $('htmlAttrs');
+  const outputTip = $('outputTip');
+
+  let mMode = TextConvertMode.JSON;
+
+  function updateFormat() {
+    output.value = textConvertMultipleLine(input.value, mMode, {
+      isTrimEmptyLines: trimEmpty.checked,
+      htmlTagName: htmlTag.value,
+      htmlAttrs: htmlAttrs.value,
+    });
+    outputTip.textContent = 'Text Output: ' + mMode;
+  }
+
+  function syncHtmlInputs() {
+    const show = mMode === TextConvertMode.HTML;
+    htmlTag.style.display = show ? '' : 'none';
+    htmlAttrs.style.display = show && htmlTag.value ? '' : 'none';
+    if (!show) { htmlTag.value = ''; htmlAttrs.value = ''; }
+  }
+
+  // mode switch
+  modeSwitch.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    mMode = btn.dataset.mode;
+    [...modeSwitch.children].forEach((b) => b.classList.toggle('active', b === btn));
+    syncHtmlInputs();
+    updateFormat();
+  });
+
+  htmlTag.addEventListener('input', () => {
+    htmlAttrs.style.display = mMode === TextConvertMode.HTML && htmlTag.value ? '' : 'none';
+    updateFormat();
+  });
+  htmlAttrs.addEventListener('input', updateFormat);
+  trimEmpty.addEventListener('change', updateFormat);
+  input.addEventListener('input', updateFormat);
+
+  // --- clipboard helpers ---
+  function toast(msg) {
+    const t = $('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => t.classList.remove('show'), 1500);
+  }
+
+  async function readClipboard() {
+    try {
+      return await navigator.clipboard.readText();
+    } catch (err) {
+      toast('Clipboard read blocked — paste manually');
+      throw err;
+    }
+  }
+
+  async function writeClipboard(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast('Copied');
+    } catch (err) {
+      toast('Copy failed — select and copy manually');
+    }
+  }
+
+  async function handlePaste() {
+    try {
+      input.value = await readClipboard();
+      updateFormat();
+    } catch (_) { /* toast already shown */ }
+  }
+
+  async function handleCopy() {
+    await writeClipboard(output.value);
+  }
+
+  async function handleAutoPasteCopy() {
+    try {
+      input.value = await readClipboard();
+      updateFormat();
+      await writeClipboard(output.value);
+    } catch (_) { /* toast already shown */ }
+  }
+
+  $('btnPaste').addEventListener('click', handlePaste);
+  $('btnCopy').addEventListener('click', handleCopy);
+  $('btnAuto').addEventListener('click', handleAutoPasteCopy);
+
+  // init
+  syncHtmlInputs();
+  updateFormat();
+</script>
+</body>
+</html>
