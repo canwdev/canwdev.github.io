@@ -6666,7 +6666,7 @@
 <li><a href="http://yrxitong.ysepan.com/">★封装系统★重装系统★系统维护★精品※网站※网址▲藏经阁▲</a></li>
 </ul>
 <p>docker-compose.yml<br>
-</p><div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Text Only</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1"> 1</a></span>
+</p><div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">YAML</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1"> 1</a></span>
 <span class="normal"><a href="#__codelineno-0-2"> 2</a></span>
 <span class="normal"><a href="#__codelineno-0-3"> 3</a></span>
 <span class="normal"><a href="#__codelineno-0-4"> 4</a></span>
@@ -6698,39 +6698,39 @@
 <span class="normal"><a href="#__codelineno-0-30">30</a></span>
 <span class="normal"><a href="#__codelineno-0-31">31</a></span>
 <span class="normal"><a href="#__codelineno-0-32">32</a></span>
-<span class="normal"><a href="#__codelineno-0-33">33</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1"></a>version: "3"
-<a id="__codelineno-0-2" name="__codelineno-0-2"></a>services:
-<a id="__codelineno-0-3" name="__codelineno-0-3"></a>  windows:
-<a id="__codelineno-0-4" name="__codelineno-0-4"></a>    image: dockurr/windows
-<a id="__codelineno-0-5" name="__codelineno-0-5"></a>    container_name: windows
-<a id="__codelineno-0-6" name="__codelineno-0-6"></a>    devices:
-<a id="__codelineno-0-7" name="__codelineno-0-7"></a>      - /dev/kvm
-<a id="__codelineno-0-8" name="__codelineno-0-8"></a>    cap_add:
-<a id="__codelineno-0-9" name="__codelineno-0-9"></a>      - NET_ADMIN
-<a id="__codelineno-0-10" name="__codelineno-0-10"></a>    ports:
-<a id="__codelineno-0-11" name="__codelineno-0-11"></a>      - 8006:8006
-<a id="__codelineno-0-12" name="__codelineno-0-12"></a>      - 3389:3389/tcp
-<a id="__codelineno-0-13" name="__codelineno-0-13"></a>      - 3389:3389/udp
-<a id="__codelineno-0-14" name="__codelineno-0-14"></a>    stop_grace_period: 2m
-<a id="__codelineno-0-15" name="__codelineno-0-15"></a>    restart: on-failure
-<a id="__codelineno-0-16" name="__codelineno-0-16"></a>    environment:
-<a id="__codelineno-0-17" name="__codelineno-0-17"></a>      VERSION: "http://192.168.xxx.xxx:8080/en-us_windows_10_iot_enterprise_ltsc_2021_x64_dvd_257ad90f.iso"
-<a id="__codelineno-0-18" name="__codelineno-0-18"></a>      MANUAL: "N"
-<a id="__codelineno-0-19" name="__codelineno-0-19"></a>      RAM_SIZE: "2G"
-<a id="__codelineno-0-20" name="__codelineno-0-20"></a>      CPU_CORES: "4"
-<a id="__codelineno-0-21" name="__codelineno-0-21"></a>      DISK_SIZE: "40G"
-<a id="__codelineno-0-22" name="__codelineno-0-22"></a>    volumes:
-<a id="__codelineno-0-23" name="__codelineno-0-23"></a>      - ./win:/storage
-<a id="__codelineno-0-24" name="__codelineno-0-24"></a>    # depends_on:
-<a id="__codelineno-0-25" name="__codelineno-0-25"></a>    #   - winiso
+<span class="normal"><a href="#__codelineno-0-33">33</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1"></a><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">"3"</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2"></a><span class="nt">services</span><span class="p">:</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3"></a><span class="w">  </span><span class="nt">windows</span><span class="p">:</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4"></a><span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dockurr/windows</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5"></a><span class="w">    </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">windows</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6"></a><span class="w">    </span><span class="nt">devices</span><span class="p">:</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/dev/kvm</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8"></a><span class="w">    </span><span class="nt">cap_add</span><span class="p">:</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">NET_ADMIN</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10"></a><span class="w">    </span><span class="nt">ports</span><span class="p">:</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8006:8006</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3389:3389/tcp</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3389:3389/udp</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14"></a><span class="w">    </span><span class="nt">stop_grace_period</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2m</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15"></a><span class="w">    </span><span class="nt">restart</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">on-failure</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16"></a><span class="w">    </span><span class="nt">environment</span><span class="p">:</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17"></a><span class="w">      </span><span class="nt">VERSION</span><span class="p">:</span><span class="w"> </span><span class="s">"http://192.168.xxx.xxx:8080/en-us_windows_10_iot_enterprise_ltsc_2021_x64_dvd_257ad90f.iso"</span>
+<a id="__codelineno-0-18" name="__codelineno-0-18"></a><span class="w">      </span><span class="nt">MANUAL</span><span class="p">:</span><span class="w"> </span><span class="s">"N"</span>
+<a id="__codelineno-0-19" name="__codelineno-0-19"></a><span class="w">      </span><span class="nt">RAM_SIZE</span><span class="p">:</span><span class="w"> </span><span class="s">"2G"</span>
+<a id="__codelineno-0-20" name="__codelineno-0-20"></a><span class="w">      </span><span class="nt">CPU_CORES</span><span class="p">:</span><span class="w"> </span><span class="s">"4"</span>
+<a id="__codelineno-0-21" name="__codelineno-0-21"></a><span class="w">      </span><span class="nt">DISK_SIZE</span><span class="p">:</span><span class="w"> </span><span class="s">"40G"</span>
+<a id="__codelineno-0-22" name="__codelineno-0-22"></a><span class="w">    </span><span class="nt">volumes</span><span class="p">:</span>
+<a id="__codelineno-0-23" name="__codelineno-0-23"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./win:/storage</span>
+<a id="__codelineno-0-24" name="__codelineno-0-24"></a><span class="w">    </span><span class="c1"># depends_on:</span>
+<a id="__codelineno-0-25" name="__codelineno-0-25"></a><span class="w">    </span><span class="c1">#   - winiso</span>
 <a id="__codelineno-0-26" name="__codelineno-0-26"></a>
 <a id="__codelineno-0-27" name="__codelineno-0-27"></a>
-<a id="__codelineno-0-28" name="__codelineno-0-28"></a>  # winiso:
-<a id="__codelineno-0-29" name="__codelineno-0-29"></a>  #   image: nginx:alpine
-<a id="__codelineno-0-30" name="__codelineno-0-30"></a>  #   container_name: winiso
-<a id="__codelineno-0-31" name="__codelineno-0-31"></a>  #   restart: on-failure
-<a id="__codelineno-0-32" name="__codelineno-0-32"></a>  #   volumes:
-<a id="__codelineno-0-33" name="__codelineno-0-33"></a>  #    - ./iso:/usr/share/nginx/html
+<a id="__codelineno-0-28" name="__codelineno-0-28"></a><span class="w">  </span><span class="c1"># winiso:</span>
+<a id="__codelineno-0-29" name="__codelineno-0-29"></a><span class="w">  </span><span class="c1">#   image: nginx:alpine</span>
+<a id="__codelineno-0-30" name="__codelineno-0-30"></a><span class="w">  </span><span class="c1">#   container_name: winiso</span>
+<a id="__codelineno-0-31" name="__codelineno-0-31"></a><span class="w">  </span><span class="c1">#   restart: on-failure</span>
+<a id="__codelineno-0-32" name="__codelineno-0-32"></a><span class="w">  </span><span class="c1">#   volumes:</span>
+<a id="__codelineno-0-33" name="__codelineno-0-33"></a><span class="w">  </span><span class="c1">#    - ./iso:/usr/share/nginx/html</span>
 </code></pre></div></td></tr></tbody></table></div><p></p>
 <div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Text Only</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-1-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1"></a>docker-compose up
 </code></pre></div></td></tr></tbody></table></div>

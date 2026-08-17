@@ -6939,7 +6939,7 @@
 <a id="__codelineno-4-4" name="__codelineno-4-4"></a>vim<span class="w"> </span>docker-compose.yml
 </code></pre></div></td></tr></tbody></table></div>
 <p>填入以下内容：<br>
-</p><div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Text Only</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-5-1"> 1</a></span>
+</p><div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">YAML</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-5-1"> 1</a></span>
 <span class="normal"><a href="#__codelineno-5-2"> 2</a></span>
 <span class="normal"><a href="#__codelineno-5-3"> 3</a></span>
 <span class="normal"><a href="#__codelineno-5-4"> 4</a></span>
@@ -6959,27 +6959,27 @@
 <span class="normal"><a href="#__codelineno-5-18">18</a></span>
 <span class="normal"><a href="#__codelineno-5-19">19</a></span>
 <span class="normal"><a href="#__codelineno-5-20">20</a></span>
-<span class="normal"><a href="#__codelineno-5-21">21</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1"></a>version: '3.5'
+<span class="normal"><a href="#__codelineno-5-21">21</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1"></a><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">'3.5'</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2"></a>
-<a id="__codelineno-5-3" name="__codelineno-5-3"></a>services:
-<a id="__codelineno-5-4" name="__codelineno-5-4"></a>    ubuntu-xfce-vnc:
-<a id="__codelineno-5-5" name="__codelineno-5-5"></a>        container_name: xfce
-<a id="__codelineno-5-6" name="__codelineno-5-6"></a>        image: imlala/ubuntu-xfce-vnc-novnc:latest
-<a id="__codelineno-5-7" name="__codelineno-5-7"></a>        shm_size: "2gb"  # 防止高分辨率下Chromium崩溃,如果内存足够也可以加大一点点
-<a id="__codelineno-5-8" name="__codelineno-5-8"></a>        ports:
-<a id="__codelineno-5-9" name="__codelineno-5-9"></a>            - 5900:5900   # TigerVNC的服务端口（保证端口是没被占用的，冒号右边的端口不能改，左边的可以改）
-<a id="__codelineno-5-10" name="__codelineno-5-10"></a>            - 6080:6080   # noVNC的服务端口，注意事项同上
-<a id="__codelineno-5-11" name="__codelineno-5-11"></a>        environment: 
-<a id="__codelineno-5-12" name="__codelineno-5-12"></a>            - VNC_PASSWD=PAS3WorD    # 改成你自己想要的密码
-<a id="__codelineno-5-13" name="__codelineno-5-13"></a>            - GEOMETRY=1280x720      # 屏幕分辨率，800×600/1024×768诸如此类的可自己调整
-<a id="__codelineno-5-14" name="__codelineno-5-14"></a>            - DEPTH=24               # 颜色位数16/24/32可用，越高画面越细腻，但网络不好的也会更卡
-<a id="__codelineno-5-15" name="__codelineno-5-15"></a>        volumes: 
-<a id="__codelineno-5-16" name="__codelineno-5-16"></a>            - ./Downloads:/root/Downloads  # Chromium/Deluge/qBittorrent/Transmission下载的文件默认保存位置都是root/Downloads下
-<a id="__codelineno-5-17" name="__codelineno-5-17"></a>            - ./Documents:/root/Documents  # 映射一些其他目录
-<a id="__codelineno-5-18" name="__codelineno-5-18"></a>            - ./Pictures:/root/Pictures
-<a id="__codelineno-5-19" name="__codelineno-5-19"></a>            - ./Videos:/root/Videos
-<a id="__codelineno-5-20" name="__codelineno-5-20"></a>            - ./Music:/root/Music
-<a id="__codelineno-5-21" name="__codelineno-5-21"></a>        restart: unless-stopped
+<a id="__codelineno-5-3" name="__codelineno-5-3"></a><span class="nt">services</span><span class="p">:</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4"></a><span class="w">    </span><span class="nt">ubuntu-xfce-vnc</span><span class="p">:</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5"></a><span class="w">        </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">xfce</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6"></a><span class="w">        </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">imlala/ubuntu-xfce-vnc-novnc:latest</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7"></a><span class="w">        </span><span class="nt">shm_size</span><span class="p">:</span><span class="w"> </span><span class="s">"2gb"</span><span class="w">  </span><span class="c1"># 防止高分辨率下Chromium崩溃,如果内存足够也可以加大一点点</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8"></a><span class="w">        </span><span class="nt">ports</span><span class="p">:</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9"></a><span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5900:5900</span><span class="w">   </span><span class="c1"># TigerVNC的服务端口（保证端口是没被占用的，冒号右边的端口不能改，左边的可以改）</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10"></a><span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">6080:6080</span><span class="w">   </span><span class="c1"># noVNC的服务端口，注意事项同上</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11"></a><span class="w">        </span><span class="nt">environment</span><span class="p">:</span><span class="w"> </span>
+<a id="__codelineno-5-12" name="__codelineno-5-12"></a><span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">VNC_PASSWD=PAS3WorD</span><span class="w">    </span><span class="c1"># 改成你自己想要的密码</span>
+<a id="__codelineno-5-13" name="__codelineno-5-13"></a><span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">GEOMETRY=1280x720</span><span class="w">      </span><span class="c1"># 屏幕分辨率，800×600/1024×768诸如此类的可自己调整</span>
+<a id="__codelineno-5-14" name="__codelineno-5-14"></a><span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">DEPTH=24</span><span class="w">               </span><span class="c1"># 颜色位数16/24/32可用，越高画面越细腻，但网络不好的也会更卡</span>
+<a id="__codelineno-5-15" name="__codelineno-5-15"></a><span class="w">        </span><span class="nt">volumes</span><span class="p">:</span><span class="w"> </span>
+<a id="__codelineno-5-16" name="__codelineno-5-16"></a><span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Downloads:/root/Downloads</span><span class="w">  </span><span class="c1"># Chromium/Deluge/qBittorrent/Transmission下载的文件默认保存位置都是root/Downloads下</span>
+<a id="__codelineno-5-17" name="__codelineno-5-17"></a><span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Documents:/root/Documents</span><span class="w">  </span><span class="c1"># 映射一些其他目录</span>
+<a id="__codelineno-5-18" name="__codelineno-5-18"></a><span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Pictures:/root/Pictures</span>
+<a id="__codelineno-5-19" name="__codelineno-5-19"></a><span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Videos:/root/Videos</span>
+<a id="__codelineno-5-20" name="__codelineno-5-20"></a><span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./Music:/root/Music</span>
+<a id="__codelineno-5-21" name="__codelineno-5-21"></a><span class="w">        </span><span class="nt">restart</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">unless-stopped</span>
 </code></pre></div></td></tr></tbody></table></div><p></p>
 <p>启动<br>
 </p><div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Bash</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-6-1">1</a></span>

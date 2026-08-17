@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Base64 Tool</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --panel: #fafafa;
+    --border: #e4e4e7;
+    --text: #18181b;
+    --muted: #71717a;
+    --accent: #77bbdd;
+    --accent-fg: #ffffff;
+    --palette-1: #77bbdd;
+    --palette-2: #ff8899;
+    --palette-3: #77dd77;
+    --palette-4: #ffdd88;
+    --palette-5: #7777aa;
+    --mono: "SF Mono", "Cascadia Code", "JetBrains Mono", "Consolas", "Monaco",
+      "Roboto Mono", "DejaVu Sans Mono", monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+      "Microsoft YaHei", sans-serif;
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .tool-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel);
+  }
+  .tool-header .label { color: var(--muted); font-weight: 600; }
+
+  .seg {
+    display: inline-flex;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .seg button {
+    border: none;
+    background: transparent;
+    color: var(--text);
+    padding: 6px 14px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  .seg button + button { border-left: 1px solid var(--border); }
+  .seg button.active { background: var(--accent); color: var(--accent-fg); }
+
+  .mygo-button {
+    border: 1px solid var(--border);
+    background: #fff;
+    color: var(--text);
+    border-radius: 6px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  .mygo-button:hover { background: #f4f4f5; }
+  .mygo-button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+  .mygo-button.primary:hover { filter: brightness(1.05); }
+
+  .btn-group { display: inline-flex; gap: 8px; margin-left: auto; }
+
+  .main { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+  .pane { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+  .pane + .pane { border-top: 1px solid var(--border); }
+  .pane-tip {
+    padding: 6px 16px;
+    font-size: 12px;
+    color: var(--muted);
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    letter-spacing: 0.02em;
+  }
+  textarea.input-text {
+    flex: 1;
+    width: 100%;
+    border: none;
+    resize: none;
+    padding: 12px 16px;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text);
+    background: #fff;
+    white-space: pre;
+    overflow: auto;
+  }
+  textarea.input-text:focus { outline: none; }
+  #output { background: #fcfcfc; }
+
+  #toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: #18181b;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  #toast.error { background: var(--palette-2); color: var(--accent-fg); }
+</style>
+</head>
+<body>
+  <div class="tool-header">
+    <span class="label">Mode:</span>
+    <div class="seg" id="modeSwitch">
+      <button data-mode="encode" class="active">Text → Base64</button>
+      <button data-mode="decode">Base64 → Text</button>
+    </div>
+
+    <div class="btn-group">
+      <button class="mygo-button" id="btnFile" title="Browse file to Base64">🖼️ File → Base64</button>
+      <button class="mygo-button" id="btnPaste" title="Paste">Paste</button>
+      <button class="mygo-button" id="btnCopy" title="Copy result">Copy</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="pane">
+      <div class="pane-tip" id="inputTip">Text Input</div>
+      <textarea class="input-text" id="input" placeholder="Text Input" spellcheck="false"></textarea>
+    </div>
+    <div class="pane">
+      <div class="pane-tip" id="outputTip">Base64 Output</div>
+      <textarea class="input-text" id="output" placeholder="Output" readonly spellcheck="false"></textarea>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+<script>
+  // --- base64 core (ported from window.$qlUtils.base64Utils) ---
+  const btoa_utf8 = (str) => {
+    const utf8Bytes = encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (match, p1) =>
+      String.fromCharCode('0x' + p1),
+    );
+    return btoa(utf8Bytes);
+  };
+
+  const atob_utf8 = (str) => {
+    const utf8Bytes = atob(str);
+    try {
+      return decodeURIComponent(
+        utf8Bytes
+          .split('')
+          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join(''),
+      );
+    } catch (e) {
+      console.error('Decoding failed', e);
+      return null;
+    }
+  };
+
+  function chooseFileToBase64({ accept = '*' } = {}) {
+    return new Promise((resolve, reject) => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = accept;
+      input.onchange = function (e) {
+        const files = e.target.files;
+        if (files.length === 0) {
+          reject('No file selected!');
+          return;
+        }
+        const file = files[0];
+        const reader = new FileReader();
+        reader.onload = function (event) {
+          resolve(event.target.result);
+        };
+        reader.onerror = function (event) {
+          reject(event.target.error);
+        };
+        reader.readAsDataURL(file);
+      };
+      input.click();
+    });
+  }
+
+  // --- state + DOM ---
+  const $ = (id) => document.getElementById(id);
+  const input = $('input');
+  const output = $('output');
+  const modeSwitch = $('modeSwitch');
+  const inputTip = $('inputTip');
+  const outputTip = $('outputTip');
+
+  let mMode = 'encode';
+
+  function updateFormat() {
+    if (mMode === 'encode') {
+      inputTip.textContent = 'Text Input';
+      outputTip.textContent = 'Base64 Output';
+      output.value = input.value ? btoa_utf8(input.value) : '';
+    } else {
+      inputTip.textContent = 'Base64 Input';
+      outputTip.textContent = 'Text Output';
+      if (!input.value) {
+        output.value = '';
+        return;
+      }
+      const decoded = atob_utf8(input.value.trim());
+      output.value = decoded === null ? '❌ Decoding failed: Invalid Base64 or encoding.' : decoded;
+    }
+  }
+
+  modeSwitch.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    mMode = btn.dataset.mode;
+    [...modeSwitch.children].forEach((b) => b.classList.toggle('active', b === btn));
+    updateFormat();
+  });
+
+  input.addEventListener('input', updateFormat);
+
+  // --- clipboard + toast ---
+  function toast(msg, isError = false) {
+    const t = $('toast');
+    t.textContent = msg;
+    t.classList.toggle('error', isError);
+    t.classList.add('show');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => t.classList.remove('show'), 1500);
+  }
+
+  async function writeClipboard(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast('Copied');
+    } catch (err) {
+      toast('Copy failed — select and copy manually', true);
+    }
+  }
+
+  async function handlePaste() {
+    try {
+      input.value = await navigator.clipboard.readText();
+      updateFormat();
+    } catch (err) {
+      toast('Clipboard read blocked — paste manually', true);
+    }
+  }
+
+  async function handleFile() {
+    try {
+      const dataUrl = await chooseFileToBase64();
+      output.value = dataUrl;
+      outputTip.textContent = 'File Base64 (data URL)';
+      toast('File loaded');
+    } catch (err) {
+      if (err !== 'No file selected!') toast('File load failed', true);
+    }
+  }
+
+  $('btnCopy').addEventListener('click', () => writeClipboard(output.value));
+  $('btnPaste').addEventListener('click', handlePaste);
+  $('btnFile').addEventListener('click', handleFile);
+
+  updateFormat();
+</script>
+</body>
+</html>

@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Image Parser</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --panel: #fafafa;
+    --border: #e4e4e7;
+    --text: #18181b;
+    --muted: #71717a;
+    --accent: #77bbdd;
+    --accent-fg: #ffffff;
+    --palette-1: #77bbdd;
+    --palette-2: #ff8899;
+    --palette-3: #77dd77;
+    --palette-4: #ffdd88;
+    --palette-5: #7777aa;
+    --mono: "SF Mono", "Cascadia Code", "JetBrains Mono", "Consolas", "Monaco",
+      "Roboto Mono", "DejaVu Sans Mono", monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+      "Microsoft YaHei", sans-serif;
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .tool-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel);
+  }
+  .tool-header .label { color: var(--muted); font-weight: 600; }
+  .tool-header .title { font-weight: 700; }
+
+  .mygo-button {
+    border: 1px solid var(--border);
+    background: #fff;
+    color: var(--text);
+    border-radius: 6px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  .mygo-button:hover { background: #f4f4f5; }
+  .mygo-button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+  .mygo-button.primary:hover { filter: brightness(1.05); }
+
+  .btn-group { display: inline-flex; gap: 8px; margin-left: auto; }
+
+  .main { flex: 1; display: flex; flex-direction: column; min-height: 0; overflow: auto; }
+  .pane-tip {
+    padding: 6px 16px;
+    font-size: 12px;
+    color: var(--muted);
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    letter-spacing: 0.02em;
+  }
+
+  /* drop zone */
+  .dropzone {
+    margin: 16px;
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 40px 16px;
+    text-align: center;
+    color: var(--muted);
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    background: #fff;
+  }
+  .dropzone:hover { background: #f7fbfd; }
+  .dropzone.dragover { border-color: var(--accent); background: #eef7fb; color: var(--text); }
+  .dropzone .big { font-size: 2rem; margin-bottom: 8px; }
+  .dropzone .hint { font-size: 12px; margin-top: 6px; }
+
+  /* result */
+  .result { padding: 16px; display: none; flex-direction: column; gap: 16px; }
+  .result.show { display: flex; }
+
+  .preview-wrap {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background:
+      linear-gradient(45deg, #eee 25%, transparent 25%),
+      linear-gradient(-45deg, #eee 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, #eee 75%),
+      linear-gradient(-45deg, transparent 75%, #eee 75%);
+    background-size: 18px 18px;
+    background-position: 0 0, 0 9px, 9px -9px, -9px 0;
+    padding: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+  .preview-wrap img { max-width: 100%; max-height: 360px; border-radius: 4px; display: block; }
+
+  .stats { margin-top: 14px; display: grid; gap: 8px; max-width: 500px; margin: 0 auto; }
+  .stat-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 10px;
+    background: var(--panel);
+  }
+  .stat-row .k { color: var(--muted); min-width: 150px; font-weight: 600; }
+  .stat-row .v { font-family: var(--mono); font-size: 13px; flex: 1; word-break: break-all; }
+  .stat-row .copy {
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 6px;
+    padding: 4px 10px;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--text);
+    white-space: nowrap;
+  }
+  .stat-row .copy:hover { background: #f4f4f5; }
+
+  .base64-section { margin-top: 14px; }
+  .base64-section .pane-tip { padding-left: 0; border: none; background: transparent; }
+  textarea.input-text {
+    width: 100%;
+    height: 160px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    resize: vertical;
+    padding: 12px 16px;
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--text);
+    background: #fcfcfc;
+    white-space: pre;
+    overflow: auto;
+  }
+  textarea.input-text:focus { outline: none; border-color: var(--accent); }
+
+  #toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: #18181b;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  #toast.error { background: var(--palette-2); color: var(--accent-fg); }
+</style>
+</head>
+<body>
+  <div class="tool-header">
+    <span class="title">🖼️ Image Parser</span>
+    <span class="label">· select / drop / paste</span>
+
+    <div class="btn-group">
+      <button class="mygo-button" id="btnColor" title="Pick a color from screen">🎨 Color Picker</button>
+      <button class="mygo-button primary" id="btnFile" title="Select image file">📂 Select File</button>
+      <button class="mygo-button" id="btnPaste" title="Paste image from clipboard">📋 Paste</button>
+      <button class="mygo-button" id="btnClear" title="Clear">Clear</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="dropzone" id="dropzone">
+      <div class="big">⬇️</div>
+      <div>Drop an image here, click to choose, or press <strong>Ctrl/⌘ + V</strong> to paste</div>
+      <div class="hint">Supported: PNG · JPG · GIF · WEBP · BMP · SVG</div>
+    </div>
+
+    <div class="result" id="result">
+      <div class="preview-wrap">
+        <img id="preview" alt="preview" />
+      </div>
+
+      <div class="stats">
+        <div class="stat-row">
+          <span class="k">Size</span>
+          <span class="v" id="vSize">—</span>
+          <button class="copy" data-copy="size">Copy</button>
+        </div>
+        <div class="stat-row">
+          <span class="k">Ratio (H/W)</span>
+          <span class="v" id="vRatio">—</span>
+          <button class="copy" data-copy="ratio">Copy</button>
+        </div>
+        <div class="stat-row">
+          <span class="k">AspectRatio (W/H)</span>
+          <span class="v" id="vAspect">—</span>
+          <button class="copy" data-copy="aspect">Copy</button>
+        </div>
+        <div class="stat-row">
+          <span class="k">Image Base64</span>
+          <span class="v" id="vBase64">—</span>
+          <button class="copy" id="btnCopyB64">Copy</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+<script>
+  // --- helpers (ported from the provided reference) ---
+  // Reads a Blob/File into a base64 data URL.
+  function blobToBase64(blob) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  // Returns a base64 data URL from a (possibly cross-origin) image URL.
+  async function getBase64FromImageUrl(imageUrl) {
+    try {
+      const response = await fetch(imageUrl);
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const blob = await response.blob();
+      return await blobToBase64(blob);
+    } catch (error) {
+      console.error('Error getting base64 from image:', error);
+      return null;
+    }
+  }
+
+  // Pastes an image from the clipboard, returns a blob URL.
+  async function pasteImage() {
+    const clipboardData = await navigator.clipboard.read();
+    const item = clipboardData.find((i) => i.types.find((t) => /^image/i.test(t)));
+    if (!item) throw new Error('No image found in clipboard');
+    const type = item.types.find((t) => /^image/i.test(t)) || 'image/png';
+    const blob = await item.getType(type);
+    return blob;
+  }
+
+  // --- state + DOM ---
+  const $ = (id) => document.getElementById(id);
+  const dropzone = $('dropzone');
+  const result = $('result');
+  const preview = $('preview');
+  const vSize = $('vSize');
+  const vRatio = $('vRatio');
+  const vAspect = $('vAspect');
+  const vBase64 = $('vBase64');
+
+  let current = {
+    size: '',
+    ratio: '',
+    aspect: '',
+    base64: '',
+  };
+
+  function round(n, d = 4) {
+    return Number(n.toFixed(d));
+  }
+
+  async function loadImageBlob(blob, name) {
+    if (!blob || !/^image\//.test(blob.type)) {
+      toast('Not a valid image file', true);
+      return;
+    }
+    // base64 data URL
+    const dataUrl = await blobToBase64(blob).catch(() => null);
+    if (!dataUrl) {
+      toast('Failed to read image', true);
+      return;
+    }
+    // load into an <img> to get natural dimensions
+    const img = new Image();
+    img.onload = () => {
+      const w = img.naturalWidth;
+      const h = img.naturalHeight;
+      const ratio = h / w;       // Ratio (H/W)
+      const aspect = w / h;      // AspectRatio (W/H)
+
+      current.size = `${w}x${h}`;
+      current.ratio = String(round(ratio));
+      current.aspect = String(round(aspect));
+      current.base64 = dataUrl;
+
+      vSize.textContent = current.size;
+      vRatio.textContent = current.ratio;
+      vAspect.textContent = current.aspect;
+      vBase64.textContent = `data:${blob.type};base64,... (${dataUrl.length} chars)`;
+      preview.src = dataUrl;
+      result.classList.add('show');
+      dropzone.style.display = 'none';
+      toast('Image loaded');
+    };
+    img.onerror = () => toast('Broken image', true);
+    img.src = dataUrl;
+  }
+
+  // --- file input ---
+  function chooseFile() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = (e) => {
+      const files = e.target.files;
+      if (files.length === 0) return;
+      loadImageBlob(files[0], files[0].name);
+    };
+    input.click();
+  }
+
+  // --- toast + clipboard ---
+  function toast(msg, isError = false) {
+    const t = $('toast');
+    t.textContent = msg;
+    t.classList.toggle('error', isError);
+    t.classList.add('show');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => t.classList.remove('show'), 1500);
+  }
+
+  async function writeClipboard(text, showValue = false) {
+    try {
+      await navigator.clipboard.writeText(text);
+      if (showValue) {
+        console.info(text)
+      }
+      toast('Copied' + (showValue?(': '+text):''));
+    } catch (err) {
+      toast('Copy failed — select and copy manually', true);
+    }
+  }
+
+  // --- events ---
+  dropzone.addEventListener('click', chooseFile);
+  $('btnFile').addEventListener('click', chooseFile);
+
+  // --- color picker (window.EyeDropper) ---
+  $('btnColor').addEventListener('click', async () => {
+    if ('EyeDropper' in window) {
+      try {
+        const eyeDropper = new window.EyeDropper();
+        const res = await eyeDropper.open({});
+        const { sRGBHex } = res;
+        await writeClipboard(sRGBHex,true);
+      } catch (err) {
+        // user cancelled (AbortError) — ignore
+      }
+    } else {
+      toast('window.EyeDropper is not supported', true);
+    }
+  });
+
+  dropzone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropzone.classList.add('dragover');
+  });
+  dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+  dropzone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropzone.classList.remove('dragover');
+    const file = e.dataTransfer.files && e.dataTransfer.files[0];
+    if (file) loadImageBlob(file, file.name);
+    else toast('No image found in drop', true);
+  });
+
+  // paste anywhere (Ctrl/⌘ + V)
+  window.addEventListener('paste', async (e) => {
+    const items = (e.clipboardData || window.clipboardData)?.items;
+    if (items) {
+      for (const it of items) {
+        if (it.type && it.type.startsWith('image/')) {
+          e.preventDefault();
+          const blob = it.getAsFile();
+          loadImageBlob(blob, 'pasted-image');
+          return;
+        }
+      }
+    }
+  });
+
+  $('btnPaste').addEventListener('click', async () => {
+    try {
+      const blob = await pasteImage();
+      loadImageBlob(blob, 'pasted-image');
+    } catch (err) {
+      toast('Clipboard read blocked — use Ctrl/⌘+V or drop', true);
+    }
+  });
+
+  $('btnClear').addEventListener('click', () => {
+    result.classList.remove('show');
+    dropzone.style.display = '';
+    preview.src = '';
+    vBase64.textContent = '—';
+    vSize.textContent = '—';
+    vRatio.textContent = '—';
+    vAspect.textContent = '—';
+    current = { size: '', ratio: '', aspect: '', base64: '' };
+  });
+
+  // copy buttons
+  document.querySelectorAll('.copy').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.copy;
+      const map = { size: current.size, ratio: current.ratio, aspect: current.aspect };
+      if (map[key]) writeClipboard(map[key]);
+    });
+  });
+  $('btnCopyB64').addEventListener('click', () => {
+    if (current.base64) writeClipboard(current.base64);
+  });
+</script>
+</body>
+</html>
