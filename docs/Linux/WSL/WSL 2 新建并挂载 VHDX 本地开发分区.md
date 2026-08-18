@@ -51,6 +51,7 @@ wsl 开机自动挂载
 ```shell
 # 查看UUID
 sudo blkid /dev/sdd
+# 记下 UUID
 # /dev/sde: UUID="bda008e8-d550-4647-9fc5-6c9742883c7b" BLOCK_SIZE="4096" TYPE="ext4"
 
 # 修改 `/etc/fstab` 文件
@@ -70,7 +71,7 @@ ls /mnt/dev-drive/
 
 Windows 自动挂载脚本
 
-`mount.ps1`
+创建 `D:\Projects\wsl\mount.ps1`
 
 ```powershell
 $vhdxPath = "D:\Projects\wsl\dev_drive.vhdx"
@@ -89,9 +90,15 @@ if (Test-Path $vhdxPath) {
 开机自动执行挂载（计划任务）以管理员权限执行：
 
 ```powershell
+# 1. 创建 Action
 $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoProfile -WindowStyle Hidden -File `"D:\Projects\wsl\mount.ps1`""
-$trigger = New-ScheduledTaskTrigger -AtLogOn -User "$env:USERDOMAIN\$env:USERNAME" -Delay (New-TimeSpan -Seconds 6)
+# 2. 创建 Trigger（去掉不存在的 -Delay 参数）
+$trigger = New-ScheduledTaskTrigger -AtLogOn -User "$env:USERDOMAIN\$env:USERNAME"
+# 3. 设置固定延迟（ISO 8601 格式：PT6S = 6秒，PT1M = 1分钟）
+$trigger.Delay = 'PT6S'
+# 4. 创建 Principal
 $principal = New-ScheduledTaskPrincipal -UserId "$env:USERDOMAIN\$env:USERNAME" -LogonType Interactive -RunLevel Highest
+# 5. 注册任务
 Register-ScheduledTask -TaskName "WSL Mount dev-drive" -Action $action -Trigger $trigger -Principal $principal -Description "Auto mount WSL dev-drive when startup"
 
 # 验证任务已创建
