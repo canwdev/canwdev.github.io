@@ -15,7 +15,7 @@
 - Hyper-V
   - [[Hyper-V 固定虚拟机网络 IP 地址 配网指南]]
 - Windows on ARM
-  - [[LG G8X 刷机]]
+  - [[LG G8X 刷机（旧）]]
   - [[一加 6T 刷 Win11ARM 指南]]
   - [[Windows 设备如何在使用 Android 手机 USB 共享上网的情况下，在局域网进行远程桌面连接(RDP)]]
 - Windows 配置
