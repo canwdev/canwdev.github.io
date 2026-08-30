@@ -5329,6 +5329,45 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="2. 备份数据">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#备份内置存储" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        备份内置存储
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#备份-termux" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        备份 Termux
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#备份必要分区" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        备份必要分区
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -6856,6 +6895,45 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="2. 备份数据">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#备份内置存储" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        备份内置存储
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#备份-termux" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        备份 Termux
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#备份必要分区" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        备份必要分区
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -7006,28 +7084,126 @@
 <li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled=""><span class="task-list-indicator"></span></label> 备份应用程序和数据（钛备份或用 X-plore 导出 apk）</li>
 <li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled=""><span class="task-list-indicator"></span></label> 备份必要分区</li>
 </ul>
-<p>备份内置存储</p>
+<h3 id="备份内置存储">备份内置存储<a class="headerlink" href="#备份内置存储" title="Permanent link">¶</a></h3>
 <div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Bash</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1"></a>tar<span class="w"> </span>-czf<span class="w"> </span>~/storage/ext_sd/backup_<span class="k">$(</span>date<span class="w"> </span>+%Y%m%d_%H%M%S<span class="k">)</span>.tar.gz<span class="w"> </span>-C<span class="w"> </span>/sdcard<span class="w"> </span>Download<span class="w"> </span>Documents<span class="w"> </span>Pictures<span class="w"> </span>Music<span class="w"> </span>Movies<span class="w"> </span>DCIM<span class="w"> </span><span class="s2">"Mindows助手"</span>
 </code></pre></div></td></tr></tbody></table></div>
-<p>备份 Termux</p>
+<h3 id="备份-termux">备份 Termux<a class="headerlink" href="#备份-termux" title="Permanent link">¶</a></h3>
+<p><a href="../../Linux/Termux%20%E9%85%8D%E7%BD%AE%E7%AC%94%E8%AE%B0/#备份与恢复">Termux 配置笔记#备份与恢复</a></p>
+<h3 id="备份必要分区">备份必要分区<a class="headerlink" href="#备份必要分区" title="Permanent link">¶</a></h3>
 <div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Bash</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-1-1">1</a></span>
 <span class="normal"><a href="#__codelineno-1-2">2</a></span>
 <span class="normal"><a href="#__codelineno-1-3">3</a></span>
-<span class="normal"><a href="#__codelineno-1-4">4</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1"></a><span class="c1"># 备份</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2"></a>termux-backup<span class="w"> </span>~/storage/ext_sd/termux_backup_<span class="k">$(</span>date<span class="w"> </span>+%Y%m%d_%H%M%S<span class="k">)</span>.tar.gz
-<a id="__codelineno-1-3" name="__codelineno-1-3"></a><span class="c1"># 还原</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4"></a>termux-restore<span class="w"> </span>~/storage/ext_sd/termux_backup_YYYYMMDD_HHMMSS.tar.gz
+<span class="normal"><a href="#__codelineno-1-4">4</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1"></a>su
+<a id="__codelineno-1-2" name="__codelineno-1-2"></a>ls<span class="w"> </span>-l<span class="w"> </span>/dev/block/by-name/
+<a id="__codelineno-1-3" name="__codelineno-1-3"></a>cat<span class="w"> </span>/proc/partitions
+<a id="__codelineno-1-4" name="__codelineno-1-4"></a>df<span class="w"> </span>-h
 </code></pre></div></td></tr></tbody></table></div>
-<p>备份必要分区</p>
-<div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Bash</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-2-1">1</a></span>
-<span class="normal"><a href="#__codelineno-2-2">2</a></span>
-<span class="normal"><a href="#__codelineno-2-3">3</a></span>
-<span class="normal"><a href="#__codelineno-2-4">4</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1"></a>su
-<a id="__codelineno-2-2" name="__codelineno-2-2"></a>ls<span class="w"> </span>-l<span class="w"> </span>/dev/block/by-name/
-<a id="__codelineno-2-3" name="__codelineno-2-3"></a>cat<span class="w"> </span>/proc/partitions
-<a id="__codelineno-2-4" name="__codelineno-2-4"></a>df<span class="w"> </span>-h
+<div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Bash</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-2-1"> 1</a></span>
+<span class="normal"><a href="#__codelineno-2-2"> 2</a></span>
+<span class="normal"><a href="#__codelineno-2-3"> 3</a></span>
+<span class="normal"><a href="#__codelineno-2-4"> 4</a></span>
+<span class="normal"><a href="#__codelineno-2-5"> 5</a></span>
+<span class="normal"><a href="#__codelineno-2-6"> 6</a></span>
+<span class="normal"><a href="#__codelineno-2-7"> 7</a></span>
+<span class="normal"><a href="#__codelineno-2-8"> 8</a></span>
+<span class="normal"><a href="#__codelineno-2-9"> 9</a></span>
+<span class="normal"><a href="#__codelineno-2-10">10</a></span>
+<span class="normal"><a href="#__codelineno-2-11">11</a></span>
+<span class="normal"><a href="#__codelineno-2-12">12</a></span>
+<span class="normal"><a href="#__codelineno-2-13">13</a></span>
+<span class="normal"><a href="#__codelineno-2-14">14</a></span>
+<span class="normal"><a href="#__codelineno-2-15">15</a></span>
+<span class="normal"><a href="#__codelineno-2-16">16</a></span>
+<span class="normal"><a href="#__codelineno-2-17">17</a></span>
+<span class="normal"><a href="#__codelineno-2-18">18</a></span>
+<span class="normal"><a href="#__codelineno-2-19">19</a></span>
+<span class="normal"><a href="#__codelineno-2-20">20</a></span>
+<span class="normal"><a href="#__codelineno-2-21">21</a></span>
+<span class="normal"><a href="#__codelineno-2-22">22</a></span>
+<span class="normal"><a href="#__codelineno-2-23">23</a></span>
+<span class="normal"><a href="#__codelineno-2-24">24</a></span>
+<span class="normal"><a href="#__codelineno-2-25">25</a></span>
+<span class="normal"><a href="#__codelineno-2-26">26</a></span>
+<span class="normal"><a href="#__codelineno-2-27">27</a></span>
+<span class="normal"><a href="#__codelineno-2-28">28</a></span>
+<span class="normal"><a href="#__codelineno-2-29">29</a></span>
+<span class="normal"><a href="#__codelineno-2-30">30</a></span>
+<span class="normal"><a href="#__codelineno-2-31">31</a></span>
+<span class="normal"><a href="#__codelineno-2-32">32</a></span>
+<span class="normal"><a href="#__codelineno-2-33">33</a></span>
+<span class="normal"><a href="#__codelineno-2-34">34</a></span>
+<span class="normal"><a href="#__codelineno-2-35">35</a></span>
+<span class="normal"><a href="#__codelineno-2-36">36</a></span>
+<span class="normal"><a href="#__codelineno-2-37">37</a></span>
+<span class="normal"><a href="#__codelineno-2-38">38</a></span>
+<span class="normal"><a href="#__codelineno-2-39">39</a></span>
+<span class="normal"><a href="#__codelineno-2-40">40</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1"></a>su
+<a id="__codelineno-2-2" name="__codelineno-2-2"></a><span class="nv">BACKUP_DIR</span><span class="o">=</span><span class="s2">"/mnt/media_rw/6C44-9EF1/essential_backup_</span><span class="k">$(</span>date<span class="w"> </span>+%Y%m%d_%H%M%S<span class="k">)</span><span class="s2">"</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3"></a>mkdir<span class="w"> </span>-p<span class="w"> </span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">"</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">"备份目录：</span><span class="nv">$BACKUP_DIR</span><span class="s2">"</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5"></a>
+<a id="__codelineno-2-6" name="__codelineno-2-6"></a><span class="c1"># ----- 必须备份（硬件校准/基带/安全） -----</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7"></a>dd<span class="w"> </span><span class="k">if</span><span class="o">=</span>/dev/block/by-name/persist<span class="w">    </span><span class="nv">of</span><span class="o">=</span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">/persist.img"</span><span class="w">    </span><span class="nv">bs</span><span class="o">=</span>4M
+<a id="__codelineno-2-8" name="__codelineno-2-8"></a>dd<span class="w"> </span><span class="k">if</span><span class="o">=</span>/dev/block/by-name/persdata<span class="w">   </span><span class="nv">of</span><span class="o">=</span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">/persdata.img"</span><span class="w">   </span><span class="nv">bs</span><span class="o">=</span>4M
+<a id="__codelineno-2-9" name="__codelineno-2-9"></a>dd<span class="w"> </span><span class="k">if</span><span class="o">=</span>/dev/block/by-name/modemst1<span class="w">   </span><span class="nv">of</span><span class="o">=</span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">/modemst1.img"</span><span class="w">   </span><span class="nv">bs</span><span class="o">=</span>4M
+<a id="__codelineno-2-10" name="__codelineno-2-10"></a>dd<span class="w"> </span><span class="k">if</span><span class="o">=</span>/dev/block/by-name/modemst2<span class="w">   </span><span class="nv">of</span><span class="o">=</span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">/modemst2.img"</span><span class="w">   </span><span class="nv">bs</span><span class="o">=</span>4M
+<a id="__codelineno-2-11" name="__codelineno-2-11"></a>dd<span class="w"> </span><span class="k">if</span><span class="o">=</span>/dev/block/by-name/fsg<span class="w">        </span><span class="nv">of</span><span class="o">=</span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">/fsg.img"</span><span class="w">        </span><span class="nv">bs</span><span class="o">=</span>4M
+<a id="__codelineno-2-12" name="__codelineno-2-12"></a>dd<span class="w"> </span><span class="k">if</span><span class="o">=</span>/dev/block/by-name/frp<span class="w">        </span><span class="nv">of</span><span class="o">=</span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">/frp.img"</span><span class="w">        </span><span class="nv">bs</span><span class="o">=</span>4M
+<a id="__codelineno-2-13" name="__codelineno-2-13"></a>
+<a id="__codelineno-2-14" name="__codelineno-2-14"></a><span class="c1"># ----- 建议备份（内核/设备树/引导/验证） -----</span>
+<a id="__codelineno-2-15" name="__codelineno-2-15"></a><span class="c1"># 当前活动槽位（默认为 _a，如需确认可运行 getprop ro.boot.slot_suffix）</span>
+<a id="__codelineno-2-16" name="__codelineno-2-16"></a>dd<span class="w"> </span><span class="k">if</span><span class="o">=</span>/dev/block/by-name/boot_a<span class="w">     </span><span class="nv">of</span><span class="o">=</span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">/boot_a.img"</span><span class="w">     </span><span class="nv">bs</span><span class="o">=</span>4M
+<a id="__codelineno-2-17" name="__codelineno-2-17"></a>dd<span class="w"> </span><span class="k">if</span><span class="o">=</span>/dev/block/by-name/dtbo_a<span class="w">     </span><span class="nv">of</span><span class="o">=</span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">/dtbo_a.img"</span><span class="w">     </span><span class="nv">bs</span><span class="o">=</span>4M
+<a id="__codelineno-2-18" name="__codelineno-2-18"></a>dd<span class="w"> </span><span class="k">if</span><span class="o">=</span>/dev/block/by-name/abl_a<span class="w">      </span><span class="nv">of</span><span class="o">=</span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">/abl_a.img"</span><span class="w">      </span><span class="nv">bs</span><span class="o">=</span>4M
+<a id="__codelineno-2-19" name="__codelineno-2-19"></a>dd<span class="w"> </span><span class="k">if</span><span class="o">=</span>/dev/block/by-name/vbmeta_a<span class="w">   </span><span class="nv">of</span><span class="o">=</span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">/vbmeta_a.img"</span><span class="w">   </span><span class="nv">bs</span><span class="o">=</span>4M
+<a id="__codelineno-2-20" name="__codelineno-2-20"></a>
+<a id="__codelineno-2-21" name="__codelineno-2-21"></a><span class="c1"># 备份备用槽位 _b（以防万一）</span>
+<a id="__codelineno-2-22" name="__codelineno-2-22"></a>dd<span class="w"> </span><span class="k">if</span><span class="o">=</span>/dev/block/by-name/boot_b<span class="w">     </span><span class="nv">of</span><span class="o">=</span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">/boot_b.img"</span><span class="w">     </span><span class="nv">bs</span><span class="o">=</span>4M
+<a id="__codelineno-2-23" name="__codelineno-2-23"></a>dd<span class="w"> </span><span class="k">if</span><span class="o">=</span>/dev/block/by-name/dtbo_b<span class="w">     </span><span class="nv">of</span><span class="o">=</span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">/dtbo_b.img"</span><span class="w">     </span><span class="nv">bs</span><span class="o">=</span>4M
+<a id="__codelineno-2-24" name="__codelineno-2-24"></a>dd<span class="w"> </span><span class="k">if</span><span class="o">=</span>/dev/block/by-name/abl_b<span class="w">      </span><span class="nv">of</span><span class="o">=</span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">/abl_b.img"</span><span class="w">      </span><span class="nv">bs</span><span class="o">=</span>4M
+<a id="__codelineno-2-25" name="__codelineno-2-25"></a>dd<span class="w"> </span><span class="k">if</span><span class="o">=</span>/dev/block/by-name/vbmeta_b<span class="w">   </span><span class="nv">of</span><span class="o">=</span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">/vbmeta_b.img"</span><span class="w">   </span><span class="nv">bs</span><span class="o">=</span>4M
+<a id="__codelineno-2-26" name="__codelineno-2-26"></a>
+<a id="__codelineno-2-27" name="__codelineno-2-27"></a><span class="c1"># ----- 备份分区布局信息（恢复参考） -----</span>
+<a id="__codelineno-2-28" name="__codelineno-2-28"></a>cat<span class="w"> </span>/proc/partitions<span class="w">                </span>&gt;<span class="w"> </span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">/partitions.txt"</span>
+<a id="__codelineno-2-29" name="__codelineno-2-29"></a>ls<span class="w"> </span>-l<span class="w"> </span>/dev/block/by-name/<span class="w">           </span>&gt;<span class="w"> </span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">/by-name.txt"</span>
+<a id="__codelineno-2-30" name="__codelineno-2-30"></a>df<span class="w"> </span>-h<span class="w">                               </span>&gt;<span class="w"> </span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">/df.txt"</span>
+<a id="__codelineno-2-31" name="__codelineno-2-31"></a>mount<span class="w">                               </span>&gt;<span class="w"> </span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">/mount.txt"</span>
+<a id="__codelineno-2-32" name="__codelineno-2-32"></a>getprop<span class="w"> </span>ro.boot.slot_suffix<span class="w">         </span>&gt;<span class="w"> </span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">/active_slot.txt"</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null
+<a id="__codelineno-2-33" name="__codelineno-2-33"></a>
+<a id="__codelineno-2-34" name="__codelineno-2-34"></a><span class="c1"># ----- 生成校验文件 -----</span>
+<a id="__codelineno-2-35" name="__codelineno-2-35"></a><span class="nb">cd</span><span class="w"> </span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">"</span>
+<a id="__codelineno-2-36" name="__codelineno-2-36"></a>md5sum<span class="w"> </span>*.img<span class="w"> </span>&gt;<span class="w"> </span>checksums.md5
+<a id="__codelineno-2-37" name="__codelineno-2-37"></a>
+<a id="__codelineno-2-38" name="__codelineno-2-38"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">"✅ 备份完成！"</span>
+<a id="__codelineno-2-39" name="__codelineno-2-39"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">"备份文件夹：</span><span class="nv">$BACKUP_DIR</span><span class="s2">"</span>
+<a id="__codelineno-2-40" name="__codelineno-2-40"></a>ls<span class="w"> </span>-lh<span class="w"> </span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">"</span>
 </code></pre></div></td></tr></tbody></table></div>
-<div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Bash</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-3-1"> 1</a></span>
+<h2 id="3-刷机">3. 刷机<a class="headerlink" href="#3-刷机" title="Permanent link">¶</a></h2>
+<h3 id="9008进入不了download-mode可尝试">9008（进入不了Download Mode可尝试）<a class="headerlink" href="#9008进入不了download-mode可尝试" title="Permanent link">¶</a></h3>
+<p>进入 9008 模式</p>
+<ol>
+<li>开机状态下，用 USB 线连接电脑，长按电源键和音量下键关机</li>
+<li>在关机黑屏的一瞬间（不要松开电源键和音量下键），快速连续按音量加键</li>
+<li>如果出现开机 Logo，则失败，重复第 1、2 步，多试几次一定能成功</li>
+<li>如果黑屏，且设备管理器中端口（COM）出现 9008 设备，则成功</li>
+</ol>
+<p>安装 QPST_2.7.496 和 Qualcomm USB Driver V1.0.exe</p>
+<p>网上搜索并下载9008救砖包如 <code>LGG8X_9008救砖包不刷基带_G850UM20j_00_OPEN_CA_OP_0416</code></p>
+<ul>
+<li>打开 QFIL</li>
+<li>选择设备</li>
+<li>在 Configuration -&gt; FireHose Configuration 中确保 Device Type 设为 UFS。</li>
+<li>选择 Flat Build</li>
+<li>Programmer Path：选择该文件夹下的 <code>firehose_ddr.elf</code> 。</li>
+<li>点击右下角 Load XML...：</li>
+<li>在弹出的第一个窗口，将 rawprogram0.xml 到 rawprogram6.xml 全选，点击打开。</li>
+<li>在弹出的第二个窗口，选择 patch0.xml（如果文件夹里有）或取消。</li>
+<li>点击 Download 按钮（没有二次确认），QFIL 会立即把所有分卷切片依次写入手机。</li>
+<li>刷完后同时按下按 <code>音量减和电源键</code> 重启。</li>
+</ul>
+<h3 id="lgup升级底包并解决-opid-mismatch">LGUP（升级底包）并解决 OPID mismatch<a class="headerlink" href="#lgup升级底包并解决-opid-mismatch" title="Permanent link">¶</a></h3>
+<p>如果出现 0x5319, OPID mismatch. TMO_US to OPEN_CA. ID Unlock first. [ERR : 0x2]，参考 <a href="https://xdaforums.com/t/tutorial-crossflash-bypass-opid-mismatched-error.4345963/">https://xdaforums.com/t/tutorial-crossflash-bypass-opid-mismatched-error.4345963/</a></p>
+<div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Text Only</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-3-1"> 1</a></span>
 <span class="normal"><a href="#__codelineno-3-2"> 2</a></span>
 <span class="normal"><a href="#__codelineno-3-3"> 3</a></span>
 <span class="normal"><a href="#__codelineno-3-4"> 4</a></span>
@@ -7066,197 +7242,92 @@
 <span class="normal"><a href="#__codelineno-3-37">37</a></span>
 <span class="normal"><a href="#__codelineno-3-38">38</a></span>
 <span class="normal"><a href="#__codelineno-3-39">39</a></span>
-<span class="normal"><a href="#__codelineno-3-40">40</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1"></a>su
-<a id="__codelineno-3-2" name="__codelineno-3-2"></a><span class="nv">BACKUP_DIR</span><span class="o">=</span><span class="s2">"/mnt/media_rw/6C44-9EF1/essential_backup_</span><span class="k">$(</span>date<span class="w"> </span>+%Y%m%d_%H%M%S<span class="k">)</span><span class="s2">"</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3"></a>mkdir<span class="w"> </span>-p<span class="w"> </span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">"</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">"备份目录：</span><span class="nv">$BACKUP_DIR</span><span class="s2">"</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5"></a>
-<a id="__codelineno-3-6" name="__codelineno-3-6"></a><span class="c1"># ----- 必须备份（硬件校准/基带/安全） -----</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7"></a>dd<span class="w"> </span><span class="k">if</span><span class="o">=</span>/dev/block/by-name/persist<span class="w">    </span><span class="nv">of</span><span class="o">=</span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">/persist.img"</span><span class="w">    </span><span class="nv">bs</span><span class="o">=</span>4M
-<a id="__codelineno-3-8" name="__codelineno-3-8"></a>dd<span class="w"> </span><span class="k">if</span><span class="o">=</span>/dev/block/by-name/persdata<span class="w">   </span><span class="nv">of</span><span class="o">=</span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">/persdata.img"</span><span class="w">   </span><span class="nv">bs</span><span class="o">=</span>4M
-<a id="__codelineno-3-9" name="__codelineno-3-9"></a>dd<span class="w"> </span><span class="k">if</span><span class="o">=</span>/dev/block/by-name/modemst1<span class="w">   </span><span class="nv">of</span><span class="o">=</span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">/modemst1.img"</span><span class="w">   </span><span class="nv">bs</span><span class="o">=</span>4M
-<a id="__codelineno-3-10" name="__codelineno-3-10"></a>dd<span class="w"> </span><span class="k">if</span><span class="o">=</span>/dev/block/by-name/modemst2<span class="w">   </span><span class="nv">of</span><span class="o">=</span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">/modemst2.img"</span><span class="w">   </span><span class="nv">bs</span><span class="o">=</span>4M
-<a id="__codelineno-3-11" name="__codelineno-3-11"></a>dd<span class="w"> </span><span class="k">if</span><span class="o">=</span>/dev/block/by-name/fsg<span class="w">        </span><span class="nv">of</span><span class="o">=</span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">/fsg.img"</span><span class="w">        </span><span class="nv">bs</span><span class="o">=</span>4M
-<a id="__codelineno-3-12" name="__codelineno-3-12"></a>dd<span class="w"> </span><span class="k">if</span><span class="o">=</span>/dev/block/by-name/frp<span class="w">        </span><span class="nv">of</span><span class="o">=</span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">/frp.img"</span><span class="w">        </span><span class="nv">bs</span><span class="o">=</span>4M
-<a id="__codelineno-3-13" name="__codelineno-3-13"></a>
-<a id="__codelineno-3-14" name="__codelineno-3-14"></a><span class="c1"># ----- 建议备份（内核/设备树/引导/验证） -----</span>
-<a id="__codelineno-3-15" name="__codelineno-3-15"></a><span class="c1"># 当前活动槽位（默认为 _a，如需确认可运行 getprop ro.boot.slot_suffix）</span>
-<a id="__codelineno-3-16" name="__codelineno-3-16"></a>dd<span class="w"> </span><span class="k">if</span><span class="o">=</span>/dev/block/by-name/boot_a<span class="w">     </span><span class="nv">of</span><span class="o">=</span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">/boot_a.img"</span><span class="w">     </span><span class="nv">bs</span><span class="o">=</span>4M
-<a id="__codelineno-3-17" name="__codelineno-3-17"></a>dd<span class="w"> </span><span class="k">if</span><span class="o">=</span>/dev/block/by-name/dtbo_a<span class="w">     </span><span class="nv">of</span><span class="o">=</span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">/dtbo_a.img"</span><span class="w">     </span><span class="nv">bs</span><span class="o">=</span>4M
-<a id="__codelineno-3-18" name="__codelineno-3-18"></a>dd<span class="w"> </span><span class="k">if</span><span class="o">=</span>/dev/block/by-name/abl_a<span class="w">      </span><span class="nv">of</span><span class="o">=</span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">/abl_a.img"</span><span class="w">      </span><span class="nv">bs</span><span class="o">=</span>4M
-<a id="__codelineno-3-19" name="__codelineno-3-19"></a>dd<span class="w"> </span><span class="k">if</span><span class="o">=</span>/dev/block/by-name/vbmeta_a<span class="w">   </span><span class="nv">of</span><span class="o">=</span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">/vbmeta_a.img"</span><span class="w">   </span><span class="nv">bs</span><span class="o">=</span>4M
-<a id="__codelineno-3-20" name="__codelineno-3-20"></a>
-<a id="__codelineno-3-21" name="__codelineno-3-21"></a><span class="c1"># 备份备用槽位 _b（以防万一）</span>
-<a id="__codelineno-3-22" name="__codelineno-3-22"></a>dd<span class="w"> </span><span class="k">if</span><span class="o">=</span>/dev/block/by-name/boot_b<span class="w">     </span><span class="nv">of</span><span class="o">=</span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">/boot_b.img"</span><span class="w">     </span><span class="nv">bs</span><span class="o">=</span>4M
-<a id="__codelineno-3-23" name="__codelineno-3-23"></a>dd<span class="w"> </span><span class="k">if</span><span class="o">=</span>/dev/block/by-name/dtbo_b<span class="w">     </span><span class="nv">of</span><span class="o">=</span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">/dtbo_b.img"</span><span class="w">     </span><span class="nv">bs</span><span class="o">=</span>4M
-<a id="__codelineno-3-24" name="__codelineno-3-24"></a>dd<span class="w"> </span><span class="k">if</span><span class="o">=</span>/dev/block/by-name/abl_b<span class="w">      </span><span class="nv">of</span><span class="o">=</span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">/abl_b.img"</span><span class="w">      </span><span class="nv">bs</span><span class="o">=</span>4M
-<a id="__codelineno-3-25" name="__codelineno-3-25"></a>dd<span class="w"> </span><span class="k">if</span><span class="o">=</span>/dev/block/by-name/vbmeta_b<span class="w">   </span><span class="nv">of</span><span class="o">=</span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">/vbmeta_b.img"</span><span class="w">   </span><span class="nv">bs</span><span class="o">=</span>4M
-<a id="__codelineno-3-26" name="__codelineno-3-26"></a>
-<a id="__codelineno-3-27" name="__codelineno-3-27"></a><span class="c1"># ----- 备份分区布局信息（恢复参考） -----</span>
-<a id="__codelineno-3-28" name="__codelineno-3-28"></a>cat<span class="w"> </span>/proc/partitions<span class="w">                </span>&gt;<span class="w"> </span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">/partitions.txt"</span>
-<a id="__codelineno-3-29" name="__codelineno-3-29"></a>ls<span class="w"> </span>-l<span class="w"> </span>/dev/block/by-name/<span class="w">           </span>&gt;<span class="w"> </span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">/by-name.txt"</span>
-<a id="__codelineno-3-30" name="__codelineno-3-30"></a>df<span class="w"> </span>-h<span class="w">                               </span>&gt;<span class="w"> </span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">/df.txt"</span>
-<a id="__codelineno-3-31" name="__codelineno-3-31"></a>mount<span class="w">                               </span>&gt;<span class="w"> </span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">/mount.txt"</span>
-<a id="__codelineno-3-32" name="__codelineno-3-32"></a>getprop<span class="w"> </span>ro.boot.slot_suffix<span class="w">         </span>&gt;<span class="w"> </span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">/active_slot.txt"</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null
+<span class="normal"><a href="#__codelineno-3-40">40</a></span>
+<span class="normal"><a href="#__codelineno-3-41">41</a></span>
+<span class="normal"><a href="#__codelineno-3-42">42</a></span>
+<span class="normal"><a href="#__codelineno-3-43">43</a></span>
+<span class="normal"><a href="#__codelineno-3-44">44</a></span>
+<span class="normal"><a href="#__codelineno-3-45">45</a></span>
+<span class="normal"><a href="#__codelineno-3-46">46</a></span>
+<span class="normal"><a href="#__codelineno-3-47">47</a></span>
+<span class="normal"><a href="#__codelineno-3-48">48</a></span>
+<span class="normal"><a href="#__codelineno-3-49">49</a></span>
+<span class="normal"><a href="#__codelineno-3-50">50</a></span>
+<span class="normal"><a href="#__codelineno-3-51">51</a></span>
+<span class="normal"><a href="#__codelineno-3-52">52</a></span>
+<span class="normal"><a href="#__codelineno-3-53">53</a></span>
+<span class="normal"><a href="#__codelineno-3-54">54</a></span>
+<span class="normal"><a href="#__codelineno-3-55">55</a></span>
+<span class="normal"><a href="#__codelineno-3-56">56</a></span>
+<span class="normal"><a href="#__codelineno-3-57">57</a></span>
+<span class="normal"><a href="#__codelineno-3-58">58</a></span>
+<span class="normal"><a href="#__codelineno-3-59">59</a></span>
+<span class="normal"><a href="#__codelineno-3-60">60</a></span>
+<span class="normal"><a href="#__codelineno-3-61">61</a></span>
+<span class="normal"><a href="#__codelineno-3-62">62</a></span>
+<span class="normal"><a href="#__codelineno-3-63">63</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1"></a>Steps
+<a id="__codelineno-3-2" name="__codelineno-3-2"></a>A)
+<a id="__codelineno-3-3" name="__codelineno-3-3"></a>1. Open QFIL.
+<a id="__codelineno-3-4" name="__codelineno-3-4"></a>2. Change "Storage Type" to UFS.
+<a id="__codelineno-3-5" name="__codelineno-3-5"></a>3. Select "Flat Build".
+<a id="__codelineno-3-6" name="__codelineno-3-6"></a>4. Browse for "LGE SM8150 Firehose" and pick it.
+<a id="__codelineno-3-7" name="__codelineno-3-7"></a>5. Now, connect the phone to PC and boot into EDL mode.
+<a id="__codelineno-3-8" name="__codelineno-3-8"></a>6. Open "Select Port" and select the phone, press OK.
+<a id="__codelineno-3-9" name="__codelineno-3-9"></a>7. In "Tools" open the "Partition Manager".
+<a id="__codelineno-3-10" name="__codelineno-3-10"></a>
+<a id="__codelineno-3-11" name="__codelineno-3-11"></a>B)
+<a id="__codelineno-3-12" name="__codelineno-3-12"></a>!!!BE CAREFUL TO DO EXACTLY AS THE INSTRUCTIONS SAY OR YOU WILL BRICK THE PHONE!!!
+<a id="__codelineno-3-13" name="__codelineno-3-13"></a>1. Make a backup of and erase these 7 partitions: FTM, Modem_A, Modem_B, SID_A, SID_B, OP_A, OP_B.
+<a id="__codelineno-3-14" name="__codelineno-3-14"></a>1.1. You have to left-click on a partition then right-click on it and select "Manage Partition Data".
+<a id="__codelineno-3-15" name="__codelineno-3-15"></a>1.2. In the pop-up window, you have 4 choices: I. Erase (to erase data on the partition), II. Read Data (to dump or back up the partition), III. Load Image (to restore the partition), IV. Close (to close the window).
+<a id="__codelineno-3-16" name="__codelineno-3-16"></a>1.3. First dump/back up the partition by choosing "Read Data" then Erase it.
+<a id="__codelineno-3-17" name="__codelineno-3-17"></a>2. Close the "Partition Manager" window.
+<a id="__codelineno-3-18" name="__codelineno-3-18"></a>3. Wait for 5 seconds then press Vol- and Power until it restarts.
+<a id="__codelineno-3-19" name="__codelineno-3-19"></a>3.1. Immediately after rebooting, Release the Vol- and Power buttons and press Vol+ to get into Download Mode.
+<a id="__codelineno-3-20" name="__codelineno-3-20"></a>Note: Do not let the phone to begin to boot! If it begins to boot, it may regenerate the SID and FTM partitions data and so you need to redo the whole step B.
+<a id="__codelineno-3-21" name="__codelineno-3-21"></a>
+<a id="__codelineno-3-22" name="__codelineno-3-22"></a>C)
+<a id="__codelineno-3-23" name="__codelineno-3-23"></a>1. Open LGUP.
+<a id="__codelineno-3-24" name="__codelineno-3-24"></a>2. Pick your favorite KDZ.
+<a id="__codelineno-3-25" name="__codelineno-3-25"></a>3. Select "PARTITION DL".
+<a id="__codelineno-3-26" name="__codelineno-3-26"></a>4. Press Start. And a pop-up window will appear. In this window you can select which partitions to be flashed.
+<a id="__codelineno-3-27" name="__codelineno-3-27"></a>5. Here, uncheck these partitions: SID_A and SID_B. It will make it able to bypass the OPID Mismatched Error.
+<a id="__codelineno-3-28" name="__codelineno-3-28"></a>6. If you are in Sprint or other platforms you will get the message whether to change the model or not. Of course you know what to do =)
+<a id="__codelineno-3-29" name="__codelineno-3-29"></a>
+<a id="__codelineno-3-30" name="__codelineno-3-30"></a>after completing the process it will boot up in some minutes and before starting the customization it will do one restart. just be patient.
+<a id="__codelineno-3-31" name="__codelineno-3-31"></a>
+<a id="__codelineno-3-32" name="__codelineno-3-32"></a>--- 译文： ---
 <a id="__codelineno-3-33" name="__codelineno-3-33"></a>
-<a id="__codelineno-3-34" name="__codelineno-3-34"></a><span class="c1"># ----- 生成校验文件 -----</span>
-<a id="__codelineno-3-35" name="__codelineno-3-35"></a><span class="nb">cd</span><span class="w"> </span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">"</span>
-<a id="__codelineno-3-36" name="__codelineno-3-36"></a>md5sum<span class="w"> </span>*.img<span class="w"> </span>&gt;<span class="w"> </span>checksums.md5
-<a id="__codelineno-3-37" name="__codelineno-3-37"></a>
-<a id="__codelineno-3-38" name="__codelineno-3-38"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">"✅ 备份完成！"</span>
-<a id="__codelineno-3-39" name="__codelineno-3-39"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">"备份文件夹：</span><span class="nv">$BACKUP_DIR</span><span class="s2">"</span>
-<a id="__codelineno-3-40" name="__codelineno-3-40"></a>ls<span class="w"> </span>-lh<span class="w"> </span><span class="s2">"</span><span class="nv">$BACKUP_DIR</span><span class="s2">"</span>
-</code></pre></div></td></tr></tbody></table></div>
-<h2 id="3-刷机">3. 刷机<a class="headerlink" href="#3-刷机" title="Permanent link">¶</a></h2>
-<h3 id="9008进入不了download-mode可尝试">9008（进入不了Download Mode可尝试）<a class="headerlink" href="#9008进入不了download-mode可尝试" title="Permanent link">¶</a></h3>
-<p>进入 9008 模式</p>
-<ol>
-<li>开机状态下，用 USB 线连接电脑，长按电源键和音量下键关机</li>
-<li>在关机黑屏的一瞬间（不要松开电源键和音量下键），快速连续按音量加键</li>
-<li>如果出现开机 Logo，则失败，重复第 1、2 步，多试几次一定能成功</li>
-<li>如果黑屏，且设备管理器中端口（COM）出现 9008 设备，则成功</li>
-</ol>
-<p>安装 QPST_2.7.496 和 Qualcomm USB Driver V1.0.exe</p>
-<p>网上搜索并下载9008救砖包如 <code>LGG8X_9008救砖包不刷基带_G850UM20j_00_OPEN_CA_OP_0416</code></p>
-<ul>
-<li>打开 QFIL</li>
-<li>选择设备</li>
-<li>在 Configuration -&gt; FireHose Configuration 中确保 Device Type 设为 UFS。</li>
-<li>选择 Flat Build</li>
-<li>Programmer Path：选择该文件夹下的 <code>firehose_ddr.elf</code> 。</li>
-<li>点击右下角 Load XML...：</li>
-<li>在弹出的第一个窗口，将 rawprogram0.xml 到 rawprogram6.xml 全选，点击打开。</li>
-<li>在弹出的第二个窗口，选择 patch0.xml（如果文件夹里有）或取消。</li>
-<li>点击 Download 按钮（没有二次确认），QFIL 会立即把所有分卷切片依次写入手机。</li>
-<li>刷完后同时按下按 <code>音量减和电源键</code> 重启。</li>
-</ul>
-<h3 id="lgup升级底包并解决-opid-mismatch">LGUP（升级底包）并解决 OPID mismatch<a class="headerlink" href="#lgup升级底包并解决-opid-mismatch" title="Permanent link">¶</a></h3>
-<p>如果出现 0x5319, OPID mismatch. TMO_US to OPEN_CA. ID Unlock first. [ERR : 0x2]，参考 <a href="https://xdaforums.com/t/tutorial-crossflash-bypass-opid-mismatched-error.4345963/">https://xdaforums.com/t/tutorial-crossflash-bypass-opid-mismatched-error.4345963/</a></p>
-<div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Text Only</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-4-1"> 1</a></span>
-<span class="normal"><a href="#__codelineno-4-2"> 2</a></span>
-<span class="normal"><a href="#__codelineno-4-3"> 3</a></span>
-<span class="normal"><a href="#__codelineno-4-4"> 4</a></span>
-<span class="normal"><a href="#__codelineno-4-5"> 5</a></span>
-<span class="normal"><a href="#__codelineno-4-6"> 6</a></span>
-<span class="normal"><a href="#__codelineno-4-7"> 7</a></span>
-<span class="normal"><a href="#__codelineno-4-8"> 8</a></span>
-<span class="normal"><a href="#__codelineno-4-9"> 9</a></span>
-<span class="normal"><a href="#__codelineno-4-10">10</a></span>
-<span class="normal"><a href="#__codelineno-4-11">11</a></span>
-<span class="normal"><a href="#__codelineno-4-12">12</a></span>
-<span class="normal"><a href="#__codelineno-4-13">13</a></span>
-<span class="normal"><a href="#__codelineno-4-14">14</a></span>
-<span class="normal"><a href="#__codelineno-4-15">15</a></span>
-<span class="normal"><a href="#__codelineno-4-16">16</a></span>
-<span class="normal"><a href="#__codelineno-4-17">17</a></span>
-<span class="normal"><a href="#__codelineno-4-18">18</a></span>
-<span class="normal"><a href="#__codelineno-4-19">19</a></span>
-<span class="normal"><a href="#__codelineno-4-20">20</a></span>
-<span class="normal"><a href="#__codelineno-4-21">21</a></span>
-<span class="normal"><a href="#__codelineno-4-22">22</a></span>
-<span class="normal"><a href="#__codelineno-4-23">23</a></span>
-<span class="normal"><a href="#__codelineno-4-24">24</a></span>
-<span class="normal"><a href="#__codelineno-4-25">25</a></span>
-<span class="normal"><a href="#__codelineno-4-26">26</a></span>
-<span class="normal"><a href="#__codelineno-4-27">27</a></span>
-<span class="normal"><a href="#__codelineno-4-28">28</a></span>
-<span class="normal"><a href="#__codelineno-4-29">29</a></span>
-<span class="normal"><a href="#__codelineno-4-30">30</a></span>
-<span class="normal"><a href="#__codelineno-4-31">31</a></span>
-<span class="normal"><a href="#__codelineno-4-32">32</a></span>
-<span class="normal"><a href="#__codelineno-4-33">33</a></span>
-<span class="normal"><a href="#__codelineno-4-34">34</a></span>
-<span class="normal"><a href="#__codelineno-4-35">35</a></span>
-<span class="normal"><a href="#__codelineno-4-36">36</a></span>
-<span class="normal"><a href="#__codelineno-4-37">37</a></span>
-<span class="normal"><a href="#__codelineno-4-38">38</a></span>
-<span class="normal"><a href="#__codelineno-4-39">39</a></span>
-<span class="normal"><a href="#__codelineno-4-40">40</a></span>
-<span class="normal"><a href="#__codelineno-4-41">41</a></span>
-<span class="normal"><a href="#__codelineno-4-42">42</a></span>
-<span class="normal"><a href="#__codelineno-4-43">43</a></span>
-<span class="normal"><a href="#__codelineno-4-44">44</a></span>
-<span class="normal"><a href="#__codelineno-4-45">45</a></span>
-<span class="normal"><a href="#__codelineno-4-46">46</a></span>
-<span class="normal"><a href="#__codelineno-4-47">47</a></span>
-<span class="normal"><a href="#__codelineno-4-48">48</a></span>
-<span class="normal"><a href="#__codelineno-4-49">49</a></span>
-<span class="normal"><a href="#__codelineno-4-50">50</a></span>
-<span class="normal"><a href="#__codelineno-4-51">51</a></span>
-<span class="normal"><a href="#__codelineno-4-52">52</a></span>
-<span class="normal"><a href="#__codelineno-4-53">53</a></span>
-<span class="normal"><a href="#__codelineno-4-54">54</a></span>
-<span class="normal"><a href="#__codelineno-4-55">55</a></span>
-<span class="normal"><a href="#__codelineno-4-56">56</a></span>
-<span class="normal"><a href="#__codelineno-4-57">57</a></span>
-<span class="normal"><a href="#__codelineno-4-58">58</a></span>
-<span class="normal"><a href="#__codelineno-4-59">59</a></span>
-<span class="normal"><a href="#__codelineno-4-60">60</a></span>
-<span class="normal"><a href="#__codelineno-4-61">61</a></span>
-<span class="normal"><a href="#__codelineno-4-62">62</a></span>
-<span class="normal"><a href="#__codelineno-4-63">63</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1"></a>Steps
-<a id="__codelineno-4-2" name="__codelineno-4-2"></a>A)
-<a id="__codelineno-4-3" name="__codelineno-4-3"></a>1. Open QFIL.
-<a id="__codelineno-4-4" name="__codelineno-4-4"></a>2. Change "Storage Type" to UFS.
-<a id="__codelineno-4-5" name="__codelineno-4-5"></a>3. Select "Flat Build".
-<a id="__codelineno-4-6" name="__codelineno-4-6"></a>4. Browse for "LGE SM8150 Firehose" and pick it.
-<a id="__codelineno-4-7" name="__codelineno-4-7"></a>5. Now, connect the phone to PC and boot into EDL mode.
-<a id="__codelineno-4-8" name="__codelineno-4-8"></a>6. Open "Select Port" and select the phone, press OK.
-<a id="__codelineno-4-9" name="__codelineno-4-9"></a>7. In "Tools" open the "Partition Manager".
-<a id="__codelineno-4-10" name="__codelineno-4-10"></a>
-<a id="__codelineno-4-11" name="__codelineno-4-11"></a>B)
-<a id="__codelineno-4-12" name="__codelineno-4-12"></a>!!!BE CAREFUL TO DO EXACTLY AS THE INSTRUCTIONS SAY OR YOU WILL BRICK THE PHONE!!!
-<a id="__codelineno-4-13" name="__codelineno-4-13"></a>1. Make a backup of and erase these 7 partitions: FTM, Modem_A, Modem_B, SID_A, SID_B, OP_A, OP_B.
-<a id="__codelineno-4-14" name="__codelineno-4-14"></a>1.1. You have to left-click on a partition then right-click on it and select "Manage Partition Data".
-<a id="__codelineno-4-15" name="__codelineno-4-15"></a>1.2. In the pop-up window, you have 4 choices: I. Erase (to erase data on the partition), II. Read Data (to dump or back up the partition), III. Load Image (to restore the partition), IV. Close (to close the window).
-<a id="__codelineno-4-16" name="__codelineno-4-16"></a>1.3. First dump/back up the partition by choosing "Read Data" then Erase it.
-<a id="__codelineno-4-17" name="__codelineno-4-17"></a>2. Close the "Partition Manager" window.
-<a id="__codelineno-4-18" name="__codelineno-4-18"></a>3. Wait for 5 seconds then press Vol- and Power until it restarts.
-<a id="__codelineno-4-19" name="__codelineno-4-19"></a>3.1. Immediately after rebooting, Release the Vol- and Power buttons and press Vol+ to get into Download Mode.
-<a id="__codelineno-4-20" name="__codelineno-4-20"></a>Note: Do not let the phone to begin to boot! If it begins to boot, it may regenerate the SID and FTM partitions data and so you need to redo the whole step B.
-<a id="__codelineno-4-21" name="__codelineno-4-21"></a>
-<a id="__codelineno-4-22" name="__codelineno-4-22"></a>C)
-<a id="__codelineno-4-23" name="__codelineno-4-23"></a>1. Open LGUP.
-<a id="__codelineno-4-24" name="__codelineno-4-24"></a>2. Pick your favorite KDZ.
-<a id="__codelineno-4-25" name="__codelineno-4-25"></a>3. Select "PARTITION DL".
-<a id="__codelineno-4-26" name="__codelineno-4-26"></a>4. Press Start. And a pop-up window will appear. In this window you can select which partitions to be flashed.
-<a id="__codelineno-4-27" name="__codelineno-4-27"></a>5. Here, uncheck these partitions: SID_A and SID_B. It will make it able to bypass the OPID Mismatched Error.
-<a id="__codelineno-4-28" name="__codelineno-4-28"></a>6. If you are in Sprint or other platforms you will get the message whether to change the model or not. Of course you know what to do =)
-<a id="__codelineno-4-29" name="__codelineno-4-29"></a>
-<a id="__codelineno-4-30" name="__codelineno-4-30"></a>after completing the process it will boot up in some minutes and before starting the customization it will do one restart. just be patient.
-<a id="__codelineno-4-31" name="__codelineno-4-31"></a>
-<a id="__codelineno-4-32" name="__codelineno-4-32"></a>--- 译文： ---
-<a id="__codelineno-4-33" name="__codelineno-4-33"></a>
-<a id="__codelineno-4-34" name="__codelineno-4-34"></a>步骤
-<a id="__codelineno-4-35" name="__codelineno-4-35"></a>A)
-<a id="__codelineno-4-36" name="__codelineno-4-36"></a>1. 打开QFIL。
-<a id="__codelineno-4-37" name="__codelineno-4-37"></a>2. 将“存储类型”更改为UFS。
-<a id="__codelineno-4-38" name="__codelineno-4-38"></a>3. 选择“Flat Build”。
-<a id="__codelineno-4-39" name="__codelineno-4-39"></a>4. 浏览并选择“LGE SM8150 Firehose”。
-<a id="__codelineno-4-40" name="__codelineno-4-40"></a>5. 现在，将手机连接到电脑并启动进入EDL模式。
-<a id="__codelineno-4-41" name="__codelineno-4-41"></a>6. 打开“选择端口”并选择手机，按“确定”。
-<a id="__codelineno-4-42" name="__codelineno-4-42"></a>7. 在“工具”中打开“分区管理器”。
-<a id="__codelineno-4-43" name="__codelineno-4-43"></a>
-<a id="__codelineno-4-44" name="__codelineno-4-44"></a>B)
-<a id="__codelineno-4-45" name="__codelineno-4-45"></a>!!!务必严格按照说明操作，否则手机将变砖!!!
-<a id="__codelineno-4-46" name="__codelineno-4-46"></a>1. 备份并擦除以下7个分区：FTM、Modem_A、Modem_B、SID_A、SID_B、OP_A、OP_B。
-<a id="__codelineno-4-47" name="__codelineno-4-47"></a>1.1. 左键单击一个分区，然后右键单击并选择“管理分区数据”。
-<a id="__codelineno-4-48" name="__codelineno-4-48"></a>1.2. 在弹出窗口中有4个选项：I. 擦除（擦除分区数据），II. 读取数据（转储或备份分区），III. 加载镜像（恢复分区），IV. 关闭（关闭窗口）。
-<a id="__codelineno-4-49" name="__codelineno-4-49"></a>1.3. 首先选择“读取数据”转储/备份分区，然后将其擦除。
-<a id="__codelineno-4-50" name="__codelineno-4-50"></a>2. 关闭“分区管理器”窗口。
-<a id="__codelineno-4-51" name="__codelineno-4-51"></a>3. 等待5秒，然后同时按音量减和电源键，直到重启。
-<a id="__codelineno-4-52" name="__codelineno-4-52"></a>3.1. 重启后立即松开音量减和电源键，然后按音量加进入下载模式。
-<a id="__codelineno-4-53" name="__codelineno-4-53"></a>注意：不要让手机开始启动！如果开始启动，可能会重新生成SID和FTM分区数据，因此您需要重做整个B步骤。
-<a id="__codelineno-4-54" name="__codelineno-4-54"></a>
-<a id="__codelineno-4-55" name="__codelineno-4-55"></a>C)
-<a id="__codelineno-4-56" name="__codelineno-4-56"></a>1. 打开LGUP。
-<a id="__codelineno-4-57" name="__codelineno-4-57"></a>2. 选择您喜欢的KDZ文件。
-<a id="__codelineno-4-58" name="__codelineno-4-58"></a>3. 选择“PARTITION DL”。
-<a id="__codelineno-4-59" name="__codelineno-4-59"></a>4. 按“开始”。将出现一个弹出窗口，在此窗口中您可以选择要刷写的分区。
-<a id="__codelineno-4-60" name="__codelineno-4-60"></a>5. 在此处取消勾选SID_A和SID_B分区。这将使其能够绕过OPID不匹配错误。
-<a id="__codelineno-4-61" name="__codelineno-4-61"></a>6. 如果您使用的是Sprint或其他平台，将会收到是否更改型号的提示。当然您知道该怎么做 =)
-<a id="__codelineno-4-62" name="__codelineno-4-62"></a>
-<a id="__codelineno-4-63" name="__codelineno-4-63"></a>完成该过程后，手机将在几分钟内启动，并且在开始自定义之前会重启一次。请耐心等待。
+<a id="__codelineno-3-34" name="__codelineno-3-34"></a>步骤
+<a id="__codelineno-3-35" name="__codelineno-3-35"></a>A)
+<a id="__codelineno-3-36" name="__codelineno-3-36"></a>1. 打开QFIL。
+<a id="__codelineno-3-37" name="__codelineno-3-37"></a>2. 将“存储类型”更改为UFS。
+<a id="__codelineno-3-38" name="__codelineno-3-38"></a>3. 选择“Flat Build”。
+<a id="__codelineno-3-39" name="__codelineno-3-39"></a>4. 浏览并选择“LGE SM8150 Firehose”。
+<a id="__codelineno-3-40" name="__codelineno-3-40"></a>5. 现在，将手机连接到电脑并启动进入EDL模式。
+<a id="__codelineno-3-41" name="__codelineno-3-41"></a>6. 打开“选择端口”并选择手机，按“确定”。
+<a id="__codelineno-3-42" name="__codelineno-3-42"></a>7. 在“工具”中打开“分区管理器”。
+<a id="__codelineno-3-43" name="__codelineno-3-43"></a>
+<a id="__codelineno-3-44" name="__codelineno-3-44"></a>B)
+<a id="__codelineno-3-45" name="__codelineno-3-45"></a>!!!务必严格按照说明操作，否则手机将变砖!!!
+<a id="__codelineno-3-46" name="__codelineno-3-46"></a>1. 备份并擦除以下7个分区：FTM、Modem_A、Modem_B、SID_A、SID_B、OP_A、OP_B。
+<a id="__codelineno-3-47" name="__codelineno-3-47"></a>1.1. 左键单击一个分区，然后右键单击并选择“管理分区数据”。
+<a id="__codelineno-3-48" name="__codelineno-3-48"></a>1.2. 在弹出窗口中有4个选项：I. 擦除（擦除分区数据），II. 读取数据（转储或备份分区），III. 加载镜像（恢复分区），IV. 关闭（关闭窗口）。
+<a id="__codelineno-3-49" name="__codelineno-3-49"></a>1.3. 首先选择“读取数据”转储/备份分区，然后将其擦除。
+<a id="__codelineno-3-50" name="__codelineno-3-50"></a>2. 关闭“分区管理器”窗口。
+<a id="__codelineno-3-51" name="__codelineno-3-51"></a>3. 等待5秒，然后同时按音量减和电源键，直到重启。
+<a id="__codelineno-3-52" name="__codelineno-3-52"></a>3.1. 重启后立即松开音量减和电源键，然后按音量加进入下载模式。
+<a id="__codelineno-3-53" name="__codelineno-3-53"></a>注意：不要让手机开始启动！如果开始启动，可能会重新生成SID和FTM分区数据，因此您需要重做整个B步骤。
+<a id="__codelineno-3-54" name="__codelineno-3-54"></a>
+<a id="__codelineno-3-55" name="__codelineno-3-55"></a>C)
+<a id="__codelineno-3-56" name="__codelineno-3-56"></a>1. 打开LGUP。
+<a id="__codelineno-3-57" name="__codelineno-3-57"></a>2. 选择您喜欢的KDZ文件。
+<a id="__codelineno-3-58" name="__codelineno-3-58"></a>3. 选择“PARTITION DL”。
+<a id="__codelineno-3-59" name="__codelineno-3-59"></a>4. 按“开始”。将出现一个弹出窗口，在此窗口中您可以选择要刷写的分区。
+<a id="__codelineno-3-60" name="__codelineno-3-60"></a>5. 在此处取消勾选SID_A和SID_B分区。这将使其能够绕过OPID不匹配错误。
+<a id="__codelineno-3-61" name="__codelineno-3-61"></a>6. 如果您使用的是Sprint或其他平台，将会收到是否更改型号的提示。当然您知道该怎么做 =)
+<a id="__codelineno-3-62" name="__codelineno-3-62"></a>
+<a id="__codelineno-3-63" name="__codelineno-3-63"></a>完成该过程后，手机将在几分钟内启动，并且在开始自定义之前会重启一次。请耐心等待。
 </code></pre></div></td></tr></tbody></table></div>
 <h3 id="刷入-abl启用-fastboot">刷入 abl，启用 fastboot<a class="headerlink" href="#刷入-abl启用-fastboot" title="Permanent link">¶</a></h3>
 <p>LG Android 12 原厂系统只有 Download Mode，下面方法可以刷入 fastboot。下载帖子中的 abl 附件。</p>
@@ -7279,10 +7350,10 @@
 <p>下载 <code>twrp-installer-v3.6.0-G8X_ab.zip</code>： <a href="https://xdaforums.com/t/unofficial-twrp-recovery-twrp-3-3-1-0.4201783/page-5">https://xdaforums.com/t/unofficial-twrp-recovery-twrp-3-3-1-0.4201783/page-5</a> </p>
 <p>root 后，可安装 <a href="https://github.com/capntrips/KernelFlasher">https://github.com/capntrips/KernelFlasher</a> 方便的备份还原 boot</p>
 <p>首先，备份 boot.img，复制到电脑<br>
-</p><div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Bash</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-5-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1"></a>PS<span class="w"> </span>D:<span class="se">\P</span>rograms<span class="se">\A</span>ndroid<span class="se">\U</span>otanToolbox_Windows_x64_3.7.0<span class="se">\B</span>in&gt;<span class="w"> </span>.<span class="se">\m</span>agiskboot.exe<span class="w"> </span>unpack<span class="w"> </span><span class="s2">"D:\Downloads\2022-09-29--20-52\boot.img"</span>
+</p><div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Bash</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-4-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1"></a>PS<span class="w"> </span>D:<span class="se">\P</span>rograms<span class="se">\A</span>ndroid<span class="se">\U</span>otanToolbox_Windows_x64_3.7.0<span class="se">\B</span>in&gt;<span class="w"> </span>.<span class="se">\m</span>agiskboot.exe<span class="w"> </span>unpack<span class="w"> </span><span class="s2">"D:\Downloads\2022-09-29--20-52\boot.img"</span>
 </code></pre></div></td></tr></tbody></table></div><p></p>
 <p>解包后会生成 <code>ramdisk.cpio</code>、<code>kernel</code> 等文件。<strong>替换 Ramdisk</strong>： 将 <code>twrp-installer-v3.6.0-G8X_ab.zip</code>  解压出的 <code>ramdisk-twrp.cpio</code> 重命名为 <code>ramdisk.cpio</code>，覆盖替换掉解包出来的 <code>ramdisk.cpio</code>。<br>
-</p><div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Bash</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-6-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1"></a>PS<span class="w"> </span>D:<span class="se">\P</span>rograms<span class="se">\A</span>ndroid<span class="se">\U</span>otanToolbox_Windows_x64_3.7.0<span class="se">\B</span>in&gt;<span class="w"> </span>.<span class="se">\m</span>agiskboot.exe<span class="w"> </span>repack<span class="w"> </span><span class="s2">"D:\Downloads\2022-09-29--20-52\boot.img"</span>
+</p><div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Bash</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-5-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1"></a>PS<span class="w"> </span>D:<span class="se">\P</span>rograms<span class="se">\A</span>ndroid<span class="se">\U</span>otanToolbox_Windows_x64_3.7.0<span class="se">\B</span>in&gt;<span class="w"> </span>.<span class="se">\m</span>agiskboot.exe<span class="w"> </span>repack<span class="w"> </span><span class="s2">"D:\Downloads\2022-09-29--20-52\boot.img"</span>
 </code></pre></div></td></tr></tbody></table></div><p></p>
 <p>会生成新的 boot.img 拷贝到手机里刷入。重启即可直接进入 recovery。</p>
 <p>后续可使用<a href="https://github.com/Uotan-Dev/UotanToolboxNT/releases">柚坛工具箱</a>-基本刷入-刷入 Recovery-临时启动 来方便的启动 recovery。</p>
@@ -7297,7 +7368,7 @@
 <p>如果刷入后循环重启，记得在 recovery 中清空 data 分区。</p>
 <h4 id="获取-zip-刷机包中的-bootimg">获取 zip 刷机包中的 boot.img<a class="headerlink" href="#获取-zip-刷机包中的-bootimg" title="Permanent link">¶</a></h4>
 <p>下载 <a href="https://github.com/ssut/payload-dumper-go">payload-dumper-go</a> 解压 zip 获取 payload.bin</p>
-<div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Bash</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-7-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1"></a>payload-dumper-go<span class="w"> </span>-p<span class="w"> </span>boot<span class="w"> </span>payload.bin
+<div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Bash</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-6-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1"></a>payload-dumper-go<span class="w"> </span>-p<span class="w"> </span>boot<span class="w"> </span>payload.bin
 </code></pre></div></td></tr></tbody></table></div>
 
 
@@ -7321,7 +7392,7 @@
     <span class="md-icon" title="最后更新">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"></path></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-datetime" title="2026年8月30日 12:38:29 CST">2026年8月30日 12:38:29</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-datetime" title="2026年8月30日 15:04:33 CST">2026年8月30日 15:04:33</span>
   </span>
 
     
