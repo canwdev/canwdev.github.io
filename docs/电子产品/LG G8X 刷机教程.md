@@ -9,8 +9,9 @@
 - 下载破解版 LGUP： https://xdaforums.com/t/lgup-1-16-3-patched-setup-installer-w-lgmobile-drivers-and-common_dll.4304181
 - 或者 LGROMUP 工具： https://lgrom.com/blog/lgromup
 - 下载固件
-  - https://lgrom.com/firmware/LMG850UM
-  - https://lg-firmwares.com/downloads-file/27581/G850UM40c_00_1129
+	- https://lgrom.com/firmware/LMG850UM
+	- https://lg-firmwares.com/downloads-file/27581/G850UM40c_00_1129
+	- [LG G8X (mh2lm) | 萤火虫资源站](https://www.yhcres.top/02-%E6%89%8B%E6%9C%BA%E5%B9%B3%E6%9D%BF/LG/LG%20G%E7%B3%BB%E5%88%97/LG%20G8X%20(mh2lm))
 
 
 ## 2. 备份数据
