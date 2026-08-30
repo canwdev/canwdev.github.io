@@ -1,6 +1,49 @@
 .md-typeset h1,
 .md-typeset h2,
 .md-typeset h3,
-.md-typeset h4 {
+.md-typeset h4,
+.md-typeset h5 {
+  border-bottom: 1px solid;
+  line-height: 1.3;
   font-weight: 700;
+}
+
+.md-typeset h1::before,
+.md-typeset h2::before,
+.md-typeset h3::before,
+.md-typeset h4::before,
+.md-typeset h5::before {
+  font-size: 11px;
+  content: "";
+  margin-right: 4px;
+  border: 1px solid;
+  line-height: 1;
+  border-radius: 4px;
+  padding: 0 2px;
+  opacity: 0.76;
+  vertical-align: middle;
+}
+
+.md-typeset h1::before {
+  content: "H1";
+}
+
+.md-typeset h2::before {
+  content: "H2";
+  margin-right: 8px;
+}
+
+.md-typeset h3::before {
+  content: "H3";
+  margin-right: 16px;
+}
+
+.md-typeset h4::before {
+  content: "H4";
+  margin-right: 32px;
+}
+
+.md-typeset h5::before {
+  content: "H5";
+  margin-right: 32px;
 }
