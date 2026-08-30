@@ -197,10 +197,12 @@ https://xdaforums.com/t/guide-lg-g8-g8x-v50-bootloader-unlock-and-magisk-root-us
 	- 还原 Load Image
 - 同时按下按 `音量减和电源键` 重启，然后按住 `音量加` 进入 fastboot，进设备管理器查看
 
+此外，切换 ab 分区命令：`fastboot set_active b`
+
 ### 利用 9008 修补 boot 获取 root 权限
 
 - 进入 9008，QFIL，Partition Manager，备份 boot_a，找到备份文件，复制并重命名为 img
-- 用 柚坛工具箱-基本刷入-修补 Boot 修补备份的 boot_a
+- 用[柚坛工具箱](https://github.com/Uotan-Dev/UotanToolboxNT/releases)-基本刷入-修补 Boot 修补备份的 boot_a
 - Partition Manager 刷入刚刚修补的 boot 文件到 boot_a/boot_b
 - 重启进入系统，安装 Magisk app-debug.apk https://github.com/topjohnwu/Magisk/releases 
 
@@ -223,6 +225,8 @@ PS D:\Programs\Android\UotanToolbox_Windows_x64_3.7.0\Bin> .\magiskboot.exe repa
 
 会生成新的 boot.img 拷贝到手机里刷入。重启即可直接进入 recovery。
 
+后续可使用[柚坛工具箱](https://github.com/Uotan-Dev/UotanToolboxNT/releases)-基本刷入-刷入 Recovery-临时启动 来方便的启动 recovery。
+
 ### 刷入三方ROM
 
 完成底包升级并刷入第三方 Recovery（如 TWRP）后，可直接下载并刷入以下基于新底包开发的最新 ROM：
@@ -234,3 +238,12 @@ https://xdaforums.com/f/lg-g8x-thinq-roms-kernels-recoveries-other-de.9267/
 * **[Evolution X 11.10](https://xdaforums.com/t/rom-16-unofficial-evolution-x-11-10-for-lg-g8x-v50s-mh2lm-mh2lm_5g.4798519/)**（Android 16）/ **[AxionOS 2.8](https://xdaforums.com/t/rom-16-unofficial-axionos-2-8-oneira-for-lg-g8x-v50s-mh2lm-mh2lm_5g.4798522/)**（Android 16）：主打 **Google Pixel 视觉体验与极端个性化**，拥有最酷炫的 UI 动画、锁屏样式和深度的自定义选项，适合追求最新 Android 特性与视觉美化的玩家。
 
 如果刷入后循环重启，记得在 recovery 中清空 data 分区。
+
+#### 获取 zip 刷机包中的 boot.img
+
+下载 [payload-dumper-go](https://github.com/ssut/payload-dumper-go) 解压 zip 获取 payload.bin
+
+```shell
+payload-dumper-go -p boot payload.bin
+```
+
