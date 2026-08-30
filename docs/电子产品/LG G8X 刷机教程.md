@@ -23,22 +23,17 @@
 - [ ] 备份应用程序和数据（钛备份或用 X-plore 导出 apk）
 - [ ] 备份必要分区
 
-备份内置存储
+### 备份内置存储
 
 ```shell
 tar -czf ~/storage/ext_sd/backup_$(date +%Y%m%d_%H%M%S).tar.gz -C /sdcard Download Documents Pictures Music Movies DCIM "Mindows助手"
 ```
 
-备份 Termux
+### 备份 Termux
 
-```shell
-# 备份
-termux-backup ~/storage/ext_sd/termux_backup_$(date +%Y%m%d_%H%M%S).tar.gz
-# 还原
-termux-restore ~/storage/ext_sd/termux_backup_YYYYMMDD_HHMMSS.tar.gz
-```
+[[Termux 配置笔记#备份与恢复]]
 
-备份必要分区
+### 备份必要分区
 
 ```shell
 su

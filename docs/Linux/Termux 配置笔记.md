@@ -15,7 +15,7 @@
 
 ## 更换国内镜像
 
-> 2026 更新：可以不用更换镜像，初次使用会自动找到合适的镜像。
+> 2026 更新：可以不用更换镜像，初次使用会自动找到合适的镜像。或使用 `termux-change-repo`
 
 [清华TUNA镜像的说明](https://mirror.tuna.tsinghua.edu.cn/help/termux/) 。编辑 `/data/data/com.termux/files/usr/etc/apt/sources.list` 文件，填入以下内容：
 
@@ -29,7 +29,7 @@ deb http://mirrors.tuna.tsinghua.edu.cn/termux stable main
 
 最后 `pkg update && pkg upgrade`
 
-工具：`pkg install neovim fastfetch htop`
+工具：`pkg install vim fastfetch htop`
 
 ## on-my-zsh
 
@@ -109,27 +109,35 @@ rclone mount :webdav:TestFolder Z: --webdav-url http://192.168.0.156:8086 --webd
 
 ## 备份与恢复
 
-参考[官方备份教程](https://wiki.termux.com/wiki/Backing_up_Termux)，通过备份 termux 的 data 数据，可以实现备份、恢复、或迁移到其他设备（仅限相同架构）。步骤见下方。
+参考[官方备份教程](https://wiki.termux.com/wiki/Backing_up_Termux)，通过备份 termux 的 data 数据，可以实现备份、恢复、或迁移到其他设备。
 
 ### 备份
 
-1. 设置termux允许访问存储空间 `termux-setup-storage`
-2. 切换到termux根目录 `cd /data/data/com.termux/files`
-3. 备份数据：`tar -czvf /sdcard/termux-backup.tar.gz home usr`
+设置termux允许访问存储空间 `termux-setup-storage`
 
+```bash
+termux-setup-storage
+
+tar -zcf /sdcard/termux-backup_$(date +%Y%m%d_%H%M%S).tar.gz -C /data/data/com.termux/files ./home ./usr
+```
 ### 恢复
 
-1. 切换到termux根目录 `cd /data/data/com.termux/files`
-2. 替换home目录
-    ```sh
-    rm -rf home
-    tar -zxvf /sdcard/termux-backup.tar.gz home
-    ```
-3. 复制 busybox 二进制文件到指定位置（重要） `cp ./usr/bin/busybox ./tar`
-4. 抹掉 sysroot，所有包将被删除 `rm -rf usr`
-5. 从备份文件恢复 sysroot
-    ```sh
-    unset LD_PRELOAD
-    ./tar -zxvf /sdcard/termux-backup.tar.gz usr
-    ```
-6. 使用通知中心的 exit 按钮退出 Termux 然后重开即可恢复完成
+```bash
+termux-setup-storage
+
+tar -zxf /sdcard/termux-backup.tar.gz -C /data/data/com.termux/files --recursive-unlink --preserve-permissions
+```
+
+使用通知中心的 exit 按钮退出 Termux 然后重开即可恢复完成
+
+### 脚本
+
+注意：以下备份和恢复脚本不会备份、恢复 home 目录
+
+```bash
+# 备份
+termux-backup /sdcard/backup.tar.xz
+
+# 恢复
+termux-restore /sdcard/backup.tar.xz
+```
