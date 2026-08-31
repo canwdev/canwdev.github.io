@@ -20,7 +20,7 @@
 
 - [ ] 备份内置存储
 - [ ] 备份 Termux
-- [ ] 备份应用程序和数据（钛备份或用 X-plore 导出 apk）
+- [ ] 备份应用和数据
 - [ ] 备份必要分区
 
 ### 备份内置存储
@@ -31,7 +31,11 @@ tar -czf ~/storage/ext_sd/backup_$(date +%Y%m%d_%H%M%S).tar.gz -C /sdcard Downlo
 
 ### 备份 Termux
 
-[[Termux 配置笔记#备份与恢复]]
+- [[Termux 配置笔记#备份与恢复]]
+
+### 备份应用和数据
+
+- [NeoApplications/Neo-Backup: backup manager for android](https://github.com/NeoApplications/Neo-Backup)
 
 ### 备份必要分区
 
