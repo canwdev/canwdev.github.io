@@ -126,6 +126,15 @@ rd /s /q %userprofile%\AppData\Local\Microsoft\Windows\Explorer
 start "" explorer.exe
 ```
 
+或
+
+```powershell
+Remove-Item "$env:LOCALAPPDATA\IconCache.db" -Force -ErrorAction SilentlyContinue
+Remove-Item "$env:LOCALAPPDATA\Microsoft\Windows\Explorer\iconcache_*.db" -Force -ErrorAction SilentlyContinue
+Stop-Process -Name explorer -Force
+Start-Process explorer
+```
+
 ---
 
 - [[RDP 远程桌面连接#修改默认 RDP 端口号]]
