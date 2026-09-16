@@ -2678,6 +2678,89 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_6">
+        
+          
+          <label class="md-nav__link" for="__nav_5_6" id="__nav_5_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scripts mgr
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Scripts mgr
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix="">
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Scripts/scripts-mgr/scripts-mgr-README/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    scripts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -6996,19 +7079,19 @@
 </ul>
 <p>以下是对这些文件夹的解释：</p>
 <h3 id="controlnet"><code>controlnet</code><a class="headerlink" href="#controlnet" title="Permanent link">¶</a></h3>
-<p>ControlNet 是一种用于条件生成的方法，它允许在生成过程中引入额外的控制信号。这使得模型可以根据特定的输入（如边缘图、关键点等）生成更加符合用户需求的图像。ControlNet 通常用于==增强图像生成的可控性==。</p>
+<p>ControlNet 是一种用于条件生成的方法，它允许在生成过程中引入额外的控制信号。这使得模型可以根据特定的输入（如边缘图、关键点等）生成更加符合用户需求的图像。ControlNet 通常用于<mark>增强图像生成的可控性</mark>。</p>
 <h3 id="clip"><code>clip</code><a class="headerlink" href="#clip" title="Permanent link">¶</a></h3>
-<p>CLIP（Contrastive Language–Image Pretraining）模型与 Stable Diffusion 相辅相成。它是一种用于图像理解和文本理解的模型，它将图像和文本嵌入到同一个向量空间中。Stable Diffusion 通常会利用 CLIP 模型进行==文本到图像的同步==，帮助生成符合给定文本描述的图像。</p>
+<p>CLIP（Contrastive Language–Image Pretraining）模型与 Stable Diffusion 相辅相成。它是一种用于图像理解和文本理解的模型，它将图像和文本嵌入到同一个向量空间中。Stable Diffusion 通常会利用 CLIP 模型进行<mark>文本到图像的同步</mark>，帮助生成符合给定文本描述的图像。</p>
 <h3 id="loras"><code>loras</code><a class="headerlink" href="#loras" title="Permanent link">¶</a></h3>
 <blockquote>
 <p>模型滤镜</p>
 </blockquote>
-<p>LoRA（Low-Rank Adaptation）是一种轻量级的==模型微调方法==，用于在不大量增加参数的情况下增强模型的能力。Lora 文件夹可能存储经过 LoRA 微调的模型，允许用户在特定任务上使用更专业的模型，这样的方法能在保持高效性的同时提高生成质量或多样性。</p>
+<p>LoRA（Low-Rank Adaptation）是一种轻量级的<mark>模型微调方法</mark>，用于在不大量增加参数的情况下增强模型的能力。Lora 文件夹可能存储经过 LoRA 微调的模型，允许用户在特定任务上使用更专业的模型，这样的方法能在保持高效性的同时提高生成质量或多样性。</p>
 <h3 id="stable-diffusion"><code>Stable-diffusion</code><a class="headerlink" href="#stable-diffusion" title="Permanent link">¶</a></h3>
 <blockquote>
 <p>基础大模型</p>
 </blockquote>
-<p>这个文件夹通常会包含 Stable Diffusion 的==基本模型文件==及其相关的配置。它是整个生成流程的核心部分，负责根据给定的输入生成图像。</p>
+<p>这个文件夹通常会包含 Stable Diffusion 的<mark>基本模型文件</mark>及其相关的配置。它是整个生成流程的核心部分，负责根据给定的输入生成图像。</p>
 <h3 id="vae"><code>vae</code><a class="headerlink" href="#vae" title="Permanent link">¶</a></h3>
 <p>变分自编码器（VAE）是 Stable Diffusion 中用于图像潜在空间表示的部分。VAE 将输入图像编码为潜在空间的向量表示，然后在这个潜在空间中进行操作，最后将生成的潜在向量解码回图像。这个过程有助于生成与训练数据相似的图像。</p>
 <h2 id="comfyui-是什么">ComfyUI 是什么<a class="headerlink" href="#comfyui-是什么" title="Permanent link">¶</a></h2>
