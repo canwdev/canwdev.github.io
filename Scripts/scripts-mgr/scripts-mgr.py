@@ -18,6 +18,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+__version__ = "0.1.0"
+
 DIR = Path(__file__).resolve().parent
 
 INTERP = {
@@ -30,7 +32,7 @@ INTERP = {
 
 NATIVE_EXEC = {".bat", ".cmd"}  # Windows 原生可执行，无需生成 shim
 
-USAGE = """脚本管理工具
+USAGE = f"""脚本管理工具 {__version__}
 
 用法: scripts-mgr <命令>
 
@@ -38,6 +40,7 @@ USAGE = """脚本管理工具
   shim [-f]  为同目录下的脚本生成 .cmd 包装（仅 Windows；已存在默认跳过，-f 强制覆盖）
   ls         列出当前可用的命令
   open       在文件管理器中打开脚本所在目录
+  version    显示版本
   help       显示本帮助
 
 支持的脚本类型: .py  .mjs  .js  .cjs  .ps1
@@ -66,11 +69,18 @@ def iter_scripts() -> list[Path]:
 
 
 def iter_native() -> list[Path]:
-    """返回目录下的 Windows 原生可执行文件（.bat/.cmd），已排序。"""
+    """返回目录下的 Windows 原生可执行文件（.bat/.cmd），已排序。
+
+    排除作为脚本包装的 .cmd（与受支持源脚本同名的），避免 ls 把
+    convert-docx2html.py 和 convert-docx2html.cmd 列成两条命令。
+    """
+    script_stems = {p.stem.lower() for p in iter_scripts()}
     natives = [
         p
         for p in DIR.iterdir()
-        if p.is_file() and p.suffix.lower() in NATIVE_EXEC
+        if p.is_file()
+        and p.suffix.lower() in NATIVE_EXEC
+        and p.stem.lower() not in script_stems
     ]
     return sorted(natives, key=lambda p: p.stem.lower())
 
@@ -138,8 +148,8 @@ def cmd_shim(force: bool = False) -> int:
         print(f"生成: {shim}")
     for shim in overwritten:
         print(f"覆盖: {shim}")
-    for shim in skipped:
-        print(f"跳过: {shim} (已存在)")
+    # for shim in skipped:
+        # print(f"跳过: {shim} (已存在)")
 
     print(
         f"\n完成: 生成 {len(generated)} 个, 覆盖 {len(overwritten)} 个, "
@@ -149,7 +159,7 @@ def cmd_shim(force: bool = False) -> int:
 
 
 def cmd_ls() -> int:
-    """列出当前可用的命令及其源脚本。"""
+    """列出当前可用的命令（仅命令名，不带 .py / .cmd 等后缀）。"""
     scripts = iter_scripts()
     natives = iter_native() if os.name == "nt" else []
 
@@ -158,37 +168,35 @@ def cmd_ls() -> int:
         return 0
 
     conflicts = find_conflicts(scripts)
-    rows = []
+    # 命令名 -> 异常状态；正常（已存在 / 原生可执行）不显示状态
+    commands: dict[str, str | None] = {}
 
-    # 处理需要 shim 的脚本
     for script in scripts:
         name = script.stem
         if name.lower() in conflicts:
-            status = "冲突"
-        elif shim_path(script).exists():
-            status = "已存在"
+            commands[name] = "冲突"
+        elif not shim_path(script).exists():
+            commands[name] = "未生成"
         else:
-            status = "未生成"
-        rows.append((name, script.name, status))
+            commands[name] = None
 
-    # 处理原生可执行
     for native in natives:
-        rows.append((native.stem, native.name, "原生可执行"))
+        commands[native.stem] = None
 
-    # 排序：按名称
-    rows.sort(key=lambda r: r[0].lower())
+    names = sorted(commands, key=str.lower)
+    w_name = max(len(n) for n in names)
 
-    w_name = max(len(r[0]) for r in rows)
-    w_file = max(len(r[1]) for r in rows)
-    w_status = max(len(r[2]) for r in rows)
-
-    print(f"可用命令 ({len(rows)} 个) — {DIR}\n")
-    for name, filename, status in rows:
-        print(f"  {name.ljust(w_name)}  {filename.ljust(w_file)}  {status.ljust(w_status)}")
+    print(f"可用命令 ({len(names)} 个) — {DIR}\n")
+    for name in names:
+        status = commands[name]
+        if status:
+            print(f"  {name.ljust(w_name)}  {status}")
+        else:
+            print(f"  {name}")
 
     for stem, group in sorted(conflicts.items()):
-        names = ", ".join(p.name for p in group)
-        print(f"\n[注意] {{{stem}.cmd}} 名冲突: {names}", file=sys.stderr)
+        file_names = ", ".join(p.name for p in group)
+        print(f"\n[注意] {{{stem}.cmd}} 名冲突: {file_names}", file=sys.stderr)
     return 0
 
 
@@ -218,10 +226,18 @@ def cmd_help() -> int:
     return 0
 
 
+def cmd_version() -> int:
+    print(f"scripts-mgr {__version__}")
+    return 0
+
+
 COMMANDS = {
     "shim": cmd_shim,
     "ls": cmd_ls,
     "open": cmd_open,
+    "version": cmd_version,
+    "-v": cmd_version,
+    "--version": cmd_version,
     "help": cmd_help,
     "-h": cmd_help,
     "--help": cmd_help,
