@@ -23,8 +23,23 @@
 
 ## 无法加载文件 xxx.ps1，因为在此系统上禁止运行脚本
 
-使用管理权限运行命令：
-```sh
+> 无法加载文件 mount.ps1，因为在此系统上禁止运行脚本。
+> 无法加载文件 mount.ps1。未对文件 mount.ps1 进行数字签名。无法在当前系统上运行该脚本。
+
+
+```powershell
+# 直接临时绕过
+powershell -ExecutionPolicy Bypass -File .\mount.ps1
+
+# 如果脚本来自网络/复制，先解除锁定
+Unblock-File .\mount.ps1
+powershell -ExecutionPolicy Bypass -File .\mount.ps1
+
+# 修改当前用户的执行策略
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force
+powershell .\mount.ps1
+
+# 全局生效：使用管理权限运行命令
 set-executionpolicy remotesigned
 ```
 
