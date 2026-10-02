@@ -5,6 +5,7 @@ Usage:
     files-compress.py <input-dir> [-o <output-dir>] [--dry-run]
     files-compress.py <input-dir> --in-place [--keep-originals] [--dry-run]
     files-compress.py <input-dir> --audit
+    files-compress.py <input-dir> --only image|video
 
 The input directory is scanned recursively, every file is classified as image,
 video, archive or unsupported, and images and videos are probed with ffprobe so
@@ -12,6 +13,10 @@ a per-file decision can be derived from hardcoded rules: a resolution cap first,
 the byte threshold second, then codec/HDR/animation gates.  Only files that pass
 are encoded -- images with caesiumclt (https://github.com/Lymphatus/caesium-clt),
 videos with ffmpeg.
+
+``--only`` narrows the run to one media kind before anything else happens: files
+of the other kind are not scanned, not probed, not encoded and not reported, so
+the ledger, the reports and the audit all describe exactly the requested subset.
 
 Two modes:
 
@@ -49,7 +54,7 @@ from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from pathlib import Path
 
-__version__ = "0.7.0"
+__version__ = "0.8.0"
 
 # ------------------------------ detection ------------------------------
 
@@ -1210,6 +1215,7 @@ class Run:
     policy: str
     in_place: bool
     dry_run: bool
+    only: str                           # "all" | "image" | "video"
     ledger: Ledger
     log: Logger
     success: list[dict] = field(default_factory=list)
@@ -1275,7 +1281,13 @@ class Run:
 
 # ------------------------------ scanning & gates ------------------------------
 
-def scan_files(run: Run) -> list[Path]:
+def scan_files(run: Run, only: str = "all") -> list[Path]:
+    """Every file worth considering, optionally narrowed to one media kind.
+
+    ``only`` overrides ``run.only`` for the one caller that needs the full tree
+    regardless of the filter (``--prune``), because pruning the ledger from a
+    filtered scan would silently drop every record of the other kind.
+    """
     files: list[Path] = []
     for path in run.in_root.rglob("*"):
         if not path.is_file() or path.is_symlink():
@@ -1284,6 +1296,8 @@ def scan_files(run: Run) -> list[Path]:
         if any(part in ARTIFACT_DIR_NAMES for part in rel_parts):
             continue
         if not run.in_place and path.is_relative_to(run.out_root):
+            continue
+        if only != "all" and classify(path) != only:
             continue
         files.append(path)
     return files
@@ -1644,6 +1658,7 @@ def audit(run: Run, files: list[Path], seen_inodes: set, limit: int = 1000) -> i
         "mode": "in-place" if run.in_place else "copy-out",
         "profile": run.profile.name,
         "policy": run.policy,
+        "only": run.only,
         "encoder": run.encoder,
         "rules_version": RULES_VERSION,
         "generated": now_iso(),
@@ -1657,13 +1672,14 @@ def audit(run: Run, files: list[Path], seen_inodes: set, limit: int = 1000) -> i
     target = run.state_dir / "audit.json"
     target.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"巡检报告 {target}")
-    print(f"档位 {run.profile.name}（policy {run.policy}） | 编码器 {run.encoder}")
+    print(f"档位 {run.profile.name}（policy {run.policy}） | 编码器 {run.encoder}"
+          + (f" | 只处理 {run.only}" if run.only != "all" else ""))
     print(f"已扫描 {len(files)} | 待压缩 {counts.get('would_compress', 0)} | "
           f"已压缩 {counts.get('already_compressed', 0)} | "
           f"已处理 {counts.get('already_processed', 0)} | "
           f"台账 {len(run.ledger.entries)} 条（过期 {run.ledger.stale}） | "
           f"无法解码的产物 {len(undecodable)}")
-    run.log.log(f"巡检 profile={run.profile.name} policy={run.policy} "
+    run.log.log(f"巡检 profile={run.profile.name} policy={run.policy} only={run.only} "
                 f"scanned={len(files)} counts={json.dumps(counts, sort_keys=True)}")
     return 0
 
@@ -1734,6 +1750,10 @@ def parse_args(argv: list[str] | None) -> argparse.Namespace:
     parser.add_argument("--profile", choices=tuple(PROFILES), default=DEFAULT_PROFILE,
                         help="压缩档位：balanced 均衡（默认）、small 更小、"
                              "tiny 极端小（不考虑质量，尽可能小）")
+    parser.add_argument("--only", choices=("all", "image", "video"), default="all",
+                        help="只处理某一类文件：all 全部（默认）、image 只处理图片"
+                             "（用 caesiumclt）、video 只处理视频（用 ffmpeg）；"
+                             "另一类文件完全不会被扫描、探测或写入报告")
     parser.add_argument("--no-hwaccel", action="store_true",
                         help="关闭硬件解码加速（默认开启；仅在排查问题或需要"
                              "与纯软件解码逐字节一致时使用）")
@@ -1805,6 +1825,7 @@ def main(argv: list[str] | None = None) -> int:
         stall_timeout=args.stall_timeout,
         in_place=args.in_place,
         dry_run=args.dry_run,
+        only=args.only,
         ledger=Ledger(state_dir / LEDGER_NAME, log, args.in_place, policy),
         log=log,
     )
@@ -1816,7 +1837,10 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     exit_code = 0
-    if not args.dry_run and not args.audit:
+    if run.only == "image":
+        # No video will be encoded, so the hardware probes would only cost seconds.
+        log.log("仅处理图片：跳过硬件探测，编码全部由 caesiumclt 完成")
+    elif not args.dry_run and not args.audit:
         probes = probe_hardware(state_dir, log)
         if not args.no_hwaccel:
             if probes.get(HWACCEL_DECODE):
@@ -1833,16 +1857,17 @@ def main(argv: list[str] | None = None) -> int:
                 f"output={out_root} profile={profile.name} policy={run.policy} "
                 f"encoder={run.encoder} hwaccel={run.hwaccel or 'off'} "
                 f"stall={str(run.stall_timeout) + 's' if run.stall_timeout else 'off'} "
-                f"dry_run={args.dry_run} audit={args.audit} rules={RULES_VERSION}")
+                f"only={run.only} dry_run={args.dry_run} audit={args.audit} rules={RULES_VERSION}")
         log.log(f'工具版本 ffmpeg="{versions["ffmpeg"]}" caesiumclt="{versions["caesiumclt"]}"')
         run.ledger.load()
-        files = scan_files(run)
+        files = scan_files(run, run.only)
         files = (sorted(files, key=lambda p: p.stat().st_size, reverse=True)
                  if args.order == "size" else sorted(files))
         if args.limit is not None:
             files = files[:max(0, args.limit)]
         run.scanned = len(files)
-        log.log(f"扫描 {in_root} -> {run.scanned} 个文件")
+        log.log(f"扫描 {in_root} -> {run.scanned} 个文件"
+                + (f"（仅 {run.only}）" if run.only != "all" else ""))
 
         seen_inodes: set = set()
         if args.audit:
@@ -1861,7 +1886,9 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"  ... 进度 {index}/{run.scanned}", flush=True)
 
         if args.prune and not run.dry_run:
-            dropped = run.ledger.prune({run.rel(path) for path in scan_files(run)})
+            # Deliberately unfiltered: --prune drops records whose file is gone,
+            # and a narrowed scan would make every other kind look gone.
+            dropped = run.ledger.prune({run.rel(path) for path in scan_files(run, "all")})
             log.log(f"清理台账 {dropped} 条记录")
         exit_code = 1 if run.failed else 0
     except KeyboardInterrupt:
@@ -1880,12 +1907,15 @@ def main(argv: list[str] | None = None) -> int:
                              {"mode": "dry-run" if run.dry_run
                               else ("in-place" if run.in_place else "copy-out"),
                               "profile": profile.name, "policy": run.policy,
+                              "only": run.only,
                               "encoder": run.encoder})
                 write_report(state_dir / "failed.json", in_root, run.failed,
                              {"profile": profile.name, "policy": run.policy,
+                              "only": run.only,
                               "encoder": run.encoder})
                 write_report(state_dir / "skipped.json", in_root, run.skipped,
                              {"profile": profile.name, "policy": run.policy,
+                              "only": run.only,
                               "encoder": run.encoder})
         except OSError as exc:
             print(f"无法写入报告文件：{exc}", file=sys.stderr)
@@ -1893,12 +1923,13 @@ def main(argv: list[str] | None = None) -> int:
         saved = sum(item["saved"] for item in run.success if "saved" in item)
         cumulative = run.ledger.total_saved()
         log.log(f"汇总 profile={profile.name} policy={run.policy} encoder={run.encoder} "
-                f"scanned={run.scanned} "
+                f"only={run.only} scanned={run.scanned} "
                 f"success={len(run.success)} failed={len(run.failed)} "
                 f"skipped={len(run.skipped)} saved={saved}")
         if not args.audit:
             print(f"输出目录 {state_dir}")
-            print(f"档位 {profile.name}（policy {run.policy}） | 编码器 {run.encoder}")
+            print(f"档位 {profile.name}（policy {run.policy}） | 编码器 {run.encoder}"
+                  + (f" | 只处理 {run.only}" if run.only != "all" else ""))
             print(f"已扫描 {run.scanned} | 成功 {len(run.success)} | 失败 {len(run.failed)} | "
                   f"跳过 {len(run.skipped)} | 节省 {human(saved)}（累计 {human(cumulative)}）")
             if run.dry_run:
