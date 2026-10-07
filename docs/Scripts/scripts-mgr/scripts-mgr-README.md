@@ -57,13 +57,13 @@ scripts-mgr open
 
 ## 使用
 
-加入 PATH 并生成 shim 后，直接按命令名调用：
+加入 PATH 并生成 shim 后，直接按命令名调用，例如：
 
 ```bash
 convert-md2html 文档.md
 convert-docx2md 报告.docx
 gen-thumbs ./photos
-files-compress ~/Downloads/media --dry-run
+# 其他脚本看 scripts-mgr ls
 ```
 
 参数原样透传给脚本本身。所有脚本遵循约定：成功返回 `0`，失败返回非 `0`，可被 `&&`、管道、CI 正常消费。
