@@ -38,6 +38,11 @@ from threading import Lock
 SOURCE_DIR = Path(__file__).resolve().parent
 CONFIG_PATH = SOURCE_DIR / "media-compress.json"
 DEFAULT_OUTPUT_DIR = "_compressed"
+LOG_SUFFIX = ".log"
+# 当前轮次打开着的日志文件；log() 在有它时同步落盘。None 表示不写日志。
+_log_file = None
+# stdout 被下游提前关闭（例如 `media-compress ... | head`）后置位，之后不再尝试写控制台。
+_console_dead = False
 
 # caesiumclt 1.5.0 读不了这些，实测每次都失败：
 #   .avif/.heic/.heif/.jxl -> 报错退出
@@ -49,6 +54,17 @@ IMAGE_EXTS = ({".jpg", ".jpeg", ".jfif", ".png", ".webp", ".gif"} | PASSTHROUGH_
 VIDEO_EXTS = {".mp4", ".m4v", ".mov", ".mkv", ".webm", ".avi",
               ".wmv", ".flv", ".mpg", ".mpeg", ".ts", ".m2ts", ".3gp"}
 MODERN_VIDEO_CODECS = {"hevc", "h265", "av1", "vp9", "vp8"}
+# 图像最长边上限。0 = 不限制。只在源超出时才缩，永不放大。
+# 常见取值（按需自行改这一个数）：
+#   1920  1080p 屏全屏
+#   2560  1440p
+#   3840  4K 原生
+#   5120  5K
+#   6144  6K
+#   7680  8K
+#   8192  常见扫描/相机输出的上限
+IMAGE_MAX_EDGE_CHOICES = (0, 1920, 2560, 3840, 5120, 6144, 7680, 8192)
+DEFAULT_IMAGE_MAX_EDGE = 5120
 HDR_TRANSFERS = {"smpte2084", "arib-std-b67"}
 JUNK_NAMES = {"desktop.ini", "thumbs.db", "ehthumbs.db", ".ds_store", ".localized"}
 # compress_video 返回这些原因表示"故意不动它"，不是失败：算 SKIP 而不是 FAIL，
@@ -82,9 +98,54 @@ def log(message: str = "", file=None, **_ignored) -> None:
     各自带时间才知道那会儿在做什么。注意换行符在时间戳之前，续行才不会被污染。
     并发时也逐行加锁式打印，所以时间戳的顺序与实际写出顺序一致。
     总是 flush：后台运行或管道里被缓冲的话，时间戳就失去意义了。
+
+    同时（若已分配日志文件）以同样格式落盘，所以日志就是屏幕内容的副本。
+    写失败一律吞掉：日志写不进去、或下游把管道关了（`| head`），都不该让整轮
+    任务半路崩掉——那会留下做了一半的输出和临时目录。
     """
+    global _console_dead
     stamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    print(f"{stamp} {message}", file=file, flush=True)
+    line = f"{stamp} {message}"
+    if not _console_dead:
+        try:
+            print(line, file=file, flush=True)
+        except OSError:
+            _console_dead = True          # 管道被下游关闭，之后只写文件
+    if _log_file is not None:
+        try:
+            _log_file.write(line + "\n")
+            _log_file.flush()
+        except (OSError, ValueError):
+            pass
+
+
+class Logger:
+    """把整轮运行的输出写成一份日志文件。
+
+    文件名带时间戳，放在输出根（-o 给的目录，或各源目录的 _compressed/），
+    方便事后回看"哪个文件当时执行了什么命令"。
+    """
+
+    def __init__(self, path: Path, fresh: bool) -> None:
+        self.path = path
+        self.fresh = fresh
+
+    def open(self) -> None:
+        global _log_file
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        _log_file = self.path.open("w" if self.fresh else "a", encoding="utf-8")
+        # 第一行是本次调用的原样命令行，第二行才是日志自己的位置。
+        log("command: " + invocation(sys.argv))
+        log(f"log file: {self.path}")
+
+    def close(self) -> None:
+        global _log_file
+        if _log_file is not None:
+            try:
+                _log_file.close()
+            except OSError:
+                pass
+            _log_file = None
 
 
 def human(size: float) -> str:
@@ -93,6 +154,16 @@ def human(size: float) -> str:
             return f"{size:.0f} {unit}" if unit == "B" else f"{size:.1f} {unit}"
         size /= 1024
     return f"{size:.1f} TB"
+
+
+def invocation(argv: list[str]) -> str:
+    """把本次调用的命令行还原成可复制粘贴的一行。
+
+    直接用 sys.argv 而不是拿 argparse 的结果重建：重建会丢掉用户实际怎么写
+    （--log=no 还是 --log no、路径带不带引号），而日志的第一价值就是"当时到底
+    敲了什么"。只有含空格或引号的参数才补引号。
+    """
+    return " ".join(f'"{a}"' if (" " in a or '"' in a) else a for a in argv)
 
 
 # ------------------------------ 工具查找 ------------------------------
@@ -184,6 +255,25 @@ def problem(result: subprocess.CompletedProcess, limit: int = 300) -> str:
     return f"{lines[0]} | … | {lines[-1]}"[:limit]
 
 
+def longest_edge(ffprobe: str, path: Path) -> int:
+    """源图的最长边（像素）；读不出来返回 0。
+
+    只用来决定"要不要下传 --long-edge"：不加判断直接传也对（caesium 不会放大），
+    但显式判断能让 dry-run 打印出真正会执行的参数。
+    """
+    command = [ffprobe, "-v", "error", "-select_streams", "v",
+               "-show_entries", "stream=width,height", "-of", "json", str(path)]
+    try:
+        result = run(command)
+        if result.returncode != 0:
+            return 0
+        streams = (json.loads(result.stdout or "{}").get("streams") or [{}])
+        first = streams[0]
+        return max(int(first.get("width") or 0), int(first.get("height") or 0))
+    except (OSError, subprocess.TimeoutExpired, json.JSONDecodeError, IndexError, ValueError):
+        return 0
+
+
 def probe(ffprobe: str, path: Path) -> dict:
     """用 ffprobe 读视频流与容器信息；图像路径不走这里。"""
     command = [ffprobe, "-v", "error",
@@ -240,7 +330,7 @@ def make_temp_dir(out_root: Path) -> Path:
 
 
 def compress_image(caesium: str, src: Path, target: Path, quality: int, image_format: str,
-                   strip_exif: bool, dry_run: bool, tmp: Path) -> tuple[int, str]:
+                   strip_exif: bool, max_edge: int, tmp: Path) -> tuple[int, str]:
     """压缩单张图像，成功返回 (压缩后字节数, "")；失败或省得不够返回 (0, 原因)。
 
     caesiumclt 的 `-e` 是"保留 EXIF"，所以 --image-strip-exif 是省掉该开关而
@@ -250,6 +340,9 @@ def compress_image(caesium: str, src: Path, target: Path, quality: int, image_fo
     临时目录由调用方按"输出根"建一个并登记清理；它不是按文件各建一个，所以
     输出镜像树里不会凭空多出目录。并发压缩时各文件用各自不同的文件名写进这个
     目录，再由 os.replace 原子改名到目标，彼此不冲突。
+
+    max_edge > 0 时按最长边缩放，配 --no-upscale：caesium 只在源超限时才缩，
+    不会把小图放大。缩放和编码在同一次调用里完成，不会二次有损。
     """
     command = [caesium, "-q", str(quality), "--keep-orientation", "--keep-dates",
                "-O", "all", "--json", "-o", str(tmp)]
@@ -261,7 +354,10 @@ def compress_image(caesium: str, src: Path, target: Path, quality: int, image_fo
     # 传了反而会把本来能压的文件变成"失败后复制"。
     if image_format != "original" and target.suffix.lower() != src.suffix.lower():
         command += ["--format", image_format]
+    if max_edge > 0:
+        command += ["--long-edge", str(max_edge), "--no-upscale"]
     command.append(str(src))
+    log("exec: " + " ".join(command))         # 完整命令，方便事后单独复现
     result = run(command)
     try:
         payload = json.loads(result.stdout or "{}")
@@ -304,7 +400,9 @@ def compress_video(handbrake: str, ffprobe: str, src: Path, target: Path,
         return 0, "dry_run"
 
     target.parent.mkdir(parents=True, exist_ok=True)
-    try:        result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+    log("exec: " + " ".join(command))         # 完整命令，方便事后单独复现
+    try:
+        result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                                 encoding="utf-8", errors="replace")
     except OSError as exc:
         return 0, str(exc)
@@ -445,6 +543,11 @@ def main(argv: list[str]) -> int:
                         help="image output format (default: original, keep source format)")
     parser.add_argument("--image-strip-exif", action="store_true",
                         help="strip image EXIF (including GPS and other private data)")
+    parser.add_argument("--image-max-edge", type=int, default=DEFAULT_IMAGE_MAX_EDGE,
+                        help="downscale images so the longest edge fits this many pixels "
+                             f"(default: {DEFAULT_IMAGE_MAX_EDGE}; 0 = no limit). "
+                             "Never upscales. Common values: "
+                             + ", ".join(str(v) for v in IMAGE_MAX_EDGE_CHOICES[1:]))
     parser.add_argument("--image-jobs", type=int, default=3,
                         help="parallel image compressions (default: 3; 1 = serial)")
     parser.add_argument("--copy-unprocessed", choices=("yes", "no"), default="yes",
@@ -452,12 +555,19 @@ def main(argv: list[str]) -> int:
                              "(default: yes). 'no' makes the output tree INCOMPLETE, "
                              "so it can no longer replace the source folder.")
     parser.add_argument("--dry-run", action="store_true", help="print commands only, write nothing")
+    parser.add_argument("--log", nargs="?", const="auto", default="auto", metavar="no|FILE",
+                        help="write a log next to the output (default: auto, i.e. "
+                             "<output>/media-compress-<timestamp>.log). 'no' disables it; "
+                             "a path writes/appends there instead.")
     args = parser.parse_args(argv[1:])
     if not 0 <= args.image_quality <= 100:
         log("[ERROR] --image-quality must be between 0 and 100", file=sys.stderr)
         return 2
     if args.image_jobs < 1:
         log("[ERROR] --image-jobs must be at least 1", file=sys.stderr)
+        return 2
+    if args.image_max_edge != 0 and args.image_max_edge < 64:
+        log("[ERROR] --image-max-edge must be 0 (no limit) or at least 64", file=sys.stderr)
         return 2
 
     preset_name, container_ext = load_preset(CONFIG_PATH)
@@ -468,6 +578,40 @@ def main(argv: list[str]) -> int:
             log(f"[ERROR] path not found: {path}", file=sys.stderr)
         return 1
 
+    # 日志要在规划之前打开，"已存在则跳过"那些行才进得了日志。
+    # 显式路径 -> 追加；auto -> 在输出根下新建带时间戳的文件。
+    logger: Logger | None = None
+    if args.log != "no":
+        # 时间戳带微秒：同一秒内连跑两次（脚本很快时很常见）文件名就不会撞，
+        # 否则第二次会把第一次的日志截断覆盖。
+        stamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
+        if args.log == "auto":
+            # 与 collect 同一套规则：有 -o 就是它，否则各自源目录的 _compressed。
+            base = Path(args.output).expanduser().resolve() if args.output else \
+                (paths[0] if paths[0].is_dir() else paths[0].parent)
+            log_path = (base if args.output else base / DEFAULT_OUTPUT_DIR) / \
+                f"media-compress-{stamp}{LOG_SUFFIX}"
+            fresh = True
+        else:
+            log_path = Path(args.log).expanduser()
+            fresh = False
+        try:
+            logger = Logger(log_path, fresh)
+            logger.open()
+        except OSError as exc:
+            log(f"[ERROR] cannot open log file: {exc}", file=sys.stderr)
+            return 1
+
+    try:
+        return compress_all(args, paths, preset_name, container_ext)
+    finally:
+        if logger is not None:
+            logger.close()
+
+
+def compress_all(args, paths: list[Path], preset_name: str,
+                 container_ext: str) -> int:
+    """打开日志之后的主体；单独成函数，好让日志在 finally 里可靠关闭。"""
     images, videos, passthrough = collect(paths, args.output)
     if args.only == "image":
         videos = []
@@ -476,7 +620,10 @@ def main(argv: list[str]) -> int:
         passthrough = []
 
     # 先算出真正需要哪些工具，再去解析它们；不处理的那一类连查找都不做。
-    needed = (["caesium"] if images else []) + (["ffprobe", "handbrake"] if videos else [])
+    # 图像也要 ffprobe：--image-max-edge 要先知道源的最长边才能决定是否下传
+    # --long-edge（dry-run 打印的命令要如实反映这一点）。
+    needed = (["caesium", "ffprobe"] if images else []) \
+        + (["ffprobe", "handbrake"] if videos else [])
     found = tools(needed)
     absent = [name for name in needed if not found[name]]
     if absent:
@@ -617,6 +764,13 @@ def main(argv: list[str]) -> int:
             return failed_copy or (tag, src, fallback, size, 0, "COPY",
                                    "unsupported format, copied as is")
         if kind == "IMAGE":
+            # 只有源超过上限才缩。caesium 本身不会放大，但先判断能让 dry-run
+            # 打印出真正会执行的参数。
+            shrink = 0
+            if args.image_max_edge > 0:
+                edge = longest_edge(found["ffprobe"], src)
+                if edge > args.image_max_edge:
+                    shrink = args.image_max_edge
             if args.dry_run:
                 command = [found["caesium"], "-q", str(args.image_quality),
                            "--keep-orientation", "--keep-dates", "-O", "all", "--json",
@@ -626,6 +780,8 @@ def main(argv: list[str]) -> int:
                 if args.image_format != "original" \
                         and src.suffix.lower() != target.suffix.lower():
                     command += ["--format", args.image_format]
+                if shrink:
+                    command += ["--long-edge", str(shrink), "--no-upscale"]
                 log("    " + " ".join(command + [str(src)]), flush=True)
                 return tag, src, target, size, 0, "DRY", ""
             try:
@@ -640,7 +796,7 @@ def main(argv: list[str]) -> int:
                 tmp_dirs.add(tmp)             # 登记后即使中断也会被清理
             new_size, reason = compress_image(found["caesium"], src, target,
                                               args.image_quality, args.image_format,
-                                              args.image_strip_exif, False, tmp)
+                                              args.image_strip_exif, shrink, tmp)
         else:
             new_size, reason = compress_video(found["handbrake"], found["ffprobe"], src,
                                               target, preset_name, args.dry_run)

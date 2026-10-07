@@ -6,7 +6,8 @@
 - 工具路径**自动查找**，无需配置
 - 输出到各自的 `<源目录>/_compressed/`，镜像源目录结构，**原文件始终不动**
 - 未压缩的文件默认**原样复制**进输出目录，所以输出目录可以替代源目录
-- 不写日志、不写台账、不加锁，产物只有压缩后的文件本身
+- 在输出目录写一份带完整命令行的日志，可用 `--log no` 关闭
+- 不写台账、不加锁，产物只有压缩后的文件和那份日志
 
 ## 下载工具
 
@@ -27,17 +28,23 @@
 | `--image-quality <0-100>` | `82` | 图像质量，越大越清晰 |
 | `--image-format <格式>` | `original` | 图像输出格式：`original`/`jpeg`/`png`/`gif`/`webp`/`tiff` |
 | `--image-strip-exif` | 关 | 去掉图像的 EXIF（含 GPS 等隐私信息）；默认保留 |
+| `--image-max-edge <像素>` | `5120` | 图像最长边上限，超出才缩；`0` 表示不限制 |
 | `--image-jobs <n>` | `3` | 图像并发数；`1` 为串行 |
 | `--copy-unprocessed <yes\|no>` | `yes` | 把未压缩的文件原样复制进输出目录；`no` 则不复制 |
 | `--dry-run` | 关 | 只打印将执行的命令，零写入 |
+| `--log [no\|路径]` | `auto` | 默认在输出根写 `media-compress-<时间戳>.log`；`no` 关闭；给路径则写到那里 |
 
 ```bash
 media-compress ./media                                  # 输出到 ./media/_compressed/
 media-compress ./pics --only image --image-quality 70   # 只压图，质量 70
 media-compress ./pics --image-format webp               # 图像统一转 webp
 media-compress ./pics --image-strip-exif                # 顺带清掉 GPS 等 EXIF 信息
+media-compress ./pics --image-max-edge 1920             # 最长边限制到 1920
+media-compress ./pics --image-max-edge 0                # 完全不缩放
 media-compress ./pics --image-jobs 4                    # 图像开 4 并发
 media-compress ./media --copy-unprocessed no            # 只要压缩产物，不复制其余文件
+media-compress ./media --log no                         # 不写日志
+media-compress ./media --log D:\logs\run.log            # 写到指定文件（追加）
 media-compress ./media --dry-run                        # 先看清楚会执行什么
 ```
 
@@ -157,6 +164,9 @@ media-compress ./media --dry-run                        # 先看清楚会执行�
 ## 注意事项
 
 - 图像是有损压缩（`--image-quality` 越大越清晰）
+- `--image-max-edge` **只在源超出上限时才缩，永不放大**；缩放与压缩在同一次编码里
+  完成，不会二次有损。常用取值：`1920`（1080p 屏）、`2560`、`3840`（4K）、
+  `5120`（5K，默认）、`6144`、`7680`、`8192`、`0`（不限）
 - 压不动的图像、已高效的视频、caesiumclt 读不了的格式，默认都会原样复制进输出目录
   （`[COPY]`），所以输出目录不会缺文件
 - `.tif/.tiff/.bmp` 和 `.avif/.heic/.heif/.jxl` 不会被压缩，只会原样复制
