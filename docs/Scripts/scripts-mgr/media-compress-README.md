@@ -11,12 +11,12 @@
 
 ## 下载工具
 
-- caesiumclt：<https://github.com/Lymphatus/caesium-clt>
-- HandBrakeCLI：<https://handbrake.fr/downloads2.php>，放进 HandBrake 安装目录
-- ffprobe：随 <https://ffmpeg.org/download.html> 提供，仅用于校验转码结果
+- caesiumclt：<https://github.com/Lymphatus/caesium-clt>，处理图像
+- HandBrakeCLI：<https://handbrake.fr/downloads2.php>，处理视频，放进 HandBrake 安装目录
+- ffmpeg / ffprobe：随 <https://ffmpeg.org/download.html> 提供；ffmpeg 压音乐，ffprobe 校验结果
 
-三者都在 PATH 里最省事；HandBrake 装在非系统盘也能被找到。找不到或找错了，可以用
-环境变量直接指定：`CAESIUM_CLT`、`HANDBRAKE_CLI`、`FFPROBE`。
+都在 PATH 里最省事；HandBrake 装在非系统盘也能被找到。找不到或找错了，可以用
+环境变量直接指定：`CAESIUM_CLT`、`HANDBRAKE_CLI`、`FFMPEG`、`FFPROBE`。
 
 ## 参数
 
@@ -24,16 +24,18 @@
 |---|---|---|
 | `<文件或目录...>` | 必填 | 可多个，目录会递归扫描 |
 | `-o, --output <目录>` | 各自的 `_compressed/` | 所有输入共用一个输出目录 |
-| `--only image\|video` | 全部 | 只**压缩**这一类；另一类仍按 `--copy-unprocessed` 处理（复制而非压缩） |
-| `--config <文件>` | 脚本旁的 `media-compress.json` | 换成另一个 HandBrake 预设 JSON |
-| `--preset <名字>` | 该文件里第一个预设 | 从多预设文件里挑一个（**区分大小写**） |
+| `--only image\|video\|audio` | 全部 | 只**压缩**这一类；其余仍按 `--copy-unprocessed` 处理（复制而非压缩） |
+| `--video-config <文件>` | 脚本旁的 `media-compress.json` | 换成另一个 HandBrake 预设 JSON |
+| `--video-preset <名字>` | 该文件里第一个预设 | 从多预设文件里挑一个（**区分大小写**） |
 | `--image-quality <0-100>` | `82` | 图像质量，越大越清晰 |
 | `--image-format <格式>` | `original` | 图像输出格式：`original`/`jpeg`/`png`/`gif`/`webp`/`tiff` |
 | `--image-strip-exif` | 关 | 去掉图像的 EXIF（含 GPS 等隐私信息）；默认保留 |
 | `--image-max-edge <像素>` | `5120` | 图像最长边上限，超出才缩；`0` 表示不限制 |
 | `--image-jobs <n>` | `3` | 图像并发数；`1` 为串行 |
+| `--audio-codec <格式>` | `mp3` | 音乐输出格式：`mp3`/`flac`/`opus`/`aac` |
+| `--audio-bitrate <码率>` | `192k` | 仅对有损格式生效（`flac` 忽略）：`128k`/`192k`/`256k`/`320k` |
 | `--copy-unprocessed <yes\|no>` | `yes` | 把未压缩的文件原样复制进输出目录；`no` 则不复制 |
-| `--dry-run` | 关 | 只打印将执行的命令，零写入 |
+| `--dry-run` | 关 | 只打印将执行的命令，**零写入**（连日志和输出目录都不建） |
 | `--log [no\|路径]` | `auto` | 默认在输出根写 `media-compress-<时间戳>.log`；`no` 关闭；给路径则写到那里 |
 
 ```bash
@@ -44,24 +46,66 @@ media-compress ./pics --image-strip-exif                # 顺带清掉 GPS 等 E
 media-compress ./pics --image-max-edge 1920             # 最长边限制到 1920
 media-compress ./pics --image-max-edge 0                # 完全不缩放
 media-compress ./pics --image-jobs 4                    # 图像开 4 并发
+media-compress ./music --only audio                     # 只压音乐
+media-compress ./music --audio-codec flac               # 无损压缩（音质零损失）
+media-compress ./music --audio-bitrate 128k             # 更省体积
 media-compress ./media --copy-unprocessed no            # 只要压缩产物，不复制其余文件
 media-compress ./media --log no                         # 不写日志
 media-compress ./media --log D:\logs\run.log            # 写到指定文件（追加）
-media-compress ./media --preset 1080p-h265              # 用内置配置里的另一个预设
-media-compress ./media --config D:\my-presets.json      # 换成自己的预设文件
+media-compress ./media --video-preset 1080p-h265        # 用内置配置里的另一个预设
+media-compress ./media --video-config D:\my-presets.json  # 换成自己的预设文件
 media-compress ./media --dry-run                        # 先看清楚会执行什么
 ```
 
 `--image-format` 只换容器、不换画质（画质看 `--image-quality`），输出的扩展名会自动
 跟着变（如 `<名字>.webp`）。指定与源相同的格式也没问题，等于 `original`。
 
-**省不到时保留源扩展名**：转 webp 若压不动（源本身已压得很紧，转出来反而更大），
-脚本复制原文件并保持原名（`poster.jpg` 而不是 `poster.webp`），所以扩展名不会说谎。
-代价是压成功的和没压成的可能后缀不同。**例外**：同目录下有同名不同扩展名的文件
-（`poster.jpg` + `poster.png`）时，为保证输出目录完整，压不动的那个会复制成目标名
-（内容仍是 jpg），并给另一个记缺口警告。
+**省不到时保留原件**：转 webp/mp3 若压不动（源本身已压得很紧，转出来反而更大），
+脚本复制原文件。扩展名会说谎时（`poster.webp` 里装着 JPEG、`song.mp3` 里装着 FLAC）
+加 `.orig` 后缀；扩展名本来就没说错时保持原名：
 
+```
+poster.webp.orig    ← 转 webp 没省到，内容仍是 JPEG
+song.mp3.orig       ← 转 mp3 没省到，内容仍是 FLAC
+modern.mp4          ← 现代编码跳过，本来就是这个格式，不加后缀
+note.txt            ← 非媒体文件，原样复制
+```
 
+**输出名冲突时自动加序号**：两个源争同一个输出名（同目录的 `song.mp3` 与
+`song.flac` 在 `--audio-codec mp3` 下都想叫 `song.mp3`）时，先到者保留原名，后到者
+变成 `song-2.mp3`。**任何情况下都不会覆盖文件**，也不会因为撞名而丢文件。
+
+## 压缩音乐
+
+只处理**独立音频文件**（不是视频里的音轨）。规则很简单：**除了已经是目标格式的，全都转**。
+
+| 源格式 | `--audio-codec mp3` | `flac` | `opus` | `aac` |
+|---|---|---|---|---|
+| `mp3` | 重编 | 转 | 转 | 转 |
+| `flac` | 转 | 复制 | 转 | 转 |
+| `wav`/`alac`/`ape`/`wv`/`aiff` | 转 | 转 | 转 | 转 |
+| `m4a`/`aac` | 转 | 转 | 转 | 复制 |
+| `ogg`/`opus` | 转 | 转 | 复制 | 转 |
+
+「复制」只发生在源**已经是目标格式**时——同编码器重转一遍收益接近零（`flac→flac`
+实测省 0%），有损的同格式重转更是白掉一次音质。
+
+所以 `--audio-codec opus --audio-bitrate 128k` 会把 mp3 库整体转成 opus（320k mp3
+→ 128k opus 实测**省 53%**）。
+
+**重编码只在"往下压"时才有意义**：`mp3 320k → 128k` 省约 60%，而 `320k → 320k` 省 0%、
+`128k → 192k` 反而更大——后两种都是白白再掉一次音质。脚本的"省不到 10% 就保留原文件"
+规则会自动挡住它们（保留的文件加 `.orig`），所以不必自己判断源码率。
+
+**跨有损格式转换会再损失一次音质**（mp3 → opus 属于二次有损编码）。要避免就选同一个
+格式：`--audio-codec mp3` 处理 mp3 库属于同格式调码率，损失最小。
+
+**标签和封面会保住**（`title`/`artist`/`album`/`track` + 内嵌封面），转换后还会校验
+是否丢失，丢了就判定失败并保留原文件。**例外**：`opus`（Ogg 容器）装不下内嵌封面，
+选它时封面不会被嵌入，需要的话把封面图单独放在同一目录（脚本会照常复制它）。
+
+**mp3 的两个硬限制**：装不下多声道（5.1 会下混成立体声）、采样率上限 48 kHz
+（更高会被重采样）。两者都不可逆，但脚本会照转并在日志里写明。
 
 补充：
 
@@ -73,24 +117,24 @@ media-compress ./media --dry-run                        # 先看清楚会执行�
 
 ## 配置与预设
 
-视频参数全部来自预设 JSON（默认是脚本旁的 `media-compress.json`），脚本不提供任何
-视频参数开关。**图像参数不走这里**，它们只看命令行（`--image-*`）——两者没有交叠，
-所以不存在谁覆盖谁的问题。
+视频参数全部来自预设 JSON（默认是脚本旁的 `media-compress.json`，用 `--video-config`
+换），脚本不提供任何视频参数开关。**图像和音频参数不走这里**，它们只看命令行
+（`--image-*` / `--audio-*`）——三者没有交叠，所以不存在谁覆盖谁的问题。
 
 **优先级**：命令行 > 配置文件 > 内置默认。
 
 ### 内置的 4 个预设
 
-配置文件里按**质量从低到高**排列，所以默认（不传 `--preset`）用第一个 `480p-h265`：
+配置文件里按**质量从低到高**排列，所以默认（不传 `--video-preset`）用第一个 `480p-h265`：
 
-| `--preset` | 编码器 | 画质 | 分辨率 | 速度档 |
+| `--video-preset` | 编码器 | 画质 | 分辨率 | 速度档 |
 |---|---|---|---|---|
 | `480p-h265`（默认，第一个） | `nvenc_h265` | 38 | 720×480 | fastest |
 | `720p-h265` | `nvenc_h265` | 22 | 1280×720 | slowest |
 | `720p-h264` | `nvenc_h264` | 22 | 1280×720 | medium |
 | `1080p-h265` | `nvenc_h265` | 22 | 1920×1080 | medium |
 
-不传 `--preset` 时用文件里**第一个**预设，想换默认就调整文件里的顺序。名字**区分
+不传 `--video-preset` 时用文件里**第一个**预设，想换默认就调整文件里的顺序。名字**区分
 大小写**——HandBrake 就是敏感的，写错会被直接拒绝并列出可用名字。
 
 ### 换成自己的预设
@@ -98,7 +142,7 @@ media-compress ./media --dry-run                        # 先看清楚会执行�
 1. 打开 HandBrake GUI，调好分辨率、编码器、质量、音频、字幕
 2. **Presets → Add New Preset** 保存并命名（可以建多个，甚至放进文件夹）
 3. 右键 → **Export** → 导出 JSON
-4. 用 `--config <该文件>` 指过去，用 `--preset <名字>` 挑其中一个
+4. 用 `--video-config <该文件>` 指过去，用 `--video-preset <名字>` 挑其中一个
 
 也可以直接覆盖脚本旁的 `media-compress.json` 当默认值。预设文件支持 HandBrake 的
 **多层结构**（预设放在文件夹的 `ChildrenArray` 里也认得）。
@@ -107,7 +151,7 @@ media-compress ./media --dry-run                        # 先看清楚会执行�
 
 | 字段 | 含义 |
 |---|---|
-| `PresetName` | 预设名，`--preset` 就是匹配它 |
+| `PresetName` | 预设名，`--video-preset` 就是匹配它 |
 | `VideoEncoder` | 编码器，改这里就是改硬编/软编 |
 | `VideoQualitySlider` | 画质（`VideoQualityType: 2` 时数值越小越清晰、体积越大） |
 | `VideoPreset` | 编码速度档，越慢同画质体积越小 |
