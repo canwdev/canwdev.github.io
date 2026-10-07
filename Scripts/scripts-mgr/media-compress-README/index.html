@@ -7147,7 +7147,8 @@
 <li>工具路径**自动查找**，无需配置</li>
 <li>输出到各自的 <code>&lt;源目录&gt;/_compressed/</code>，镜像源目录结构，<strong>原文件始终不动</strong></li>
 <li>未压缩的文件默认**原样复制**进输出目录，所以输出目录可以替代源目录</li>
-<li>不写日志、不写台账、不加锁，产物只有压缩后的文件本身</li>
+<li>在输出目录写一份带完整命令行的日志，可用 <code>--log no</code> 关闭</li>
+<li>不写台账、不加锁，产物只有压缩后的文件和那份日志</li>
 </ul>
 <h2 id="下载工具">下载工具<a class="headerlink" href="#下载工具" title="Permanent link">¶</a></h2>
 <ul>
@@ -7198,6 +7199,11 @@
 <td>去掉图像的 EXIF（含 GPS 等隐私信息）；默认保留</td>
 </tr>
 <tr>
+<td><code>--image-max-edge &lt;像素&gt;</code></td>
+<td><code>5120</code></td>
+<td>图像最长边上限，超出才缩；<code>0</code> 表示不限制</td>
+</tr>
+<tr>
 <td><code>--image-jobs &lt;n&gt;</code></td>
 <td><code>3</code></td>
 <td>图像并发数；<code>1</code> 为串行</td>
@@ -7212,21 +7218,34 @@
 <td>关</td>
 <td>只打印将执行的命令，零写入</td>
 </tr>
+<tr>
+<td><code>--log [no\|路径]</code></td>
+<td><code>auto</code></td>
+<td>默认在输出根写 <code>media-compress-&lt;时间戳&gt;.log</code>；<code>no</code> 关闭；给路径则写到那里</td>
+</tr>
 </tbody>
 </table>
-<div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Bash</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1">1</a></span>
-<span class="normal"><a href="#__codelineno-0-2">2</a></span>
-<span class="normal"><a href="#__codelineno-0-3">3</a></span>
-<span class="normal"><a href="#__codelineno-0-4">4</a></span>
-<span class="normal"><a href="#__codelineno-0-5">5</a></span>
-<span class="normal"><a href="#__codelineno-0-6">6</a></span>
-<span class="normal"><a href="#__codelineno-0-7">7</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1"></a>media-compress<span class="w"> </span>./media<span class="w">                                  </span><span class="c1"># 输出到 ./media/_compressed/</span>
+<div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Bash</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1"> 1</a></span>
+<span class="normal"><a href="#__codelineno-0-2"> 2</a></span>
+<span class="normal"><a href="#__codelineno-0-3"> 3</a></span>
+<span class="normal"><a href="#__codelineno-0-4"> 4</a></span>
+<span class="normal"><a href="#__codelineno-0-5"> 5</a></span>
+<span class="normal"><a href="#__codelineno-0-6"> 6</a></span>
+<span class="normal"><a href="#__codelineno-0-7"> 7</a></span>
+<span class="normal"><a href="#__codelineno-0-8"> 8</a></span>
+<span class="normal"><a href="#__codelineno-0-9"> 9</a></span>
+<span class="normal"><a href="#__codelineno-0-10">10</a></span>
+<span class="normal"><a href="#__codelineno-0-11">11</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1"></a>media-compress<span class="w"> </span>./media<span class="w">                                  </span><span class="c1"># 输出到 ./media/_compressed/</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2"></a>media-compress<span class="w"> </span>./pics<span class="w"> </span>--only<span class="w"> </span>image<span class="w"> </span>--image-quality<span class="w"> </span><span class="m">70</span><span class="w">   </span><span class="c1"># 只压图，质量 70</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3"></a>media-compress<span class="w"> </span>./pics<span class="w"> </span>--image-format<span class="w"> </span>webp<span class="w">               </span><span class="c1"># 图像统一转 webp</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4"></a>media-compress<span class="w"> </span>./pics<span class="w"> </span>--image-strip-exif<span class="w">                </span><span class="c1"># 顺带清掉 GPS 等 EXIF 信息</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5"></a>media-compress<span class="w"> </span>./pics<span class="w"> </span>--image-jobs<span class="w"> </span><span class="m">4</span><span class="w">                    </span><span class="c1"># 图像开 4 并发</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6"></a>media-compress<span class="w"> </span>./media<span class="w"> </span>--copy-unprocessed<span class="w"> </span>no<span class="w">            </span><span class="c1"># 只要压缩产物，不复制其余文件</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7"></a>media-compress<span class="w"> </span>./media<span class="w"> </span>--dry-run<span class="w">                        </span><span class="c1"># 先看清楚会执行什么</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5"></a>media-compress<span class="w"> </span>./pics<span class="w"> </span>--image-max-edge<span class="w"> </span><span class="m">1920</span><span class="w">             </span><span class="c1"># 最长边限制到 1920</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6"></a>media-compress<span class="w"> </span>./pics<span class="w"> </span>--image-max-edge<span class="w"> </span><span class="m">0</span><span class="w">                </span><span class="c1"># 完全不缩放</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7"></a>media-compress<span class="w"> </span>./pics<span class="w"> </span>--image-jobs<span class="w"> </span><span class="m">4</span><span class="w">                    </span><span class="c1"># 图像开 4 并发</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8"></a>media-compress<span class="w"> </span>./media<span class="w"> </span>--copy-unprocessed<span class="w"> </span>no<span class="w">            </span><span class="c1"># 只要压缩产物，不复制其余文件</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9"></a>media-compress<span class="w"> </span>./media<span class="w"> </span>--log<span class="w"> </span>no<span class="w">                         </span><span class="c1"># 不写日志</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10"></a>media-compress<span class="w"> </span>./media<span class="w"> </span>--log<span class="w"> </span>D:<span class="se">\l</span>ogs<span class="se">\r</span>un.log<span class="w">            </span><span class="c1"># 写到指定文件（追加）</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11"></a>media-compress<span class="w"> </span>./media<span class="w"> </span>--dry-run<span class="w">                        </span><span class="c1"># 先看清楚会执行什么</span>
 </code></pre></div></td></tr></tbody></table></div>
 <p><code>--image-format</code> 只换容器、不换画质（画质看 <code>--image-quality</code>），输出的扩展名会自动<br>
 跟着变（如 <code>&lt;名字&gt;.webp</code>）。指定与源相同的格式也没问题，等于 <code>original</code>。</p>
@@ -7400,6 +7419,9 @@
 <h2 id="注意事项">注意事项<a class="headerlink" href="#注意事项" title="Permanent link">¶</a></h2>
 <ul>
 <li>图像是有损压缩（<code>--image-quality</code> 越大越清晰）</li>
+<li><code>--image-max-edge</code> <strong>只在源超出上限时才缩，永不放大</strong>；缩放与压缩在同一次编码里<br>
+  完成，不会二次有损。常用取值：<code>1920</code>（1080p 屏）、<code>2560</code>、<code>3840</code>（4K）、<br>
+<code>5120</code>（5K，默认）、<code>6144</code>、<code>7680</code>、<code>8192</code>、<code>0</code>（不限）</li>
 <li>压不动的图像、已高效的视频、caesiumclt 读不了的格式，默认都会原样复制进输出目录<br>
   （<code>[COPY]</code>），所以输出目录不会缺文件</li>
 <li><code>.tif/.tiff/.bmp</code> 和 <code>.avif/.heic/.heif/.jxl</code> 不会被压缩，只会原样复制</li>
@@ -7435,7 +7457,7 @@
     <span class="md-icon" title="最后更新">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"></path></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-datetime" title="2026年10月7日 12:38:44 CST">2026年10月7日 12:38:44</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-datetime" title="2026年10月7日 13:08:10 CST">2026年10月7日 13:08:10</span>
   </span>
 
     
