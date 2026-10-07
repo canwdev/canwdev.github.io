@@ -30,17 +30,24 @@ import shutil
 import string
 import subprocess
 import sys
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime
 from pathlib import Path
+from threading import Lock
 
 SOURCE_DIR = Path(__file__).resolve().parent
 CONFIG_PATH = SOURCE_DIR / "media-compress.json"
 DEFAULT_OUTPUT_DIR = "_compressed"
 
-IMAGE_EXTS = {".jpg", ".jpeg", ".jfif", ".png", ".webp", ".gif", ".bmp", ".tif", ".tiff"}
+# caesiumclt 1.5.0 读不了这些，实测每次都失败：
+#   .avif/.heic/.heif/.jxl -> 报错退出
+#   .tif/.tiff/.bmp        -> "Unable to compute the base path for the files."
+# 它们本身也不易再压，所以不压缩、但仍是图像类别，这样 --copy-unprocessed yes
+# 会把它们原样搬进输出目录，输出目录不会缺文件。
+PASSTHROUGH_EXTS = {".avif", ".heic", ".heif", ".jxl", ".tif", ".tiff", ".bmp"}
+IMAGE_EXTS = ({".jpg", ".jpeg", ".jfif", ".png", ".webp", ".gif"} | PASSTHROUGH_EXTS)
 VIDEO_EXTS = {".mp4", ".m4v", ".mov", ".mkv", ".webm", ".avi",
               ".wmv", ".flv", ".mpg", ".mpeg", ".ts", ".m2ts", ".3gp"}
-# caesiumclt 1.5.0 读不了这些（实测报错），且本身已足够高效，直接跳过。
-TOOL_UNSUPPORTED_EXTS = {".avif", ".heic", ".heif", ".jxl"}
 MODERN_VIDEO_CODECS = {"hevc", "h265", "av1", "vp9", "vp8"}
 HDR_TRANSFERS = {"smpte2084", "arib-std-b67"}
 JUNK_NAMES = {"desktop.ini", "thumbs.db", "ehthumbs.db", ".ds_store", ".localized"}
@@ -66,6 +73,18 @@ def setup_console() -> None:
             stream.reconfigure(encoding="utf-8")  # type: ignore[attr-defined]
         except (AttributeError, OSError, ValueError):
             pass
+
+
+def log(message: str = "", file=None, **_ignored) -> None:
+    """带人类可读时间戳的输出。
+
+    时间戳打在**每一行**上，因为多行结果（例如"输出目录完整"那两行）只有每行
+    各自带时间才知道那会儿在做什么。注意换行符在时间戳之前，续行才不会被污染。
+    并发时也逐行加锁式打印，所以时间戳的顺序与实际写出顺序一致。
+    总是 flush：后台运行或管道里被缓冲的话，时间戳就失去意义了。
+    """
+    stamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    print(f"{stamp} {message}", file=file, flush=True)
 
 
 def human(size: float) -> str:
@@ -208,33 +227,28 @@ def temp_dir_for(target: Path) -> Path:
 
 
 def compress_image(caesium: str, src: Path, target: Path, quality: int, image_format: str,
-                   strip_exif: bool, dry_run: bool,
-                   made_tmp: set[Path]) -> tuple[int, str]:
+                   strip_exif: bool, dry_run: bool, tmp: Path) -> tuple[int, str]:
     """压缩单张图像，成功返回 (压缩后字节数, "")；失败或省得不够返回 (0, 原因)。
 
     caesiumclt 的 `-e` 是"保留 EXIF"，所以 --image-strip-exif 是省掉该开关而
     不是加上某个开关。
     `--keep-orientation` 始终保留：只留方向标签，否则带 EXIF 旋转的照片会躺倒。
 
-    目录在真正要压缩时才创建，并登记进 made_tmp 由调用方兜底清理——dry-run
-    和"输出会覆盖源文件"这类提前跳过的路径因此不会留下任何东西。
+    临时目录由调用方按文件独立命名并登记清理；创建推迟到真正要压缩之时，
+    所以 dry-run 和"输出会覆盖源文件"这类提前跳过的路径不留任何东西。
+    每次调用用独立目录，多个并发任务才不会写进同一个目录互相覆盖。
     """
-    tmp = temp_dir_for(target)
     command = [caesium, "-q", str(quality), "--keep-orientation", "--keep-dates",
                "-O", "all", "--json", "-o", str(tmp)]
     if not strip_exif:
         command.append("-e")
-    if image_format != "original":
+    # 只在输出扩展名与源不同时才传 --format。caesiumclt 对"转成自身格式"会直接
+    # 报 "Cannot convert to the same format"（实测 png->png / jpg->jpeg /
+    # webp->webp / gif->gif 全失败），而 --format original 的语义本就是保持原样，
+    # 传了反而会把本来能压的文件变成"失败后复制"。
+    if image_format != "original" and target.suffix.lower() != src.suffix.lower():
         command += ["--format", image_format]
     command.append(str(src))
-    if dry_run:
-        print("    " + " ".join(command))
-        return 0, "dry_run"
-    try:
-        tmp.mkdir(parents=True, exist_ok=True)
-        made_tmp.add(tmp)
-    except OSError as exc:
-        return 0, f"cannot create temp dir: {exc}"
     result = run(command)
     try:
         payload = json.loads(result.stdout or "{}")
@@ -272,7 +286,7 @@ def compress_video(handbrake: str, ffprobe: str, src: Path, target: Path,
     command = [handbrake, "-i", str(src), "-o", str(temp),
                "--preset-import-file", str(CONFIG_PATH), "--preset", preset_name]
     if dry_run:
-        print("    " + " ".join(command))
+        log("    " + " ".join(command))
         return 0, "dry_run"
 
     target.parent.mkdir(parents=True, exist_ok=True)
@@ -319,11 +333,16 @@ def verify_video(ffprobe: str, src: Path, out: Path, info: dict) -> str:
 # ------------------------------ 扫描与主流程 ------------------------------
 
 def classify(path: Path) -> str:
+    """返回 image / video / passthrough / junk / other。
+
+    passthrough 表示"不压缩、但可以原样搬过去"：caesiumclt 读不了的格式。
+    这类文件必须进队列，否则 --copy-unprocessed 管不到它，输出目录会缺文件。
+    """
     if path.name.lower() in JUNK_NAMES:
         return "junk"
     suffix = path.suffix.lower()
     if suffix in IMAGE_EXTS:
-        return "skip" if suffix in TOOL_UNSUPPORTED_EXTS else "image"
+        return "passthrough" if suffix in PASSTHROUGH_EXTS else "image"
     if suffix in VIDEO_EXTS:
         return "video"
     return "other"
@@ -332,14 +351,15 @@ def classify(path: Path) -> str:
 Item = tuple[Path, Path, Path]               # (源文件, 输入根目录, 输出根目录)
 
 
-def collect(paths: list[Path], output: str | None) -> tuple[list[Item], list[Item]]:
-    """展开输入为 (图像列表, 视频列表)，过程不读取任何文件内容。
+def collect(paths: list[Path], output: str | None) -> tuple[list[Item], list[Item], list[Item]]:
+    """展开输入为 (图像, 视频, 仅复制) 三个列表，过程不读取任何文件内容。
 
     每个输入各自决定输出根目录：显式 --output 时是所有输入共用的那一个，
     否则是该输入自己的 <目录>/_compressed/。
     """
     images: list[Item] = []
     videos: list[Item] = []
+    passthrough: list[Item] = []
     for path in paths:
         if path.is_file():
             root, files, base = path.parent, [path], path.parent
@@ -357,7 +377,9 @@ def collect(paths: list[Path], output: str | None) -> tuple[list[Item], list[Ite
                 images.append((item, root, out_root))
             elif kind == "video":
                 videos.append((item, root, out_root))
-    return images, videos
+            elif kind == "passthrough":
+                passthrough.append((item, root, out_root))
+    return images, videos, passthrough
 
 
 def destination(src: Path, root: Path, out_root: Path, suffix: str) -> Path:
@@ -372,7 +394,27 @@ def destination(src: Path, root: Path, out_root: Path, suffix: str) -> Path:
 
 
 def main(argv: list[str]) -> int:
-    parser = argparse.ArgumentParser(
+    class Parser(argparse.ArgumentParser):
+        """让 argparse 自己的报错也走 log()，否则那几行没有时间戳。
+
+        error() 直接用 2 退出，不再经过 exit()，所以不会被当成帮助。
+        脚本约定：参数错误 = 2，帮助 = 0。
+        """
+
+        def error(self, message: str) -> None:
+            self.print_usage(sys.stderr)
+            self.exit(2, f"{self.prog}: [ERROR] {message}\n")
+
+        def exit(self, status: int = 0, message: str | None = None) -> None:
+            if message:
+                text = message.rstrip("\n")
+                if text.startswith("usage:"):     # 用法块只有 print_usage 输出，别重复加时间戳
+                    sys.stderr.write(text + "\n")
+                else:
+                    log(text, file=sys.stderr)
+            raise SystemExit(status)
+
+    parser = Parser(
         prog="media-compress", add_help=True,
         description="Compress images with caesiumclt and videos with HandBrakeCLI; "
                     "tool paths are auto-detected.",
@@ -389,10 +431,19 @@ def main(argv: list[str]) -> int:
                         help="image output format (default: original, keep source format)")
     parser.add_argument("--image-strip-exif", action="store_true",
                         help="strip image EXIF (including GPS and other private data)")
+    parser.add_argument("--image-jobs", type=int, default=3,
+                        help="parallel image compressions (default: 3; 1 = serial)")
+    parser.add_argument("--copy-unprocessed", choices=("yes", "no"), default="yes",
+                        help="copy files left uncompressed into the output tree "
+                             "(default: yes). 'no' makes the output tree INCOMPLETE, "
+                             "so it can no longer replace the source folder.")
     parser.add_argument("--dry-run", action="store_true", help="print commands only, write nothing")
     args = parser.parse_args(argv[1:])
     if not 0 <= args.image_quality <= 100:
-        print("[ERROR] --image-quality must be between 0 and 100", file=sys.stderr)
+        log("[ERROR] --image-quality must be between 0 and 100", file=sys.stderr)
+        return 2
+    if args.image_jobs < 1:
+        log("[ERROR] --image-jobs must be at least 1", file=sys.stderr)
         return 2
 
     preset_name, container_ext = load_preset(CONFIG_PATH)
@@ -400,49 +451,57 @@ def main(argv: list[str]) -> int:
     missing = [p for p in paths if not p.exists()]
     if missing:
         for path in missing:
-            print(f"[ERROR] path not found: {path}", file=sys.stderr)
+            log(f"[ERROR] path not found: {path}", file=sys.stderr)
         return 1
 
-    images, videos = collect(paths, args.output)
+    images, videos, passthrough = collect(paths, args.output)
     if args.only == "image":
         videos = []
     elif args.only == "video":
         images = []
+        passthrough = []
 
     # 先算出真正需要哪些工具，再去解析它们；不处理的那一类连查找都不做。
     needed = (["caesium"] if images else []) + (["ffprobe", "handbrake"] if videos else [])
     found = tools(needed)
     absent = [name for name in needed if not found[name]]
     if absent:
-        print(f"[ERROR] missing tool(s): {', '.join(absent)}"
+        log(f"[ERROR] missing tool(s): {', '.join(absent)}"
               f" (set CAESIUM_CLT / HANDBRAKE_CLI / FFPROBE to override the path)",
               file=sys.stderr)
         return 1
 
     # 按媒体类型给出 (源, 输出)，并一次性滤掉已有输出与过长的路径。
-    # 下面三轮的 kind 一律用 IMAGE / VIDEO，和处理阶段保持一致，方便直接比对。
+    # COPY 一类永远不压缩，只在 --copy-unprocessed yes 时原样搬进输出目录。
     plan: list[tuple[str, list[tuple[Path, Path]]]] = []
     taken: dict[Path, Path] = {}              # 输出路径 -> 已占用它的源文件
-    skipped = 0
+    # 预过滤（已存在/撞名/路径过长）与阶段内跳过分开计数：前者不在 todo 里，
+    # 混进 TOTAL 的 SKIP 会得出"共 1 个却跳过 8 个"这种自相矛盾的行。
+    prefiltered = 0
+    # 输出目录留下的缺口：走完全流程却没有对应文件。删源目录前必须为 0。
+    gaps: list[tuple[str, str, Path]] = []    # (kind, 原因, 路径)
     # 图像输出扩展名由 --image-format 决定；original 时沿用源扩展名。
     # 这一步同时决定"已存在则跳过"的比对路径，格式换了才不会被误判成已完成。
     image_ext = FORMAT_EXTS[args.image_format]
     for kind, items, suffix in (("IMAGE", images, image_ext),
-                                ("VIDEO", videos, container_ext)):
+                                ("VIDEO", videos, container_ext),
+                                ("COPY", passthrough, "")):
         pending: list[tuple[Path, Path]] = []
         for src, root, out_root in items:
             if len(str(src)) > MAX_PATH_LENGTH:
-                print(f"[{kind}] [SKIP] path too long (>{MAX_PATH_LENGTH})  {src}")
-                skipped += 1
+                log(f"[{kind}] [SKIP] path too long (>{MAX_PATH_LENGTH})  {src}")
+                prefiltered += 1
+                gaps.append((kind, "path too long", src))
                 continue
             target = destination(src, root, out_root, suffix or src.suffix)
             if target in taken and taken[target] != src:
-                print(f"[{kind}] [SKIP] output name taken by {taken[target]}  {target}")
-                skipped += 1
+                log(f"[{kind}] [SKIP] output name taken by {taken[target]}  {target}")
+                prefiltered += 1
+                gaps.append((kind, "output name taken", target))
                 continue
             if target.is_file() and target.stat().st_size > 0:
-                print(f"[{kind}] [SKIP] output exists  {target}")
-                skipped += 1
+                log(f"[{kind}] [SKIP] output exists  {target}")
+                prefiltered += 1
                 continue
             taken[target] = src
             pending.append((src, target))
@@ -451,76 +510,176 @@ def main(argv: list[str]) -> int:
 
     todo = sum(len(pending) for _, pending in plan)
     if not todo:
-        print("nothing to process.")
+        note = f" ({prefiltered} skipped beforehand)" if prefiltered else ""
+        log(f"nothing to process.{note}")
         return 0
 
-    print(f"IMAGE {len(images)} / VIDEO {len(videos)}"
+    log(f"IMAGE {len(images)} / VIDEO {len(videos)} / COPY {len(passthrough)}"
           f"  (preset {preset_name}, container {container_ext})"
-          + ("  [dry-run]" if args.dry_run else ""))
+          + (f"  [{prefiltered} skipped beforehand]" if prefiltered else "")
+          + ("  [dry-run]" if args.dry_run else "")
+          + ("" if args.copy_unprocessed == "yes"
+             else "  [--copy-unprocessed no: output tree will be incomplete]"))
 
-    done = failed = copied = 0
+    def deliver(kind: str, tag: str, src: Path, target: Path, size: int) -> tuple | None:
+        """把未压缩的文件原样搬进输出目录；失败返回结果元组，成功返回 None。"""
+        try:
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(src, target)
+        except OSError as exc:
+            # 要复制却复制失败 = 输出目录缺口，必须让用户看见。
+            gaps.append((kind, f"copy failed: {exc}", src))
+            return tag, src, target, size, 0, "FAIL", f"copy: {exc}"
+        return None
+
+    # 单个待办文件的完整处理：返回 (tag, 源, 目标, 源大小, 压缩后大小, 结果词, 备注)，
+    # 结果词取 OK / SKIP / COPY / FAIL / DRY。记账全部交给主线程的 report 做，
+    # 所以并发时不需要给计数器加锁。
+    def process(index: int, kind: str, src: Path, target: Path) -> tuple:
+        tag = f"[{index:>{len(str(todo))}}/{todo}] [{kind}]"
+        if src.resolve() == target.resolve():
+            gaps.append((kind, "output would overwrite the source", src))
+            return tag, src, target, 0, 0, "SKIP", "output would overwrite the source"
+        try:
+            size = src.stat().st_size
+        except OSError as exc:
+            gaps.append((kind, f"cannot stat source: {exc}", src))
+            return tag, src, target, 0, 0, "FAIL", f"cannot stat source: {exc}"
+        log(f"{tag} {src}", flush=True)
+
+        if kind == "COPY":                    # 不压缩，只看 --copy-unprocessed
+            if args.copy_unprocessed == "no":
+                gaps.append((kind, "unsupported format, not copied", src))
+                return tag, src, target, size, 0, "SKIP", "unsupported format, not copied"
+            if args.dry_run:
+                log(f"    copy -> {target}", flush=True)
+                return tag, src, target, size, 0, "DRY", ""
+            failed_copy = deliver(kind, tag, src, target, size)
+            return failed_copy or (tag, src, target, size, 0, "COPY",
+                                   "unsupported format, copied as is")
+        if kind == "IMAGE":
+            tmp = temp_dir_for(target)
+            if args.dry_run:
+                command = [found["caesium"], "-q", str(args.image_quality),
+                           "--keep-orientation", "--keep-dates", "-O", "all", "--json",
+                           "-o", str(tmp)]
+                if not args.image_strip_exif:
+                    command.append("-e")
+                if args.image_format != "original" \
+                        and src.suffix.lower() != target.suffix.lower():
+                    command += ["--format", args.image_format]
+                log("    " + " ".join(command + [str(src)]), flush=True)
+                return tag, src, target, size, 0, "DRY", ""
+            try:
+                tmp.mkdir(parents=True, exist_ok=True)
+            except OSError as exc:
+                # 临时目录建不出来，压缩没法进行；但输出目录仍要完整。
+                gaps.append((kind, f"cannot create temp dir: {exc}", src))
+                failed_copy = deliver(kind, tag, src, target, size)
+                return failed_copy or (tag, src, target, size, 0, "COPY",
+                                       "cannot create temp dir, copied as is")
+            with tmp_lock:
+                tmp_dirs.add(tmp)             # 登记后即使中断也会被清理
+            new_size, reason = compress_image(found["caesium"], src, target,
+                                              args.image_quality, args.image_format,
+                                              args.image_strip_exif, False, tmp)
+        else:
+            new_size, reason = compress_video(found["handbrake"], found["ffprobe"], src,
+                                              target, preset_name, args.dry_run)
+            if reason == "dry_run":
+                return tag, src, target, size, 0, "DRY", ""
+
+        if not reason:                        # 压缩成功
+            return tag, src, target, size, new_size, "OK", ""
+
+        # 未产出可用结果。压缩出错时永远复制：删源目录前必须保证输出目录完整，
+        # 否则会丢文件。故意跳过（省得不够 / 现代编码 / HDR）则听 --copy-unprocessed。
+        if kind != "COPY" and reason not in INTENTIONAL_SKIPS and reason != "not_smaller":
+            note = f"compression failed ({reason}), copied as is"
+            failed_copy = deliver(kind, tag, src, target, size)
+            return failed_copy or (tag, src, target, size, 0, "COPY", note)
+        if reason == "not_smaller":
+            note = "not worth compressing, copied as is"
+        elif reason in INTENTIONAL_SKIPS:
+            note = f"{reason}, copied as is"
+        if args.copy_unprocessed == "no":
+            gaps.append((kind, reason, src))
+            return tag, src, target, size, 0, "SKIP", f"{reason} (not copied)"
+        failed_copy = deliver(kind, tag, src, target, size)
+        return failed_copy or (tag, src, target, size, 0, "COPY", note)
+
+    def report(results: list[tuple]) -> None:
+        """在主线程里记账并打印，逐条处理以便并发结果一到就显示。"""
+        nonlocal done, failed, copied, saved, skipped
+        for tag, src, target, size, new_size, word, note in results:
+            if word == "DRY":
+                continue
+            if word == "OK":
+                done += 1
+                saved += max(0, size - new_size)
+                ratio = f"-{100 * (size - new_size) / size:.0f}%" if size else "-0%"
+                log(f"{tag} [OK] {ratio}  "
+                      f"{human(size)} -> {human(new_size)}  {target}")
+            elif word == "COPY":
+                copied += 1
+                log(f"{tag} [COPY] {note}  {target}")
+            elif word == "SKIP":
+                skipped += 1
+                log(f"{tag} [SKIP] {note}  {src}")
+            else:
+                failed += 1
+                log(f"{tag} [FAIL] {note}  {src}")
+
+    done = failed = copied = skipped = 0
     saved = 0
-    index = 0
-    width = len(str(todo))                    # 序号右对齐，位数跟着总数走
     tmp_dirs: set[Path] = set()
+    tmp_lock = Lock()                         # 只保护 tmp_dirs 这一个共享集合
+    # 进出总量按本次实际处理的文件算：被"已存在"过滤掉的不参与，合计才对得上。
+    total_in = 0
+    for _, pending in plan:
+        for src, _target in pending:
+            try:
+                total_in += src.stat().st_size
+            except OSError:
+                pass
     try:
         for kind, pending in plan:
-            for src, target in pending:
-                index += 1
-                tag = f"[{index:>{width}}/{todo}] [{kind}]"
-                if src.resolve() == target.resolve():
-                    print(f"{tag} [SKIP] output would overwrite the source  {src}")
-                    skipped += 1
-                    continue
-                size = src.stat().st_size
-                print(f"{tag} {src}")
-                if kind == "IMAGE":
-                    new_size, reason = compress_image(found["caesium"], src, target,
-                                                      args.image_quality, args.image_format,
-                                                      args.image_strip_exif, args.dry_run,
-                                                      tmp_dirs)
-                else:
-                    new_size, reason = compress_video(found["handbrake"], found["ffprobe"], src,
-                                                      target, preset_name, args.dry_run)
-                if reason == "dry_run":
-                    continue
-                if reason:
-                    if reason in INTENTIONAL_SKIPS:
-                        print(f"{tag} [SKIP] {reason}  {src}")
-                        skipped += 1
-                        continue
-                    if reason == "not_smaller":
-                        skipped += 1
-                        # 图像原样复制到目的地，保证输出目录图像齐全、不缺图。
-                        if kind == "IMAGE":
-                            try:
-                                target.parent.mkdir(parents=True, exist_ok=True)
-                                shutil.copy2(src, target)
-                                copied += 1
-                                print(f"{tag} [COPY] not worth compressing, copied as is  "
-                                      f"{target}")
-                            except OSError as exc:
-                                print(f"{tag} [FAIL] copy  {exc}  {src}")
-                                failed += 1
-                        else:
-                            print(f"{tag} [SKIP] not enough savings, source kept  {src}")
-                    else:
-                        print(f"{tag} [FAIL] {reason}  {src}")
-                        failed += 1
-                    continue
-                saved += max(0, size - new_size)
-                done += 1
-                print(f"{tag} [OK] -{100 * (size - new_size) / size:.0f}%  "
-                      f"{human(size)} -> {human(new_size)}  {target}")
+            if kind != "IMAGE" or args.image_jobs == 1:
+                report([process(i, kind, src, target)
+                        for i, (src, target) in enumerate(pending, 1)])
+                continue
+            # 图像之间并发；视频保持串行——HandBrake 的管线本身就吃 CPU，
+            # 实测与图像并发只会互相拖慢（视频侧慢 1.8 倍）。
+            with ThreadPoolExecutor(max_workers=args.image_jobs) as pool:
+                futures = [pool.submit(process, i, kind, src, target)
+                           for i, (src, target) in enumerate(pending, 1)]
+                for future in as_completed(futures):
+                    report([future.result()])
     finally:
-        for tmp in tmp_dirs:                      # 哪怕 Ctrl+C 也不留临时目录
+        for tmp in tmp_dirs:                  # 哪怕 Ctrl+C 也不留临时目录
             shutil.rmtree(tmp, ignore_errors=True)
 
     if args.dry_run:
-        print(f"TOTAL {todo}  dry-run only, nothing written")
+        log(f"TOTAL {todo}  dry-run only, nothing written")
         return 0
-    print(f"TOTAL {todo}  OK {done}  SKIP {skipped}  COPY {copied}  FAIL {failed}  "
-          f"saved {human(saved)}")
+    counts = f"TOTAL {todo}  OK {done}  SKIP {skipped}  COPY {copied}  FAIL {failed}"
+    final_size = total_in - saved
+    if total_in:
+        log(f"{counts}  total {human(total_in)} -> {human(final_size)}  "
+              f"saved {human(saved)}  ({100 * saved / total_in:.0f}%)")
+    else:
+        log(f"{counts}  saved 0 B")
+
+    # 输出目录完整性：这个脚本的用途是"压完抽查、无误就删原文件夹"，
+    # 所以必须明确回答"现在能不能删"。只要还有文件没进输出目录就拦住。
+    if gaps:
+        log(f"WARNING: {len(gaps)} file(s) are NOT in the output tree; "
+              f"do NOT delete the source folder:", file=sys.stderr)
+        for kind, reason, path in gaps:
+            log(f"  [{kind}] {reason}  {path}", file=sys.stderr)
+    else:
+        log(f"output tree complete for {todo} file(s); "
+              f"the source folder can be replaced by the output tree")
     return 1 if failed else 0
 
 
@@ -529,5 +688,5 @@ if __name__ == "__main__":
     try:
         sys.exit(main(sys.argv))
     except KeyboardInterrupt:
-        print("\ninterrupted.", file=sys.stderr)
+        log("interrupted.", file=sys.stderr)
         sys.exit(130)
