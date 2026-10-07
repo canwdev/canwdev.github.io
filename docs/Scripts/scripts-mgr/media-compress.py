@@ -26,6 +26,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import shutil
 import string
 import subprocess
@@ -168,9 +169,10 @@ IMAGE_MAX_EDGE_CHOICES = (0, 1920, 2560, 3840, 5120, 6144, 7680, 8192)
 DEFAULT_IMAGE_MAX_EDGE = 5120
 HDR_TRANSFERS = {"smpte2084", "arib-std-b67"}
 JUNK_NAMES = {"desktop.ini", "thumbs.db", "ehthumbs.db", ".ds_store", ".localized"}
-# compress_video 返回这些原因表示"故意不动它"，不是失败：算 SKIP 而不是 FAIL，
-# 也不影响退出码。HDR 重编会变色，现代编码器重编通常只会更大。
-INTENTIONAL_SKIPS = {"hdr", "modern_codec"}
+# 表示"故意不动它"，不是失败：算 SKIP 而不是 FAIL，也不影响退出码。
+#   hdr / modern_codec      —— 视频：HDR 重编会变色，现代编码器重编通常只会更大
+#   bitrate_not_worth_it    —— 音频：目标码率不低于源，重编出来只会一样大或更大
+INTENTIONAL_SKIPS = {"hdr", "modern_codec", "bitrate_not_worth_it"}
 # HandBrake 的 FileFormat 取值 -> 容器扩展名。
 CONTAINER_EXTS = {"av_mp4": ".mp4", "av_m4v": ".mp4", "av_mkv": ".mkv",
                   "av_webm": ".webm", "av_avi": ".avi"}
@@ -214,21 +216,36 @@ AUDIO_SOURCE_CODEC = {
 LOW_EFFICIENCY_LOSSLESS_EXTS = {".wav", ".alac", ".ape", ".wv", ".aiff", ".aif", ".caf"}
 # 所有会进音频队列的扩展名。
 AUDIO_EXTS = set(AUDIO_SOURCE_CODEC) | LOW_EFFICIENCY_LOSSLESS_EXTS
+# 有损编码器：只有它们才受码率影响（无损编码器忽略码率）。
+LOSSY_AUDIO_CODECS = {"mp3", "opus", "aac"}
 AUDIO_NARROW_TARGETS = {"mp3": "mp3 cannot carry multichannel or >48kHz audio; "
                                "channels will be downmixed and sample rate resampled"}
 
 
-def audio_action(src: Path, codec: str) -> str:
+def audio_action(src: Path, codec: str, bitrate: str = DEFAULT_AUDIO_BITRATE) -> str:
     """返回 "convert"（送去转码）或 "copy"（原样复制）。
 
-    只对 AUDIO_EXTS 里的扩展名有意义；其他后缀（.txt/.png）在 classify 里就被分流了，
-    这里统一返回 "copy" 免得调用方误以为该转。
+    规则：
+      * 源扩展名不是音频 -> copy（其他后缀在 classify 里就被分流了）
+      * 源已经是目标格式且**没有显式调码率** -> copy（同编码器重转没有收益）
+      * 源已经是目标格式但**显式给了非默认码率** -> convert（就是要按这个码率重编，
+        例如把 320k 的 mp3 压成 128k）
+      * 源是别的格式 -> convert
+
+    "同格式调码率"必须能真的转，否则 `--audio-bitrate 128k` 处理 mp3 库会一声不响地
+    全都原样复制——实测踩过。判断依据是"码率是否被显式改过"而不是源码率的绝对值：
+    classify 阶段拿不到源码率（要额外探测每个文件），而默认码率下重编没有任何收益。
     """
     suffix = src.suffix.lower()
     if suffix not in AUDIO_EXTS:
         return "copy"
-    # 低效无损不在表里，取到 None，永远不等于任何目标编码器，所以必转。
-    return "copy" if AUDIO_SOURCE_CODEC.get(suffix) == codec else "convert"
+    if AUDIO_SOURCE_CODEC.get(suffix) != codec:
+        return "convert"          # 低效无损不在表里，取到 None，与任何目标都不等 -> 必转
+    # 到这里源已经是目标格式。"显式调码率"只对**有损格式**有意义：无损编码器（flac）
+    # 忽略码率，重编一遍只会白费时间，不会更省。
+    if codec in LOSSY_AUDIO_CODECS and bitrate != DEFAULT_AUDIO_BITRATE:
+        return "convert"
+    return "copy"
 
 
 def setup_console() -> None:
@@ -378,7 +395,7 @@ def flatten_presets(nodes) -> list[dict]:
     return found
 
 
-def load_preset(path: Path, wanted: str = "") -> tuple[str, str, list[str]]:
+def load_preset(path: Path, wanted: str = "") -> tuple[str, str, str, list[str]]:
     """读 HandBrake 预设文件，返回 (预设名, 输出容器扩展名, 全部预设名)。
 
     wanted 为空时取第一个预设；给了名字就必须精确命中——HandBrake 的预设名
@@ -414,7 +431,10 @@ def load_preset(path: Path, wanted: str = "") -> tuple[str, str, list[str]]:
     if raw_format not in CONTAINER_EXTS:
         log(f"[WARNING] unknown FileFormat {raw_format!r} in preset \"{name}\"; "
             f"assuming av_mp4 (.mp4)", file=sys.stderr)
-    return name, CONTAINER_EXTS.get(raw_format, ".mp4"), names
+        raw_format = "av_mp4"
+    # 两个都返回：扩展名用于拼输出名，av_* 原值用于显式告诉 HandBrake 容器
+    # （临时文件是 .mctmp，它没法从后缀推断）。
+    return name, CONTAINER_EXTS[raw_format], raw_format, names
 
 
 # ------------------------------ 工具调用 ------------------------------
@@ -496,7 +516,7 @@ def probe_audio(ffprobe: str, path: Path) -> dict:
     stream 级**，只查 format_tags 会误判成"标签全丢"（实测踩过）。
     """
     command = [ffprobe, "-v", "error",
-               "-show_entries", "stream=codec_type,codec_name,channels:"
+               "-show_entries", "stream=codec_type,codec_name,channels,bit_rate:"
                                 "stream_disposition=attached_pic:stream_tags",
                "-show_entries", "format=duration:format_tags", "-of", "json", str(path)]
     result = run(command)
@@ -516,12 +536,43 @@ def probe_audio(ffprobe: str, path: Path) -> dict:
     return {
         "codec": str(audio.get("codec_name") or ""),
         "channels": int(audio.get("channels") or 0),
+        # VBR/ABR 文件报告的是**平均**码率（实测纯音内容 q0 只有 63k），所以拿它做
+        # "码率是否已经一样"的判断必须带容差，不能要求精确相等。
+        "bit_rate": int(str(audio.get("bit_rate") or 0) or 0),
         "duration": float((data.get("format") or {}).get("duration") or 0.0),
         "has_cover": any((s.get("disposition") or {}).get("attached_pic")
                          for s in streams if s.get("codec_type") == "video"),
         "tags": tags - special,
         "audio_streams": sum(1 for s in streams if s.get("codec_type") == "audio"),
     }
+
+
+def bitrate_value(bitrate: str) -> int:
+    """把 "192k" 这样的目标码率换成 bps；解析不出来返回 0。"""
+    text = bitrate.strip().lower().rstrip("b")
+    if text.endswith("k"):
+        text = text[:-1]
+    return int(float(text) * 1000) if text.replace(".", "", 1).isdigit() else 0
+
+
+def bitrate_wont_shrink(source_bps: int, target: str) -> bool:
+    """目标码率没有明显低于源码率 —— 压了也不会省，别压。
+
+    这是"花 67 秒重编完才发现没省到"的提前出口：脚本本来就知道源码率（探测只要
+    二十几毫秒），完全可以在启动编码器之前就判断出来。实测踩过——286k 的源码被要求
+    转到 320k，整条重编一遍，结果产物和源一样大，只能原样复制，时间全白花。
+
+    判据是"目标是否比源低 MIN_SAVINGS_RATIO 以上"，而不是"是否相等"：
+      * 目标高于源（286k -> 320k）        -> 必然变大，跳过
+      * 目标只低一点点（300k -> 320k）     -> 省不到门槛，跳过
+      * 目标明显更低（286k -> 128k）       -> 该转，放行
+    容差比节省门槛再宽一点，因为 VBR 文件报告的只是平均码率，本身就有波动。
+    源码率读不到时返回 False（照常转，宁可多花时间也不要漏掉该压的）。
+    """
+    want = bitrate_value(target)
+    if not source_bps or not want:
+        return False
+    return want > source_bps * (1 - MIN_SAVINGS_RATIO - 0.03)
 
 
 def compress_audio(ffmpeg: str, ffprobe: str, src: Path, target: Path, codec: str,
@@ -541,6 +592,16 @@ def compress_audio(ffmpeg: str, ffprobe: str, src: Path, target: Path, codec: st
         info = probe_audio(ffprobe, src)
     except (RuntimeError, json.JSONDecodeError) as exc:
         return 0, f"cannot read metadata: {exc}"
+
+    # 开始编码**之前**先判断值不值得压：脚本已经拿到源码率了，没必要等整条重编完
+    # 才发现没省到（长音频一次就是几十秒）。
+    # 只在**编码器相同**时判断：跨编码器时源码率没有可比性（opus 128k 的信息量约等于
+    # mp3 256k），不能因为数字接近就跳过本该发生的转换。
+    if info["codec"] == codec and codec in LOSSY_AUDIO_CODECS \
+            and bitrate_wont_shrink(info["bit_rate"], bitrate):
+        log(f"    note: source is already {codec} @ {info['bit_rate'] // 1000}k, "
+            f"target {bitrate} would not be smaller — skipping re-encode")
+        return 0, "bitrate_not_worth_it"
 
     _, muxer, encoder_args = AUDIO_TARGETS[codec]
     # 码率只对有损编码器有意义；flac 是无损，给了也会被忽略。
@@ -595,18 +656,65 @@ def compress_audio(ffmpeg: str, ffprobe: str, src: Path, target: Path, codec: st
         temp.unlink(missing_ok=True)
 
 
-def temp_file_for(target: Path) -> Path:
-    """目标同目录下唯一的临时文件名，带容器扩展名。
+# 临时文件名形如 `<目标名>-<pid>-<序号>.mctmp`。
+# 用专属后缀 `.mctmp` 而不是 `.tmp`：`.tmp` 太通用，用户完全可能自己有个 `notes.tmp`，
+# 而我们的临时文件是"目标名 + 进程号 + 序号"，只靠名字形状去猜就有误删的可能。
+# `.mctmp` 是脚本专有的，见到它就能确定是自己造的，判定因此变得简单而可靠。
+TEMP_SUFFIX = ".mctmp"
+TEMP_STEM_RE = re.compile(r"-\d+-\d+$")      # 名字以 `-<pid>-<序号>` 结尾
 
-    音频/视频的编码器（ffmpeg）靠扩展名判断容器，所以临时名不能是以 .tmp 结尾而丢掉
-    扩展名；但保留扩展名又可能和"别的文件正好叫这个名字"撞上，所以括号里放 pid 和
-    一个递增计数，兼顾容器识别与唯一性。
+
+def _our_temp_file(path: Path) -> bool:
+    """是不是本脚本造的临时文件：`.mctmp` 结尾，且名字以 `-<pid>-<序号>` 收尾。
+
+    专属后缀已经排除了绝大多数误判；再要求尾段形状，是为了连"用户自己也有个
+    `.mctmp` 文件"这种极端情况也不会被误删。
+    """
+    return path.suffix == TEMP_SUFFIX and bool(TEMP_STEM_RE.search(path.stem))
+
+
+def sweep_temp_files(out_roots: set[Path], whole_run: bool = False) -> int:
+    """清掉输出目录里的临时文件残留。
+
+    正常情况下每个文件的临时文件都由 finally 删掉；但**进程被强杀时 finally 不会执行**，
+    残留就会一直躺在输出目录里（实测出现过 `<名字>-<pid>-<序号>.mctmp`）。所以除了收尾
+    清理，还要在**开始时**扫一遍：那时本次运行还没建过任何临时文件，凡是匹配的必定是
+    上一次留下的，删掉一定安全。
+
+    whole_run=True 时不看 pid：开始时用，清掉所有历史残留。False 时只删本进程的，
+    避免踩到另一个同时在跑的实例。
+    """
+    removed = 0
+    mine = f"-{os.getpid()}-"
+    for out_root in out_roots:
+        if not out_root.is_dir():
+            continue
+        for stale in out_root.rglob(f"*{TEMP_SUFFIX}"):
+            if not _our_temp_file(stale) or not stale.is_file():
+                continue
+            if not whole_run and mine not in stale.name:
+                continue
+            try:
+                stale.unlink()
+                removed += 1
+            except OSError:
+                pass                        # 删不掉就算了，不影响主流程
+    return removed
+
+
+def temp_file_for(target: Path) -> Path:
+    """目标同目录下唯一的临时文件名：`<目标名>-<pid>-<序号>.mctmp`。
+
+    容器不再靠后缀判定——ffmpeg 那边本来就有显式 `-f muxer`，HandBrake 那边补上
+    `--format`。所以临时文件不必伪装成成品，`.mctmp` 一眼就能认出是中间产物，
+    即使进程被强杀残留下来，也不会被误认为正常输出。
+    结尾的 pid 与递增计数保证并发时不重名，也让清理能识别出是自己造的。
     """
     global _temp_seq
     with _temp_lock:
         _temp_seq += 1
         seq = _temp_seq
-    return target.with_name(f"{target.stem}.{os.getpid()}-{seq}{target.suffix}")
+    return target.with_name(f"{target.name}-{os.getpid()}-{seq}{TEMP_SUFFIX}")
 
 
 # ------------------------------ 压缩 ------------------------------
@@ -683,8 +791,13 @@ def compress_image(caesium: str, src: Path, target: Path, quality: int, image_fo
 
 
 def compress_video(handbrake: str, ffprobe: str, src: Path, target: Path, temp: Path,
-                   config_path: Path, preset_name: str, dry_run: bool) -> tuple[int, str]:
-    """转码单个视频，成功返回 (压缩后字节数, "")；失败或省得不够返回 (0, 原因)。"""
+                   config_path: Path, preset_name: str, file_format: str,
+                   dry_run: bool) -> tuple[int, str]:
+    """转码单个视频，成功返回 (压缩后字节数, "")；失败或省得不够返回 (0, 原因)。
+
+    明确传 `--format`：临时文件名是 `.mctmp`，HandBrake 没法从后缀推断容器。取值与
+    预设里的 FileFormat 同域（av_mp4 等），所以结果和"让它自己推断"一致。
+    """
     try:
         info = probe(ffprobe, src)
     except (RuntimeError, json.JSONDecodeError) as exc:
@@ -698,6 +811,7 @@ def compress_video(handbrake: str, ffprobe: str, src: Path, target: Path, temp: 
         return 0, "hdr"
 
     command = [handbrake, "-i", str(src), "-o", str(temp),
+               "--format", file_format,
                "--preset-import-file", str(config_path), "--preset", preset_name]
     if dry_run:
         log("    " + " ".join(command))
@@ -748,7 +862,7 @@ def verify_video(ffprobe: str, src: Path, out: Path, info: dict) -> str:
 
 # ------------------------------ 扫描与主流程 ------------------------------
 
-def classify(path: Path, audio_codec: str) -> str:
+def classify(path: Path, audio_codec: str, audio_bitrate: str) -> str:
     """返回 image / video / audio / audio-copy / passthrough / junk。
 
     passthrough 表示"不压缩、但会原样搬到输出目录"，包含两类：
@@ -757,8 +871,8 @@ def classify(path: Path, audio_codec: str) -> str:
     两类都必须进队列，否则输出目录会缺文件——而这个脚本的用途是"压完删源目录"，
     缺文件就等于丢数据。只有明确的操作系统垃圾（Thumbs.db 等）才丢下不管。
 
-    audio-copy 与 audio 分开：前者（例如目标为 mp3 时的 aac/ogg 源）只复制，后者
-    才真的送去转码。分开是为了让"哪些会被压缩"在输出里一眼可见。
+    audio-copy 与 audio 分开：前者（源已是目标格式且没调码率）只复制，后者才真的送去
+    转码。分开是为了让"哪些会被压缩"在输出里一眼可见。
     """
     if path.name.lower() in JUNK_NAMES:
         return "junk"
@@ -768,14 +882,16 @@ def classify(path: Path, audio_codec: str) -> str:
     if suffix in VIDEO_EXTS:
         return "video"
     if suffix in AUDIO_EXTS:
-        return "audio" if audio_action(path, audio_codec) == "convert" else "audio-copy"
+        return "audio" if audio_action(path, audio_codec, audio_bitrate) == "convert" \
+            else "audio-copy"
     return "passthrough"
 
 
 Item = tuple[Path, Path, Path]               # (源文件, 输入根目录, 输出根目录)
 
 
-def collect(paths: list[Path], output: str | None, audio_codec: str) \
+def collect(paths: list[Path], output: str | None, audio_codec: str,
+            audio_bitrate: str) \
         -> tuple[list[Item], list[Item], list[Item], list[Item], int, int]:
     """展开输入为 (图像, 视频, 音频, 仅复制, 扫描总数, 垃圾数)，不读取文件内容。
 
@@ -794,6 +910,10 @@ def collect(paths: list[Path], output: str | None, audio_codec: str) \
     scanned = 0
     junk = 0
     for path in paths:
+        # 在这里绝对化，而不是要求调用方保证：下面判"是否位于输出目录之内"必须两边
+        # 同为绝对路径。源给了相对路径时 rglob 产出相对路径，与 resolve() 过的输出根
+        # 永远不相等，那条跳过会静默失效（上一轮产物被重新压一遍、输出多套一层目录）。
+        path = path.resolve()
         if path.is_file():
             root, files, base = path.parent, [path], path.parent
         elif path.is_dir():
@@ -810,7 +930,7 @@ def collect(paths: list[Path], output: str | None, audio_codec: str) \
             if out_root in item.parents:
                 continue
             scanned += 1
-            kind = classify(item, audio_codec)
+            kind = classify(item, audio_codec, audio_bitrate)
             if kind == "image":
                 images.append((item, root, out_root))
             elif kind == "video":
@@ -824,14 +944,31 @@ def collect(paths: list[Path], output: str | None, audio_codec: str) \
     return images, videos, audios, passthrough, scanned, junk
 
 
-def destination(src: Path, root: Path, out_root: Path, suffix: str) -> Path:
-    """输出路径: 在输出根目录下镜像源目录结构，只把扩展名换成目标容器。"""
+def destination(src: Path, root: Path, out_root: Path, suffix: str, keep: bool = False,
+                qualify: bool = False) -> Path:
+    """输出路径：镜像源目录结构，名字按需带上目标扩展名。
+
+    三种形态：
+      * `keep=True`      -> 保留名，就是源本名（`a.flac`）。内容与扩展名一致，不说谎。
+      * `qualify=False`  -> 最简转换名（`a.png` 转 webp -> `a.webp`）。
+      * `qualify=True`   -> 带源扩展名的转换名（`a.png.webp`），用于和别的源撞名时区分。
+
+    扩展名本来就相符时（image-format original、现代编码跳过的视频、非媒体文件）
+    目标扩展名与源相同，不加任何后缀，保持 `a.webp`、`a.txt` 的原名。
+    """
+    source_suffix = src.suffix          # 保留原始大小写，如 .PNG
+    if keep or suffix.lower() == source_suffix.lower():
+        name = src.name
+    elif qualify:
+        name = src.name + suffix
+    else:
+        name = src.with_suffix(suffix).name
     try:
-        relative = src.relative_to(root).with_suffix(suffix)
+        relative = src.relative_to(root).with_name(name)
     except ValueError:
-        relative = Path(src.with_suffix(suffix).name)
+        relative = Path(name)
     if not relative.parts:
-        relative = Path(src.with_suffix(suffix).name)
+        relative = Path(name)
     return out_root / relative
 
 
@@ -896,7 +1033,7 @@ def main(argv: list[str]) -> int:
                         help=f"audio output codec (default: {DEFAULT_AUDIO_CODEC}). Every "
                              "audio file is converted except those already in this format. "
                              "Conversions that save less than 10%% are discarded and the "
-                             "original is kept instead (with a .orig suffix).")
+                             "original is copied instead.")
     parser.add_argument("--audio-bitrate", choices=AUDIO_BITRATES,
                         default=DEFAULT_AUDIO_BITRATE,
                         help=f"audio bitrate for lossy codecs (default: {DEFAULT_AUDIO_BITRATE}); "
@@ -933,9 +1070,14 @@ def main(argv: list[str]) -> int:
     # 这才符合命令行直觉。
     global _config_note
     config_path = Path(args.video_config).expanduser() if args.video_config else CONFIG_PATH
-    preset_name, container_ext, preset_names = load_preset(config_path, args.video_preset or "")
+    preset_name, container_ext, file_format, preset_names = load_preset(
+        config_path, args.video_preset or "")
     _config_note = (config_path, preset_name, container_ext, preset_names)
-    paths = [Path(p).expanduser() for p in args.paths]
+    # 输入一律绝对化。下游所有比较都是绝对路径对绝对路径：源用相对路径（如 "."）时
+    # rglob 产出的是相对路径，而输出根是 resolve() 过的绝对路径，两者永远不相等，
+    # 于是"跳过位于输出目录之内的文件"这条会静默失效——上一次的产物被当成输入再压
+    # 一遍，输出还会多套一层 _compressed。实测踩过。
+    paths = [Path(p).expanduser().resolve() for p in args.paths]
     missing = [p for p in paths if not p.exists()]
     if missing:
         for path in missing:
@@ -994,7 +1136,7 @@ def main(argv: list[str]) -> int:
             return 1
 
     try:
-        return compress_all(args, paths, config_path, preset_name, container_ext)
+        return compress_all(args, paths, config_path, preset_name, container_ext, file_format)
     finally:
         if logger is not None:
             logger.close()
@@ -1036,25 +1178,24 @@ def deliver(kind: str, tag: str, src: Path, target: Path, size: int) -> tuple | 
     return None
 
 
-def keep_original_name(wanted: Path, src: Path, real_target: Path, taken: set, lock) -> Path:
-    """保留源文件时用的输出名：扩展名会说谎就加 .orig，否则保持原名。
+def wanted_pair(src: Path, root: Path, out_root: Path, suffix: str,
+                qualify: bool = False) -> tuple[Path, Path]:
+    """一个源的两种可能产出：(转换成功的路径, 压不动时保留原件的路径)。
 
-    转码没成功、退回复制源文件时，wanted 的扩展名是按转码后格式起的（.webp/.mp3），
-    而实际内容是原格式（jpeg/flac）——直接叫 .webp 就是扩展名说谎，加 .orig 说明。
-    本来就原样复制的文件（.txt/.tiff/.mp4 的现代编码跳过）扩展名没说谎，保持原名。
+    qualify=True 表示这个名字会和别的源撞上，于是把源扩展名也写进转换产物名
+    （`a.png` -> `a.png.webp`）；保留件始终是源本名，不受影响。
     """
-    if wanted.suffix == src.suffix:
-        # 扩展名相符：就是要写主路径的名字，而它已由 resolve_free_name 定好并占用，
-        # 直接复用。再解析一次会把它自己当成"已被占用"，平白改成 name-2。
-        return real_target
-    return resolve_free_name(wanted.with_name(wanted.name + ".orig"), taken, lock)
+    target = destination(src, root, out_root, suffix)
+    if qualify and target.suffix.lower() != src.suffix.lower():
+        target = destination(src, root, out_root, suffix, qualify=True)
+    return target, destination(src, root, out_root, suffix, keep=True)
 
 
 def compress_all(args, paths: list[Path], config_path: Path, preset_name: str,
-                 container_ext: str) -> int:
+                 container_ext: str, file_format: str) -> int:
     """打开日志之后的主体；单独成函数，好让日志在 finally 里可靠关闭。"""
     images, videos, audios, passthrough, scanned, junk = collect(
-        paths, args.output, args.audio_codec)
+        paths, args.output, args.audio_codec, args.audio_bitrate)
 
     # --only 表示"只**压缩**这一类"，不是"只出现在输出目录"。其余类照样按
     # --copy-unprocessed 处理：yes 时原样复制（输出目录因此仍是完整的，可以替换源
@@ -1099,7 +1240,7 @@ def compress_all(args, paths: list[Path], config_path: Path, preset_name: str,
 
     # 按媒体类型给出 (源, 输出, 输出根, 原样复制路径)，并一次性滤掉已有输出与过长的路径。
     # COPY 一类永远不压缩，只在 --copy-unprocessed yes 时原样搬进输出目录。
-    plan: list[tuple[str, set, list[tuple[Path, Path, Path]]]] = []
+    plan: list[tuple[str, set, list[tuple[Path, Path, Path, Path]]]] = []
     # 预过滤（已存在/撞名/路径过长）与阶段内跳过分开计数：前者不在 todo 里，
     # 混进 TOTAL 的 SKIP 会得出"共 1 个却跳过 8 个"这种自相矛盾的行。
     prefiltered = 0
@@ -1112,35 +1253,91 @@ def compress_all(args, paths: list[Path], config_path: Path, preset_name: str,
     # 名字冲突全部交给运行期的 resolve_free_name 处理，规划期不预定任何名字：
     # 先占住会让 process 把自己想要的名字判成"已被占用"，平白多出一个 -2。
     audio_ext = AUDIO_TARGETS[args.audio_codec][0]
-    for kind, items, suffix in (("IMAGE", sorted(images, key=lambda i: str(i[0])), image_ext),
-                                ("VIDEO", sorted(videos, key=lambda i: str(i[0])), container_ext),
-                                ("AUDIO", sorted(audios, key=lambda i: str(i[0])), audio_ext),
-                                ("COPY", sorted(passthrough, key=lambda i: str(i[0])), "")):
-        # 每阶段单独占用输出名：跨阶段共表会误判。名字冲突不在这里跳过，而是让后到
-        # 者照常入队，写盘时由 resolve_free_name 自动改名（song.mp3 -> song-2.mp3）。
-        taken: set[Path] = set()
-        pending: list[tuple[Path, Path, Path]] = []
+    phases = (("IMAGE", sorted(images, key=lambda i: str(i[0])), image_ext),
+              ("VIDEO", sorted(videos, key=lambda i: str(i[0])), container_ext),
+              ("AUDIO", sorted(audios, key=lambda i: str(i[0])), audio_ext),
+              ("COPY", sorted(passthrough, key=lambda i: str(i[0])), ""))
+
+    # 名字策略：不冲突就用最简名（`a.webp`），只有真的会和**别的源**撞名时才把源扩展名
+    # 也写进去（`a.png.webp`）。正常目录里保持简洁，同 stem 多格式时才限定。
+    entries: list[tuple[str, Path, Path, Path, str]] = []   # (kind, src, root, out_root, want)
+    for kind, items, suffix in phases:
         for src, root, out_root in items:
-            if len(str(src)) > MAX_PATH_LENGTH:
-                log(f"[{kind}] [SKIP] path too long (>{MAX_PATH_LENGTH})  {src}")
-                prefiltered += 1
-                gaps.append((kind, "path too long", src))
-                continue
-            target = destination(src, root, out_root, suffix or src.suffix)
-            # "已完成"要看两条路径：转换成功落在 target，省不到则保留原件落在
-            # target + .orig（仅当扩展名不符时，见 keep_original_name）。只查 target
-            # 会让 .orig 在重跑时又生成一个 -2，幂等就破了。
-            kept_name = target if target.suffix == src.suffix \
-                else target.with_name(target.name + ".orig")
-            existing = next((p for p in (target, kept_name)
-                             if p.is_file() and p.stat().st_size > 0), None)
-            if existing is not None:
-                log(f"[{kind}] [SKIP] output exists  {existing}")
-                prefiltered += 1
-                continue
-            pending.append((src, target, out_root))
+            entries.append((kind, src, root, out_root, suffix or src.suffix))
+    # 每个源都要按**它自己**的目标扩展名来算名字——跨媒体类型时不等于当前源的那个
+    # （`.webp` 图像走 passthrough 时扩展名不变，而 `.png` 要转 webp）。
+    # 同时要记住各自的 root：镜像结构靠 src.relative_to(root)，传错就会把子目录里的
+    # 文件平铺到输出根（实测踩过）。
+    # 同一次运行里出现相同的源只可能来自互相重叠的输入参数，去重后再判重名。
+    plans_of: dict[Path, tuple[Path, Path, str]] = {}      # src -> (root, out_root, want)
+    for kind, src, root, out_root, want in entries:
+        plans_of.setdefault(src, (root, out_root, want))
+
+    # 名字要一次性定稳：谁因为撞名而加了限定，和它有牵连的那些源的名字也得跟着重算，
+    # 所以用一个工作集反复迭代到不再变化为止。加上限是防御——正常情况一两轮就收敛。
+    #
+    # 只在**同一套名字空间内**比：目标名之间比、保留名之间比。不做"我的目标 vs 别人的
+    # 保留名"这种交叉比较——那是误判：`s.wav`(目标 s.mp3、保留 s.wav) 与
+    # `s.flac`(目标 s.flac.mp3、保留 s.flac) 四个名字两两不同，根本没有冲突，交叉比对
+    # 却会把 s.wav 判成冲突，让它白白变成 `s.wav.mp3`。实测踩过。
+    qualified: set[Path] = set()
+    names: dict[Path, tuple[Path, Path]] = {}
+    for _ in range(6):
+        for src, (root, out_root, want) in plans_of.items():
+            names[src] = wanted_pair(src, root, out_root, want, src in qualified)
+        changed = False
+        for src in plans_of:
+            target, kept = names[src]
+            for other in plans_of:
+                if other == src:
+                    continue
+                other_target, other_kept = names[other]
+                if target == other_target or kept == other_kept:
+                    if src not in qualified:
+                        qualified.add(src)
+                        changed = True
+                    if other not in qualified:
+                        qualified.add(other)
+                        changed = True
+                    break
+        if not changed:
+            break
+    for src, (root, out_root, want) in plans_of.items():
+        names[src] = wanted_pair(src, root, out_root, want, src in qualified)
+
+    by_phase: dict[str, list[tuple[Path, Path, Path, Path]]] = {}
+    for kind, src, root, out_root, want in entries:
+        if len(str(src)) > MAX_PATH_LENGTH:
+            log(f"[{kind}] [SKIP] path too long (>{MAX_PATH_LENGTH})  {src}")
+            prefiltered += 1
+            gaps.append((kind, "path too long", src))
+            continue
+        target, kept = names[src]
+        # 两种产物各查一次：转换成功落在 target，压不动保留原件落在 kept（源名）。
+        done = next((p for p in (target, kept)
+                     if p.is_file() and p.stat().st_size > 0), None)
+        if done is not None:
+            log(f"[{kind}] [SKIP] output exists  {done}")
+            prefiltered += 1
+            continue
+        by_phase.setdefault(kind, []).append((src, target, kept, out_root))
+
+    # 执行顺序：先原样复制（最快，且复制都是纯 IO），再图像，然后音频，最后视频。
+    # 视频放最后是因为它最慢、且 HandBrake 的管线吃 CPU，放在末尾不会拖住别的阶段。
+    # 收集与命名的顺序仍走 phases，不随之改变——命名只跟源集合有关，与先后无关。
+    for kind in ("COPY", "IMAGE", "AUDIO", "VIDEO"):
+        pending = by_phase.get(kind)
         if pending:
-            plan.append((kind, taken, pending))
+            plan.append((kind, set(), pending))
+
+    # 输出根集合：临时文件清理要按输出根来扫，而不是扫整个源目录。
+    out_roots = {out_root for _kind, _src, _root, out_root, _want in entries}
+
+    # 开工前先清掉上一次留下的临时文件。此刻本次运行还没建过任何临时文件，所以凡是
+    # 符合命名规则的必定是历史残留——进程被强杀时 finally 不执行，就靠这一步兜底。
+    leftovers = sweep_temp_files(out_roots, whole_run=True)
+    if leftovers:
+        log(f"cleaned up {leftovers} leftover temp file(s) from a previous run")
 
     todo = sum(len(pending) for _, _taken, pending in plan)
     if not todo:
@@ -1173,7 +1370,7 @@ def compress_all(args, paths: list[Path], config_path: Path, preset_name: str,
     # 单个待办文件的完整处理：返回 (tag, 源, 目标, 源大小, 压缩后大小, 结果词, 备注)，
     # 结果词取 OK / SKIP / COPY / FAIL / DRY。记账全部交给主线程的 report 做，
     # 所以并发时不需要给计数器加锁。
-    def process(index: int, kind: str, src: Path, target: Path, out_root: Path,
+    def process(index: int, kind: str, src: Path, target: Path, kept: Path, out_root: Path,
                 taken: set, name_lock) -> tuple:
         tag = f"[{index:>{len(str(todo))}}/{todo}] [{kind}]"
         if src.resolve() == target.resolve():
@@ -1186,9 +1383,9 @@ def compress_all(args, paths: list[Path], config_path: Path, preset_name: str,
             return tag, src, target, 0, 0, "FAIL", f"cannot stat source: {exc}"
         log(f"{tag} {src}", flush=True)
 
-        # 只在这里定主路径的名字；回退路径（省不到时保留源扩展名的落脚点）按需再定。
-        # 一次性把两条都定下来会白占号：转换成功时回退名根本用不上，却把序号推后，
-        # 输出里就会莫名其妙出现 song-3 / song-5 这样的空号。
+        # 主路径的名字。保留件（kept）就是源名、已经确定，不需要在这里解析，也就不会
+        # 出现"先占了主路径的名字却什么都没写"的情况——那种情况会让重跑永远认不出
+        # 已完成，每次多生成一个带序号的副本。
         try:
             real_target = resolve_free_name(target, taken, name_lock)
         except OSError as exc:
@@ -1198,15 +1395,20 @@ def compress_all(args, paths: list[Path], config_path: Path, preset_name: str,
             log(f"    note: {target.name} taken in this run, writing {real_target.name}")
 
         if kind == "COPY":                    # 不压缩，只看 --copy-unprocessed
+            # 措辞按文件性质分开：音频不是"格式不支持"，只是它已经是目标格式、
+            # 或没调码率所以不值得重编。一律说"unsupported format"会误导。
+            if src.suffix.lower() in AUDIO_EXTS:
+                copied_note = "already in the target format, copied as is"
+            else:
+                copied_note = "unsupported format, copied as is"
             if args.copy_unprocessed == "no":
-                gaps.append((kind, "unsupported format, not copied", src))
-                return tag, src, target, size, 0, "SKIP", "unsupported format, not copied"
+                gaps.append((kind, copied_note, src))
+                return tag, src, target, size, 0, "SKIP", copied_note
             if args.dry_run:
                 log(f"    copy -> {real_target}", flush=True)
                 return tag, src, target, size, 0, "DRY", ""
             failed_copy = deliver(kind, tag, src, real_target, size)
-            return failed_copy or (tag, src, real_target, size, 0, "COPY",
-                                   "unsupported format, copied as is")
+            return failed_copy or (tag, src, real_target, size, 0, "COPY", copied_note)
         if kind == "IMAGE":
             # 只有源超过上限才缩。caesium 本身不会放大，但先判断能让 dry-run
             # 打印出真正会执行的参数。
@@ -1248,10 +1450,11 @@ def compress_all(args, paths: list[Path], config_path: Path, preset_name: str,
             if reason == "dry_run":
                 return tag, src, target, size, 0, "DRY", ""
         elif kind == "VIDEO":
-            # 临时文件带容器扩展名（HandBrake/ffmpeg 靠它判断容器），且每次调用唯一。
+            # 临时文件是 .mctmp，容器由 --format 显式给出；每次调用唯一，便于并发。
             new_size, reason = compress_video(found["handbrake"], found["ffprobe"], src,
                                               real_target, temp_file_for(real_target),
-                                              config_path, preset_name, args.dry_run)
+                                              config_path, preset_name, file_format,
+                                              args.dry_run)
             if reason == "dry_run":
                 return tag, src, target, size, 0, "DRY", ""
 
@@ -1259,14 +1462,17 @@ def compress_all(args, paths: list[Path], config_path: Path, preset_name: str,
             return tag, src, real_target, size, new_size, "OK", ""
 
         # 未产出可用结果。压缩出错时永远复制：删源目录前必须保证输出目录完整，
-        # 否则会丢文件。故意跳过（省得不够 / 现代编码 / HDR）则听 --copy-unprocessed。
-        # 这些复制的都是**源文件本身**，名字由 keep_original_name 定（扩展名不符时加
-        # .orig），不能用转码后的 real_target——那会让 .webp 里装着 jpeg。
-        if kind != "COPY" and reason not in INTENTIONAL_SKIPS and reason != "not_smaller":
-            note = f"compression failed ({reason}), copied as is"
-            kept = keep_original_name(target, src, real_target, taken, name_lock)
+        # 否则会丢文件。故意跳过（省得不够 / 现代编码 / HDR / 码率不划算）则听
+        # --copy-unprocessed。
+        #
+        # 落脚在 kept（= 源名），所以扩展名与内容一致，不会说谎。它在规划阶段已经
+        # 查过"是否已存在"，走到这里说明还没写过，直接复制即可。
+        def keep_original(note: str) -> tuple:
             failed_copy = deliver(kind, tag, src, kept, size)
             return failed_copy or (tag, src, kept, size, 0, "COPY", note)
+
+        if kind != "COPY" and reason not in INTENTIONAL_SKIPS and reason != "not_smaller":
+            return keep_original(f"compression failed ({reason}), copied as is")
         if reason == "not_smaller":
             note = "not worth compressing, copied as is"
         elif reason in INTENTIONAL_SKIPS:
@@ -1274,9 +1480,7 @@ def compress_all(args, paths: list[Path], config_path: Path, preset_name: str,
         if args.copy_unprocessed == "no":
             gaps.append((kind, reason, src))
             return tag, src, target, size, 0, "SKIP", f"{reason} (not copied)"
-        kept = keep_original_name(target, src, real_target, taken, name_lock)
-        failed_copy = deliver(kind, tag, src, kept, size)
-        return failed_copy or (tag, src, kept, size, 0, "COPY", note)
+        return keep_original(note)
 
     def report(results: list[tuple]) -> None:
         """在主线程里记账并打印，逐条处理以便并发结果一到就显示。"""
@@ -1305,7 +1509,7 @@ def compress_all(args, paths: list[Path], config_path: Path, preset_name: str,
     # 进出总量按本次实际处理的文件算：被"已存在"过滤掉的不参与，合计才对得上。
     total_in = 0
     for _, _taken, pending in plan:
-        for src, _target, _out_root in pending:
+        for src, _target, _kept, _out_root in pending:
             try:
                 total_in += src.stat().st_size
             except OSError:
@@ -1317,20 +1521,24 @@ def compress_all(args, paths: list[Path], config_path: Path, preset_name: str,
             if kind != "IMAGE" or args.image_jobs == 1:
                 # 逐个处理、逐个上报：绝不能先把整批 process 完再一起 report，
                 # 否则完成行要等到这批结束才出现（视频批尤其致命）。
-                for i, (src, target, out_root) in enumerate(pending, 1):
-                    report([process(i, kind, src, target, out_root, taken, name_lock)])
+                for i, (src, target, kept, out_root) in enumerate(pending, 1):
+                    report([process(i, kind, src, target, kept, out_root,
+                                    taken, name_lock)])
                 continue
             # 图像之间并发；视频保持串行——HandBrake 的管线本身就吃 CPU，
             # 实测与图像并发只会互相拖慢（视频侧慢 1.8 倍）。
             with ThreadPoolExecutor(max_workers=args.image_jobs) as pool:
-                futures = [pool.submit(process, i, kind, src, target, out_root,
+                futures = [pool.submit(process, i, kind, src, target, kept, out_root,
                                        taken, name_lock)
-                           for i, (src, target, out_root) in enumerate(pending, 1)]
+                           for i, (src, target, kept, out_root) in enumerate(pending, 1)]
                 for future in as_completed(futures):
                     report([future.result()])
     finally:
         for tmp in tmp_dirs:                  # 哪怕 Ctrl+C 也不留临时目录
             shutil.rmtree(tmp, ignore_errors=True)
+        # 再兜一遍临时文件：正常路径上各文件都自己删过，这里只处理异常中断漏掉的
+        # （只删本进程的，免得踩到另一个同时在跑的实例）。
+        sweep_temp_files(out_roots)
 
     if args.dry_run:
         log(f"TOTAL {todo}  dry-run only, nothing written")
