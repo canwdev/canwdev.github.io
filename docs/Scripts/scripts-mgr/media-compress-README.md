@@ -33,6 +33,7 @@
 | `--copy-unprocessed <yes\|no>` | `yes` | 把未压缩的文件原样复制进输出目录；`no` 则不复制 |
 | `--dry-run` | 关 | 只打印将执行的命令，零写入 |
 | `--log [no\|路径]` | `auto` | 默认在输出根写 `media-compress-<时间戳>.log`；`no` 关闭；给路径则写到那里 |
+| `--color <模式>` | `auto` | 控制台着色：`auto`（仅真终端）/`always`/`never`。日志始终纯文本 |
 
 ```bash
 media-compress ./media                                  # 输出到 ./media/_compressed/
@@ -69,8 +70,8 @@ media-compress ./media --dry-run                        # 先看清楚会执行�
 
 ```
 2026-10-07 11:44:23 WARNING: 3 file(s) are NOT in the output tree; do NOT delete the source folder:
-2026-10-07 11:44:23   [IMAGE] not_smaller  ...\tiny.jpg
-2026-10-07 11:44:23   [VIDEO] modern_codec  ...\sub\modern.mp4
+2026-10-07 11:44:23   [MISSING] [IMAGE] not_smaller  ...\tiny.jpg
+2026-10-07 11:44:23   [MISSING] [VIDEO] modern_codec  ...\sub\modern.mp4
 ```
 
 用 `--copy-unprocessed no` 时输出目录**必然不完整**（头部行会写明），此时它只能用来
@@ -92,12 +93,19 @@ media-compress ./media --dry-run                        # 先看清楚会执行�
 
 状态词只有四个：
 
-| 状态 | 含义 |
-|---|---|
-| `[OK]` | 已压缩，输出文件存在 |
-| `[COPY]` | 未压缩但**已在输出目录**（原样复制） |
-| `[SKIP]` | **输出目录里没有这个文件 —— 缺口，不可删原目录** |
-| `[FAIL]` | 出错，原因跟在后面 |
+| 状态 | 含义 | 颜色 |
+|---|---|---|
+| `[OK]` | 已压缩，输出文件存在 | 绿 |
+| `[COPY]` | 未压缩但**已在输出目录**（原样复制） | 青 |
+| `[SKIP]` | **输出目录里没有这个文件 —— 缺口，不可删原目录** | 黄 |
+| `[FAIL]` | 出错，原因跟在后面 | 红 |
+
+`exec:` / `command:` 行是灰色，`WARNING:` 及缺口明细行是橘色。
+
+**着色规则**：默认 `auto`——只有输出到真终端时才上色，重定向到文件或管道一律无色，
+所以不会往日志或别人的管道里灌转义码。要强制上色（比如用支持 ANSI 的日志查看器）
+用 `--color always`；要彻底关掉用 `--color never`。**日志文件永远是纯文本**，不受该
+选项影响，这样按列解析和用编辑器查看都不会被转义码破坏。
 
 补充：
 
@@ -169,6 +177,9 @@ media-compress ./media --dry-run                        # 先看清楚会执行�
   `5120`（5K，默认）、`6144`、`7680`、`8192`、`0`（不限）
 - 压不动的图像、已高效的视频、caesiumclt 读不了的格式，默认都会原样复制进输出目录
   （`[COPY]`），所以输出目录不会缺文件
+- **非媒体文件也会原样复制**（`.txt`/`.srt`/`.nfo`/`.md` 等等一切其他文件），
+  因为输出目录要能整体替代源目录；只有 `Thumbs.db`/`desktop.ini`/`.DS_Store`
+  这类系统垃圾会被有意丢弃
 - `.tif/.tiff/.bmp` 和 `.avif/.heic/.heif/.jxl` 不会被压缩，只会原样复制
 - `--image-strip-exif` 保留方向标签，所以带 EXIF 旋转的照片不会躺倒
 - 省得不够的视频每次运行都会重算一遍（脚本不记状态），但它会被复制，不影响完整性
