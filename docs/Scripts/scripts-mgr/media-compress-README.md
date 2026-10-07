@@ -24,7 +24,9 @@
 |---|---|---|
 | `<文件或目录...>` | 必填 | 可多个，目录会递归扫描 |
 | `-o, --output <目录>` | 各自的 `_compressed/` | 所有输入共用一个输出目录 |
-| `--only image\|video` | 全部 | 只处理一类媒体 |
+| `--only image\|video` | 全部 | 只**压缩**这一类；另一类仍按 `--copy-unprocessed` 处理（复制而非压缩） |
+| `--config <文件>` | 脚本旁的 `media-compress.json` | 换成另一个 HandBrake 预设 JSON |
+| `--preset <名字>` | 该文件里第一个预设 | 从多预设文件里挑一个（**区分大小写**） |
 | `--image-quality <0-100>` | `82` | 图像质量，越大越清晰 |
 | `--image-format <格式>` | `original` | 图像输出格式：`original`/`jpeg`/`png`/`gif`/`webp`/`tiff` |
 | `--image-strip-exif` | 关 | 去掉图像的 EXIF（含 GPS 等隐私信息）；默认保留 |
@@ -33,7 +35,6 @@
 | `--copy-unprocessed <yes\|no>` | `yes` | 把未压缩的文件原样复制进输出目录；`no` 则不复制 |
 | `--dry-run` | 关 | 只打印将执行的命令，零写入 |
 | `--log [no\|路径]` | `auto` | 默认在输出根写 `media-compress-<时间戳>.log`；`no` 关闭；给路径则写到那里 |
-| `--color <模式>` | `auto` | 控制台着色：`auto`（仅真终端）/`always`/`never`。日志始终纯文本 |
 
 ```bash
 media-compress ./media                                  # 输出到 ./media/_compressed/
@@ -46,6 +47,8 @@ media-compress ./pics --image-jobs 4                    # 图像开 4 并发
 media-compress ./media --copy-unprocessed no            # 只要压缩产物，不复制其余文件
 media-compress ./media --log no                         # 不写日志
 media-compress ./media --log D:\logs\run.log            # 写到指定文件（追加）
+media-compress ./media --preset 1080p-h265              # 用内置配置里的另一个预设
+media-compress ./media --config D:\my-presets.json      # 换成自己的预设文件
 media-compress ./media --dry-run                        # 先看清楚会执行什么
 ```
 
@@ -58,54 +61,7 @@ media-compress ./media --dry-run                        # 先看清楚会执行�
 （`poster.jpg` + `poster.png`）时，为保证输出目录完整，压不动的那个会复制成目标名
 （内容仍是 jpg），并给另一个记缺口警告。
 
-## 用作"压完替换原目录"
 
-典型用途是**压缩资源后抽查，无误就直接删掉原文件夹**。判定依据是最后一行：
-
-```
-2026-10-07 11:44:23 output tree complete for 4 file(s); the source folder can be replaced by the output tree
-```
-
-看到这一行，说明输出目录里每个源文件都有对应物。反之会打印警告并列出缺口：
-
-```
-2026-10-07 11:44:23 WARNING: 3 file(s) are NOT in the output tree; do NOT delete the source folder:
-2026-10-07 11:44:23   [MISSING] [IMAGE] not_smaller  ...\tiny.jpg
-2026-10-07 11:44:23   [MISSING] [VIDEO] modern_codec  ...\sub\modern.mp4
-```
-
-用 `--copy-unprocessed no` 时输出目录**必然不完整**（头部行会写明），此时它只能用来
-取压缩产物，**不能用来替换原目录**。
-
-## 输出格式
-
-全部为英文，每行以本地时间戳开头（`YYYY-MM-DD HH:MM:SS`，可排序、可切分）：
-
-```
-2026-10-07 11:44:23 IMAGE 4 / VIDEO 1 / COPY 1  (preset 480p-h265, container .mp4)
-2026-10-07 11:44:23 [1/6] [IMAGE] <源路径>
-2026-10-07 11:44:23 [1/6] [IMAGE] [OK] -64%  183.8 KB -> 66.8 KB  <输出路径>
-2026-10-07 11:44:23 [4/6] [IMAGE] [COPY] not worth compressing, copied as is  <输出路径>
-2026-10-07 11:44:23 [6/6] [COPY] [COPY] unsupported format, copied as is  <输出路径>
-2026-10-07 11:44:23 TOTAL 6  OK 4  SKIP 0  COPY 2  FAIL 0  total 9.3 MB -> 643.4 KB  saved 8.6 MB  (93%)
-2026-10-07 11:44:23 output tree complete for 6 file(s); the source folder can be replaced by the output tree
-```
-
-状态词只有四个：
-
-| 状态 | 含义 | 颜色 |
-|---|---|---|
-| `[OK]` | 已压缩，输出文件存在 | 绿 |
-| `[COPY]` | 未压缩但**已在输出目录**（原样复制） | 青 |
-| `[SKIP]` | **输出目录里没有这个文件 —— 缺口，不可删原目录** | 黄 |
-| `[FAIL]` | 出错，原因跟在后面 | 红 |
-
-`exec:` / `command:` 行是灰色，`WARNING:` 及缺口明细行是橘色。
-
-**着色规则**：默认 `auto`——只有输出到真终端时才上色，重定向到文件或管道一律无色，
-所以不会往日志或别人的管道里灌转义码。要强制上色（比如用支持 ANSI 的日志查看器）
-用 `--color always`；要彻底关掉用 `--color never`。**日志文件永远是纯文本**，不受该
-选项影响，这样按列解析和用编辑器查看都不会被转义码破坏。
 
 补充：
 
@@ -115,27 +71,52 @@ media-compress ./media --dry-run                        # 先看清楚会执行�
 - 头部第一个数字 `COPY` 是"不压缩、只复制"的文件数（如 `.avif`、`.tif`、`.bmp`）
 
 
-## 配置与预设导出
+## 配置与预设
 
-视频参数全部来自脚本旁的 `media-compress.json`，脚本不提供任何视频参数开关。
+视频参数全部来自预设 JSON（默认是脚本旁的 `media-compress.json`），脚本不提供任何
+视频参数开关。**图像参数不走这里**，它们只看命令行（`--image-*`）——两者没有交叠，
+所以不存在谁覆盖谁的问题。
+
+**优先级**：命令行 > 配置文件 > 内置默认。
+
+### 内置的 4 个预设
+
+配置文件里按**质量从低到高**排列，所以默认（不传 `--preset`）用第一个 `480p-h265`：
+
+| `--preset` | 编码器 | 画质 | 分辨率 | 速度档 |
+|---|---|---|---|---|
+| `480p-h265`（默认，第一个） | `nvenc_h265` | 38 | 720×480 | fastest |
+| `720p-h265` | `nvenc_h265` | 22 | 1280×720 | slowest |
+| `720p-h264` | `nvenc_h264` | 22 | 1280×720 | medium |
+| `1080p-h265` | `nvenc_h265` | 22 | 1920×1080 | medium |
+
+不传 `--preset` 时用文件里**第一个**预设，想换默认就调整文件里的顺序。名字**区分
+大小写**——HandBrake 就是敏感的，写错会被直接拒绝并列出可用名字。
+
+### 换成自己的预设
 
 1. 打开 HandBrake GUI，调好分辨率、编码器、质量、音频、字幕
-2. **Presets → Add New Preset** 保存并命名
-3. 右键该预设 → **Export** → 导出 JSON，覆盖脚本旁的 `media-compress.json`
-4. 预设名由脚本自动读出，不必同步改脚本
+2. **Presets → Add New Preset** 保存并命名（可以建多个，甚至放进文件夹）
+3. 右键 → **Export** → 导出 JSON
+4. 用 `--config <该文件>` 指过去，用 `--preset <名字>` 挑其中一个
 
-也可以直接编辑该 JSON 的字段（字段名与 HandBrake GUI 一一对应），常用的是：
+也可以直接覆盖脚本旁的 `media-compress.json` 当默认值。预设文件支持 HandBrake 的
+**多层结构**（预设放在文件夹的 `ChildrenArray` 里也认得）。
+
+### 常用字段
 
 | 字段 | 含义 |
 |---|---|
+| `PresetName` | 预设名，`--preset` 就是匹配它 |
 | `VideoEncoder` | 编码器，改这里就是改硬编/软编 |
 | `VideoQualitySlider` | 画质（`VideoQualityType: 2` 时数值越小越清晰、体积越大） |
 | `VideoPreset` | 编码速度档，越慢同画质体积越小 |
 | `PictureWidth` / `PictureHeight` | 输出尺寸上限，配 `PictureAllowUpscaling: false` 即不放大 |
 | `AudioList` | 音轨编码与码率 |
-| `FileFormat` | 容器，决定输出扩展名（`av_mp4` → `.mp4`） |
+| `FileFormat` | 容器，决定输出扩展名（`av_mp4` → `.mp4`、`av_mkv` → `.mkv`） |
 | `Optimize` | MP4 faststart |
 | `SubtitleTrackSelectionBehavior` | 字幕轨取舍，见下 |
+
 ## HandBrake 参数说明
 
 ### 编码器

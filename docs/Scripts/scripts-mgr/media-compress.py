@@ -43,7 +43,10 @@ LOG_SUFFIX = ".log"
 _log_file = None
 # stdout 被下游提前关闭（例如 `media-compress ... | head`）后置位，之后不再尝试写控制台。
 _console_dead = False
-# 是否给控制台输出上色。--color 决定；auto 时按"是不是真终端"判断。
+# 日志开头那行配置信息所需的内容：(配置文件, 实际选中的预设, 容器扩展名, 可用预设)。
+# 用模块级变量是因为它要在 Logger.open() 里、第一行 command 之后立刻打印。
+_config_note: tuple = (None, "", "", [])
+# 是否给控制台输出上色：只在输出到真终端时为真。
 _color = False
 
 RESET = "\033[0m"
@@ -91,11 +94,11 @@ def enable_vt() -> bool:
         return False
 
 
-def want_color(mode: str) -> bool:
-    if mode == "always":
-        return True
-    if mode == "never":
-        return False
+def want_color() -> bool:
+    """是否给控制台着色：只在输出到真终端时上色。
+
+    没有开关——重定向到文件或管道时一定无色，所以不会往日志或别人的管道里灌转义码。
+    """
     return sys.stdout.isatty() and enable_vt()
 
 
@@ -201,9 +204,15 @@ class Logger:
         global _log_file
         self.path.parent.mkdir(parents=True, exist_ok=True)
         _log_file = self.path.open("w" if self.fresh else "a", encoding="utf-8")
-        # 第一行是本次调用的原样命令行，第二行才是日志自己的位置。
+        # 开头三行：本次调用的原样命令行、日志自身位置、实际生效的配置。
+        # 配置是唯一没有持久状态的东西，不回显出来事后就无从复现当时用了哪套视频参数。
         log("command: " + invocation(sys.argv))
         log(f"log file: {self.path}")
+        config, preset, container, names = _config_note
+        if config is not None:
+            others = [n for n in names if n != preset]
+            log(f"config: {config}  preset={preset}  container={container}"
+                + (f"  others: {', '.join(others)}" if others else ""))
 
     def close(self) -> None:
         global _log_file
@@ -291,17 +300,65 @@ def tools(needed: list[str], extra_dir: Path | None = None) -> dict[str, str]:
     return found
 
 
-def load_preset(path: Path) -> tuple[str, str]:
-    """读 HandBrake 预设文件，返回 (预设名, 输出容器扩展名)。"""
+def flatten_presets(nodes) -> list[dict]:
+    """把 HandBrake 预设文件里的预设摊平。
+
+    导出的文件可以是**多层的**：顶层 PresetList 里可能放的是文件夹
+    （Type 0，或带 ChildrenArray 却没有 FileFormat），真正的预设藏在
+    ChildrenArray 里。所以不能只取 PresetList[0]——那会拿到文件夹，名字是
+    文件夹名、也没有 FileFormat。
+    """
+    found: list[dict] = []
+    for node in nodes if isinstance(nodes, list) else []:
+        if not isinstance(node, dict):
+            continue
+        children = node.get("ChildrenArray") or []
+        is_folder = node.get("Type") == 0 or (children and not node.get("FileFormat"))
+        if is_folder:
+            found.extend(flatten_presets(children))
+            continue
+        found.append(node)
+        found.extend(flatten_presets(children))
+    return found
+
+
+def load_preset(path: Path, wanted: str = "") -> tuple[str, str, list[str]]:
+    """读 HandBrake 预设文件，返回 (预设名, 输出容器扩展名, 全部预设名)。
+
+    wanted 为空时取第一个预设；给了名字就必须精确命中——HandBrake 的预设名
+    **区分大小写**（实测 `aaa-480p` 匹配不到 `AAA-480p`），这里用宽松匹配会
+    造成"脚本放行、HandBrake 拒绝"。找不到时把可用名字都列出来，否则用户只能
+    去翻 JSON。
+    """
     if not path.is_file():
         raise SystemExit(f"[ERROR] config file not found: {path}")
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
-        preset = (data.get("PresetList") or [])[0]
-        name = str(preset["PresetName"])
-    except (json.JSONDecodeError, KeyError, IndexError, TypeError) as exc:
+    except (json.JSONDecodeError, OSError, UnicodeDecodeError) as exc:
         raise SystemExit(f"[ERROR] cannot parse config ({exc}): {path}") from None
-    return name, CONTAINER_EXTS.get(str(preset.get("FileFormat", "")), ".mp4")
+
+    presets = flatten_presets(data.get("PresetList") or [])
+    named = [p for p in presets if str(p.get("PresetName") or "")]
+    if not named:
+        raise SystemExit(f"[ERROR] no presets in {path}")
+
+    names = [str(p["PresetName"]) for p in named]
+    if wanted:
+        preset = next((p for p in named if str(p["PresetName"]) == wanted), None)
+        if preset is None:
+            raise SystemExit(f"[ERROR] preset \"{wanted}\" not found in {path}\n"
+                             f"        available: {', '.join(names)}")
+    else:
+        preset = named[0]
+
+    name = str(preset["PresetName"])
+    # 容器由预设的 FileFormat 决定。未知取值不再静默当 mp4——那会让输出后缀
+    # 与实际容器不符，且用户无从察觉。
+    raw_format = str(preset.get("FileFormat") or "")
+    if raw_format not in CONTAINER_EXTS:
+        log(f"[WARNING] unknown FileFormat {raw_format!r} in preset \"{name}\"; "
+            f"assuming av_mp4 (.mp4)", file=sys.stderr)
+    return name, CONTAINER_EXTS.get(raw_format, ".mp4"), names
 
 
 # ------------------------------ 工具调用 ------------------------------
@@ -445,7 +502,7 @@ def compress_image(caesium: str, src: Path, target: Path, quality: int, image_fo
 
 
 def compress_video(handbrake: str, ffprobe: str, src: Path, target: Path,
-                   preset_name: str, dry_run: bool) -> tuple[int, str]:
+                   config_path: Path, preset_name: str, dry_run: bool) -> tuple[int, str]:
     """转码单个视频，成功返回 (压缩后字节数, "")；失败或省得不够返回 (0, 原因)。"""
     try:
         info = probe(ffprobe, src)
@@ -461,7 +518,7 @@ def compress_video(handbrake: str, ffprobe: str, src: Path, target: Path,
 
     temp = target.with_name(target.name + ".tmp")
     command = [handbrake, "-i", str(src), "-o", str(temp),
-               "--preset-import-file", str(CONFIG_PATH), "--preset", preset_name]
+               "--preset-import-file", str(config_path), "--preset", preset_name]
     if dry_run:
         log("    " + " ".join(command))
         return 0, "dry_run"
@@ -560,8 +617,12 @@ def collect(paths: list[Path], output: str | None) \
         out_root = Path(output).expanduser().resolve() if output \
             else (base / DEFAULT_OUTPUT_DIR).resolve()
         for item in files:
-            if out_root in item.parents or item == out_root:
-                continue                      # 不处理自己的输出
+            # 跳过"位于输出目录之内"的文件，也就是上一轮的产物。
+            # 判断方向不能反：out_root 是源目录的**祖先**时（例如 -o 指向源目录的
+            # 父目录），`out_root in item.parents` 同样成立，那会把所有源文件误判成
+            # "自己的输出"而全部跳过——整轮变成 nothing to process。
+            if out_root in item.parents:
+                continue
             scanned += 1
             kind = classify(item)
             if kind == "image":
@@ -617,7 +678,9 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--output", "-o", default=None,
                         help="output directory mirroring the source tree "
                              f"(default: <dir>/{DEFAULT_OUTPUT_DIR}/ per input)")
-    parser.add_argument("--only", choices=("image", "video"), help="process one media kind only")
+    parser.add_argument("--only", choices=("image", "video"),
+                        help="compress one media kind only; the other kind is still handled "
+                             "by --copy-unprocessed (copied, not compressed)")
     parser.add_argument("--image-quality", type=int, default=82,
                         help="image quality 0-100 (default: 82)")
     parser.add_argument("--image-format", default="original", choices=tuple(FORMAT_EXTS),
@@ -635,18 +698,21 @@ def main(argv: list[str]) -> int:
                         help="copy files left uncompressed into the output tree "
                              "(default: yes). 'no' makes the output tree INCOMPLETE, "
                              "so it can no longer replace the source folder.")
+    parser.add_argument("--config", metavar="FILE", default=None,
+                        help="HandBrake preset JSON to use for video "
+                             f"(default: {CONFIG_PATH.name} next to this script)")
+    parser.add_argument("--preset", metavar="NAME", default=None,
+                        help="preset to pick from --config (default: the first one). "
+                             "Names are case-sensitive.")
     parser.add_argument("--dry-run", action="store_true", help="print commands only, write nothing")
     parser.add_argument("--log", nargs="?", const="auto", default="auto", metavar="no|FILE",
                         help="write a log next to the output (default: auto, i.e. "
                              "<output>/media-compress-<timestamp>.log). 'no' disables it; "
                              "a path writes/appends there instead.")
-    parser.add_argument("--color", choices=("auto", "always", "never"), default="auto",
-                        help="colourise console output: auto (default, only on a real "
-                             "terminal), always, never. The log file is always plain text.")
     args = parser.parse_args(argv[1:])
     # 颜色要在这里就定下来：下面所有校验失败都会打 [ERROR]，放到校验之后就染不上色了。
     global _color
-    _color = want_color(args.color)
+    _color = want_color()
     if not 0 <= args.image_quality <= 100:
         log("[ERROR] --image-quality must be between 0 and 100", file=sys.stderr)
         return 2
@@ -657,13 +723,44 @@ def main(argv: list[str]) -> int:
         log("[ERROR] --image-max-edge must be 0 (no limit) or at least 64", file=sys.stderr)
         return 2
 
-    preset_name, container_ext = load_preset(CONFIG_PATH)
+    # 配置和预设要在扫描之前定下来并校验：参数写错却先跑，会白做几百个文件
+    # （而且它们已经进了输出目录）。--config 的相对路径按调用者的当前目录解析，
+    # 这才符合命令行直觉。
+    global _config_note
+    config_path = Path(args.config).expanduser() if args.config else CONFIG_PATH
+    preset_name, container_ext, preset_names = load_preset(config_path, args.preset or "")
+    _config_note = (config_path, preset_name, container_ext, preset_names)
     paths = [Path(p).expanduser() for p in args.paths]
     missing = [p for p in paths if not p.exists()]
     if missing:
         for path in missing:
             log(f"[ERROR] path not found: {path}", file=sys.stderr)
         return 1
+
+    # --output 不能与源目录重叠。三种重叠都直接拒绝：
+    #   * 等于源目录      -> 每个文件的输出路径就是它自己，整轮静默什么都不做
+    #   * 在源目录之内    -> 下次运行会把上一轮产物当输入再压一遍（有损叠加），
+    #                        输出里还会多出套娃目录
+    #   * 是源目录的祖先  -> 输出目录把源目录包在里面，扫描时会连自己的产出一起扫
+    # 这些都是"跑很久之后才发现结果不对"，所以宁可拒绝也不放行。
+    if args.output:
+        out_root = Path(args.output).expanduser().resolve()
+        for src in paths:
+            base = src.resolve() if src.is_dir() else src.resolve().parent
+            if out_root == base:
+                log(f"[ERROR] --output must not be the source directory itself: {out_root}",
+                    file=sys.stderr)
+                return 2
+            if base in out_root.parents:
+                log(f"[ERROR] --output must not be inside a source directory", file=sys.stderr)
+                log(f"        output: {out_root}", file=sys.stderr)
+                log(f"        source: {base}", file=sys.stderr)
+                return 2
+            if out_root in base.parents:
+                log(f"[ERROR] --output must not contain a source directory", file=sys.stderr)
+                log(f"        output: {out_root}", file=sys.stderr)
+                log(f"        source: {base}", file=sys.stderr)
+                return 2
 
     # 日志要在规划之前打开，"已存在则跳过"那些行才进得了日志。
     # 显式路径 -> 追加；auto -> 在输出根下新建带时间戳的文件。
@@ -690,27 +787,36 @@ def main(argv: list[str]) -> int:
             return 1
 
     try:
-        return compress_all(args, paths, preset_name, container_ext)
+        return compress_all(args, paths, config_path, preset_name, container_ext)
     finally:
         if logger is not None:
             logger.close()
 
 
-def compress_all(args, paths: list[Path], preset_name: str,
+def compress_all(args, paths: list[Path], config_path: Path, preset_name: str,
                  container_ext: str) -> int:
     """打开日志之后的主体；单独成函数，好让日志在 finally 里可靠关闭。"""
     images, videos, passthrough, scanned, junk = collect(paths, args.output)
+
+    # --only 表示"只**压缩**这一类"，不是"只出现在输出目录"。另一类照样按
+    # --copy-unprocessed 处理：yes 时原样复制（输出目录因此仍是完整的，可以替换源
+    # 目录），no 时才真的丢弃。否则 `--only image` 会悄悄让输出目录缺掉所有视频，
+    # 而末尾那句"可以删源目录"就成了谎话。
     ignored = 0
     if args.only == "image":
-        ignored = len(videos) + len(passthrough)
+        if args.copy_unprocessed == "yes":
+            passthrough += videos          # 视频降级为"只复制"，永不压缩
+        else:
+            ignored = len(videos)
         videos = []
-        passthrough = []
     elif args.only == "video":
-        ignored = len(images) + len(passthrough)
+        if args.copy_unprocessed == "yes":
+            passthrough += images
+        else:
+            ignored = len(images)
         images = []
-        passthrough = []
 
-    # 交叉校验：扫到的文件必须都有去处——入队、被 --only 有意忽略、或被明确判为
+    # 交叉校验：扫到的文件必须都有去处——入队、被 --only 有意丢弃、或被明确判为
     # 系统垃圾。剩下的就是"无处可去"，那会在输出目录里缺席，也就是最后那句
     # "可以删源目录"在说谎。这条断言存在的意义就是让那种情况不可能静默发生。
     accounted = len(images) + len(videos) + len(passthrough) + ignored + junk
@@ -718,7 +824,9 @@ def compress_all(args, paths: list[Path], preset_name: str,
         log(f"[WARNING] scanned {scanned} file(s) but only {accounted} are accounted for; "
             f"{scanned - accounted} would be missing from the output tree", file=sys.stderr)
 
-    # 先算出真正需要哪些工具，再去解析它们；不处理的那一类连查找都不做。
+    # 先算出真正需要哪些工具，再去解析它们；不压缩的那一类连查找都不做。
+    # passthrough 里的文件只会被复制，不需要任何工具——所以 `--only video` 在没有
+    # caesiumclt 的机器上也跑得起来。
     # 图像也要 ffprobe：--image-max-edge 要先知道源的最长边才能决定是否下传
     # --long-edge（dry-run 打印的命令要如实反映这一点）。
     needed = (["caesium", "ffprobe"] if images else []) \
@@ -898,7 +1006,7 @@ def compress_all(args, paths: list[Path], preset_name: str,
                                               args.image_strip_exif, shrink, tmp)
         else:
             new_size, reason = compress_video(found["handbrake"], found["ffprobe"], src,
-                                              target, preset_name, args.dry_run)
+                                              target, config_path, preset_name, args.dry_run)
             if reason == "dry_run":
                 return tag, src, target, size, 0, "DRY", ""
 
@@ -993,9 +1101,8 @@ def compress_all(args, paths: list[Path], preset_name: str,
             log(f"  [MISSING] [{kind}] {reason}  {path}", file=sys.stderr)
     else:
         log(f"output tree complete for {todo} file(s); "
-              f"the source folder can be replaced by the output tree")
+            f"the source folder can be replaced by the output tree")
     return 1 if failed else 0
-
 
 if __name__ == "__main__":
     setup_console()
