@@ -216,14 +216,27 @@ def probe(ffprobe: str, path: Path) -> dict:
 
 # ------------------------------ 压缩 ------------------------------
 
-def temp_dir_for(target: Path) -> Path:
-    """caesiumclt 的输出目录，按目标文件独立命名，避免一个共享目录。
+def make_temp_dir(out_root: Path) -> Path:
+    """为一次运行建一个临时目录，放在输出根下。
 
-    caesiumclt 只支持"输出目录"、无法指定输出文件名，所以必须先落一个目录。
-    它必须和 target 同卷，否则 os.replace 跨盘会报 WinError 17（退化成复制则
-    失去原子性）。因此宁可留一个隐藏目录，也不要放到系统临时目录去。
+    caesiumclt 只支持"输出目录"、无法直接指定输出文件名，所以必须有这么个目录。
+    它要和目标同卷，否则 os.replace 跨盘会报 WinError 17（退化成复制就失去原子性），
+    所以放在输出根而不是系统临时目录。
+
+    放成"输出根下唯一的隐藏目录"而不是"每个文件一个目标同级目录"：后者会在输出
+    镜像树的每个子目录里都塞一个临时目录（如 _compressed/P/.x.webp.mc-tmp/），
+    翻目录时会看见，也不像正常产物。名字带 pid，两个进程同时跑不会互相踩。
+
+    每次调用还会顺手清掉本卷上过期的同类目录（进程被硬杀时会留下）。
     """
-    return target.parent / f".{target.name}.mc-tmp"
+    tmp = out_root / f".media-compress-tmp-{os.getpid()}"
+    if tmp.is_dir():
+        shutil.rmtree(tmp, ignore_errors=True)
+    tmp.mkdir(parents=True, exist_ok=True)
+    for stale in out_root.glob(".media-compress-tmp-*"):
+        if stale != tmp:
+            shutil.rmtree(stale, ignore_errors=True)
+    return tmp
 
 
 def compress_image(caesium: str, src: Path, target: Path, quality: int, image_format: str,
@@ -234,9 +247,9 @@ def compress_image(caesium: str, src: Path, target: Path, quality: int, image_fo
     不是加上某个开关。
     `--keep-orientation` 始终保留：只留方向标签，否则带 EXIF 旋转的照片会躺倒。
 
-    临时目录由调用方按文件独立命名并登记清理；创建推迟到真正要压缩之时，
-    所以 dry-run 和"输出会覆盖源文件"这类提前跳过的路径不留任何东西。
-    每次调用用独立目录，多个并发任务才不会写进同一个目录互相覆盖。
+    临时目录由调用方按"输出根"建一个并登记清理；它不是按文件各建一个，所以
+    输出镜像树里不会凭空多出目录。并发压缩时各文件用各自不同的文件名写进这个
+    目录，再由 os.replace 原子改名到目标，彼此不冲突。
     """
     command = [caesium, "-q", str(quality), "--keep-orientation", "--keep-dates",
                "-O", "all", "--json", "-o", str(tmp)]
@@ -263,6 +276,7 @@ def compress_image(caesium: str, src: Path, target: Path, quality: int, image_fo
     size = produced.stat().st_size
     if not keeps_enough(src.stat().st_size, size):
         return 0, "not_smaller"
+    target.parent.mkdir(parents=True, exist_ok=True)   # os.replace 不会建目标目录
     os.replace(produced, target)                  # 同卷改名，原子
     return size, ""
 
@@ -471,10 +485,9 @@ def main(argv: list[str]) -> int:
               file=sys.stderr)
         return 1
 
-    # 按媒体类型给出 (源, 输出)，并一次性滤掉已有输出与过长的路径。
+    # 按媒体类型给出 (源, 输出, 输出根, 原样复制路径)，并一次性滤掉已有输出与过长的路径。
     # COPY 一类永远不压缩，只在 --copy-unprocessed yes 时原样搬进输出目录。
-    plan: list[tuple[str, list[tuple[Path, Path]]]] = []
-    taken: dict[Path, Path] = {}              # 输出路径 -> 已占用它的源文件
+    plan: list[tuple[str, list[tuple[Path, Path, Path, Path]]]] = []
     # 预过滤（已存在/撞名/路径过长）与阶段内跳过分开计数：前者不在 todo 里，
     # 混进 TOTAL 的 SKIP 会得出"共 1 个却跳过 8 个"这种自相矛盾的行。
     prefiltered = 0
@@ -483,10 +496,31 @@ def main(argv: list[str]) -> int:
     # 图像输出扩展名由 --image-format 决定；original 时沿用源扩展名。
     # 这一步同时决定"已存在则跳过"的比对路径，格式换了才不会被误判成已完成。
     image_ext = FORMAT_EXTS[args.image_format]
-    for kind, items, suffix in (("IMAGE", images, image_ext),
-                                ("VIDEO", videos, container_ext),
-                                ("COPY", passthrough, "")):
-        pending: list[tuple[Path, Path]] = []
+
+    def keep_name(src: Path, target: Path) -> Path:
+        """省不到时原样复制的落脚路径：保留**源**扩展名。
+
+        转 webp 没省到时复制的是原始 jpg 字节，若仍叫 .webp 就是扩展名说谎
+        （内容真的是 JPEG）。所以这种情况下退回源文件名；真正转换成功才用新扩展名。
+        """
+        return target if target.suffix == src.suffix \
+            else target.with_name(src.stem + src.suffix)
+
+    # 同目录下同名不同扩展名（poster.jpg + poster.png）在格式转换后会争同一个输出名。
+    # 同目录同 stem 超过一个文件就算"有争议"：这类只能保一个，让先到的那个既占
+    # target 又占 fallback，另一个记缺口跳过——牺牲一个文件也好过两个源往同一路径
+    # 写、互相覆盖。按源路径排序，所以同一份输入每次得到同样的结果。
+    stems: dict[tuple[Path, str], set[str]] = {}
+    for entries in (images, videos, passthrough):
+        for src, _root, out_root in entries:
+            stems.setdefault((out_root, src.stem.lower()), set()).add(src.suffix.lower())
+
+    for kind, items, suffix in (("IMAGE", sorted(images, key=lambda i: str(i[0])), image_ext),
+                                ("VIDEO", sorted(videos, key=lambda i: str(i[0])), container_ext),
+                                ("COPY", sorted(passthrough, key=lambda i: str(i[0])), "")):
+        # 每阶段单独占用输出名：跨阶段共表会误判。
+        taken: dict[Path, Path] = {}
+        pending: list[tuple[Path, Path, Path, Path]] = []
         for src, root, out_root in items:
             if len(str(src)) > MAX_PATH_LENGTH:
                 log(f"[{kind}] [SKIP] path too long (>{MAX_PATH_LENGTH})  {src}")
@@ -494,17 +528,27 @@ def main(argv: list[str]) -> int:
                 gaps.append((kind, "path too long", src))
                 continue
             target = destination(src, root, out_root, suffix or src.suffix)
-            if target in taken and taken[target] != src:
-                log(f"[{kind}] [SKIP] output name taken by {taken[target]}  {target}")
+            # 有争议时退回 target：输出目录必须完整，此时宁可让扩展名说谎。
+            disputed = len(stems.get((out_root, src.stem.lower()), ())) > 1
+            fallback = target if disputed else keep_name(src, target)
+            # 两条可能的落脚路径都要防撞名、都要判"已存在"：转换成功落在 target，
+            # 省不到则原样落在 fallback，只查其中一条会漏。
+            clash = next((p for p in (fallback, target)
+                          if p in taken and taken[p] != src), None)
+            if clash is not None:
+                log(f"[{kind}] [SKIP] output name taken by {taken[clash]}  {clash}")
                 prefiltered += 1
-                gaps.append((kind, "output name taken", target))
+                gaps.append((kind, "output name taken", clash))
                 continue
-            if target.is_file() and target.stat().st_size > 0:
-                log(f"[{kind}] [SKIP] output exists  {target}")
+            existing = next((p for p in (fallback, target)
+                             if p.is_file() and p.stat().st_size > 0), None)
+            if existing is not None:
+                log(f"[{kind}] [SKIP] output exists  {existing}")
                 prefiltered += 1
                 continue
+            taken[fallback] = src
             taken[target] = src
-            pending.append((src, target))
+            pending.append((src, target, out_root, fallback))
         if pending:
             plan.append((kind, pending))
 
@@ -532,10 +576,25 @@ def main(argv: list[str]) -> int:
             return tag, src, target, size, 0, "FAIL", f"copy: {exc}"
         return None
 
+    tmp_for: dict[Path, Path] = {}            # 输出根 -> 本次运行在该卷上的临时目录
+    tmp_dirs: set[Path] = set()               # 本次运行建出的临时目录，finally 清理
+    tmp_lock = Lock()                         # 保护上面两个共享集合
+
+    def temp_dir(out_root: Path) -> Path:
+        """取（必要时创建）该输出根的临时目录；并发下只建一次。"""
+        with tmp_lock:
+            tmp = tmp_for.get(out_root)
+            if tmp is None:
+                tmp = make_temp_dir(out_root)
+                tmp_for[out_root] = tmp
+                tmp_dirs.add(tmp)
+            return tmp
+
     # 单个待办文件的完整处理：返回 (tag, 源, 目标, 源大小, 压缩后大小, 结果词, 备注)，
     # 结果词取 OK / SKIP / COPY / FAIL / DRY。记账全部交给主线程的 report 做，
     # 所以并发时不需要给计数器加锁。
-    def process(index: int, kind: str, src: Path, target: Path) -> tuple:
+    def process(index: int, kind: str, src: Path, target: Path, out_root: Path,
+                fallback: Path) -> tuple:
         tag = f"[{index:>{len(str(todo))}}/{todo}] [{kind}]"
         if src.resolve() == target.resolve():
             gaps.append((kind, "output would overwrite the source", src))
@@ -552,17 +611,16 @@ def main(argv: list[str]) -> int:
                 gaps.append((kind, "unsupported format, not copied", src))
                 return tag, src, target, size, 0, "SKIP", "unsupported format, not copied"
             if args.dry_run:
-                log(f"    copy -> {target}", flush=True)
+                log(f"    copy -> {fallback}", flush=True)
                 return tag, src, target, size, 0, "DRY", ""
-            failed_copy = deliver(kind, tag, src, target, size)
-            return failed_copy or (tag, src, target, size, 0, "COPY",
+            failed_copy = deliver(kind, tag, src, fallback, size)
+            return failed_copy or (tag, src, fallback, size, 0, "COPY",
                                    "unsupported format, copied as is")
         if kind == "IMAGE":
-            tmp = temp_dir_for(target)
             if args.dry_run:
                 command = [found["caesium"], "-q", str(args.image_quality),
                            "--keep-orientation", "--keep-dates", "-O", "all", "--json",
-                           "-o", str(tmp)]
+                           "-o", str(out_root / f".media-compress-tmp-{os.getpid()}")]
                 if not args.image_strip_exif:
                     command.append("-e")
                 if args.image_format != "original" \
@@ -571,12 +629,12 @@ def main(argv: list[str]) -> int:
                 log("    " + " ".join(command + [str(src)]), flush=True)
                 return tag, src, target, size, 0, "DRY", ""
             try:
-                tmp.mkdir(parents=True, exist_ok=True)
+                tmp = temp_dir(out_root)
             except OSError as exc:
                 # 临时目录建不出来，压缩没法进行；但输出目录仍要完整。
                 gaps.append((kind, f"cannot create temp dir: {exc}", src))
-                failed_copy = deliver(kind, tag, src, target, size)
-                return failed_copy or (tag, src, target, size, 0, "COPY",
+                failed_copy = deliver(kind, tag, src, fallback, size)
+                return failed_copy or (tag, src, fallback, size, 0, "COPY",
                                        "cannot create temp dir, copied as is")
             with tmp_lock:
                 tmp_dirs.add(tmp)             # 登记后即使中断也会被清理
@@ -594,10 +652,11 @@ def main(argv: list[str]) -> int:
 
         # 未产出可用结果。压缩出错时永远复制：删源目录前必须保证输出目录完整，
         # 否则会丢文件。故意跳过（省得不够 / 现代编码 / HDR）则听 --copy-unprocessed。
+        # 这些都复制**源文件本身**，所以落脚在 fallback（保留源扩展名）而不是 target。
         if kind != "COPY" and reason not in INTENTIONAL_SKIPS and reason != "not_smaller":
             note = f"compression failed ({reason}), copied as is"
-            failed_copy = deliver(kind, tag, src, target, size)
-            return failed_copy or (tag, src, target, size, 0, "COPY", note)
+            failed_copy = deliver(kind, tag, src, fallback, size)
+            return failed_copy or (tag, src, fallback, size, 0, "COPY", note)
         if reason == "not_smaller":
             note = "not worth compressing, copied as is"
         elif reason in INTENTIONAL_SKIPS:
@@ -605,8 +664,8 @@ def main(argv: list[str]) -> int:
         if args.copy_unprocessed == "no":
             gaps.append((kind, reason, src))
             return tag, src, target, size, 0, "SKIP", f"{reason} (not copied)"
-        failed_copy = deliver(kind, tag, src, target, size)
-        return failed_copy or (tag, src, target, size, 0, "COPY", note)
+        failed_copy = deliver(kind, tag, src, fallback, size)
+        return failed_copy or (tag, src, fallback, size, 0, "COPY", note)
 
     def report(results: list[tuple]) -> None:
         """在主线程里记账并打印，逐条处理以便并发结果一到就显示。"""
@@ -632,12 +691,10 @@ def main(argv: list[str]) -> int:
 
     done = failed = copied = skipped = 0
     saved = 0
-    tmp_dirs: set[Path] = set()
-    tmp_lock = Lock()                         # 只保护 tmp_dirs 这一个共享集合
     # 进出总量按本次实际处理的文件算：被"已存在"过滤掉的不参与，合计才对得上。
     total_in = 0
     for _, pending in plan:
-        for src, _target in pending:
+        for src, _target, _out_root, _fallback in pending:
             try:
                 total_in += src.stat().st_size
             except OSError:
@@ -645,14 +702,16 @@ def main(argv: list[str]) -> int:
     try:
         for kind, pending in plan:
             if kind != "IMAGE" or args.image_jobs == 1:
-                report([process(i, kind, src, target)
-                        for i, (src, target) in enumerate(pending, 1)])
+                # 逐个处理、逐个上报：绝不能先把整批 process 完再一起 report，
+                # 否则完成行要等到这批结束才出现（视频批尤其致命）。
+                for i, (src, target, out_root, fallback) in enumerate(pending, 1):
+                    report([process(i, kind, src, target, out_root, fallback)])
                 continue
             # 图像之间并发；视频保持串行——HandBrake 的管线本身就吃 CPU，
             # 实测与图像并发只会互相拖慢（视频侧慢 1.8 倍）。
             with ThreadPoolExecutor(max_workers=args.image_jobs) as pool:
-                futures = [pool.submit(process, i, kind, src, target)
-                           for i, (src, target) in enumerate(pending, 1)]
+                futures = [pool.submit(process, i, kind, src, target, out_root, fallback)
+                           for i, (src, target, out_root, fallback) in enumerate(pending, 1)]
                 for future in as_completed(futures):
                     report([future.result()])
     finally:
