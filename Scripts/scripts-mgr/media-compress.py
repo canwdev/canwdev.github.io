@@ -43,6 +43,101 @@ LOG_SUFFIX = ".log"
 _log_file = None
 # stdout 被下游提前关闭（例如 `media-compress ... | head`）后置位，之后不再尝试写控制台。
 _console_dead = False
+# 是否给控制台输出上色。--color 决定；auto 时按"是不是真终端"判断。
+_color = False
+
+RESET = "\033[0m"
+ORANGE = "\033[38;5;208m"
+# 一行一个颜色：按消息里出现的标记词匹配，靠前的先命中（所以具体原因要排在通用的
+# [IMAGE]/[VIDEO] 之类之前，否则永远轮不到）。
+# 注意这些字符串必须和实际打印出来的字面一致——`WARNING:` 有冒号无方括号，
+# 缺口明细行里没有 "WARNING" 字样，所以只能靠原因词本身来识别。
+COLOR_RULES = (
+    # 缺口明细行带 [MISSING] 前缀——它与正常状态行结构相同（都是 "[IMAGE] 原因"），
+    # 靠模式猜会误染，所以让打印方显式标出来。
+    ("[MISSING]", ORANGE),
+    ("WARNING:", ORANGE),
+    ("[FAIL]", "\033[31m"),               # 红
+    ("[OK]", "\033[32m"),                 # 绿
+    ("[SKIP]", "\033[33m"),               # 黄
+    ("[COPY]", "\033[36m"),               # 青
+    ("[ERROR]", "\033[31m"),              # 红
+    ("exec:", "\033[90m"),                # 灰
+    ("command:", "\033[90m"),             # 灰
+)
+
+
+def enable_vt() -> bool:
+    """尽力打开 Windows 控制台的 ANSI 转义处理。
+
+    只在确实是控制台句柄时才动手：本工具在管道里跑时 GetConsoleMode 会失败，
+    而这正是我们想要的结果——那种情况本来就不该输出颜色。
+    失败不报错，返回 False 让调用方退回无颜色。
+    """
+    if os.name != "nt":
+        return True
+    try:
+        import ctypes
+        from ctypes import wintypes
+
+        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        handle = kernel32.GetStdHandle(-11)                 # STD_OUTPUT_HANDLE
+        mode = wintypes.DWORD()
+        if not kernel32.GetConsoleMode(wintypes.HANDLE(handle), ctypes.byref(mode)):
+            return False
+        want = mode.value | 0x0004 | 0x0001                 # VT | PROCESSED_OUTPUT
+        return bool(kernel32.SetConsoleMode(wintypes.HANDLE(handle), want))
+    except (OSError, AttributeError, ImportError):
+        return False
+
+
+def want_color(mode: str) -> bool:
+    if mode == "always":
+        return True
+    if mode == "never":
+        return False
+    return sys.stdout.isatty() and enable_vt()
+
+
+def paint(line: str) -> str:
+    """给消息上色；时间戳保持原样，方便眼睛直接跳过前缀。"""
+    if not _color:
+        return line
+    body = line[20:] if len(line) > 20 else line      # 跳过 "YYYY-MM-DD HH:MM:SS "
+    for marker, code in COLOR_RULES:
+        if marker in body:
+            return line[:20] + code + body + RESET
+    return line
+
+
+def log(message: str = "", file=None, **_ignored) -> None:
+    """带人类可读时间戳的输出。
+
+    时间戳打在**每一行**上，因为多行结果（例如"输出目录完整"那两行）只有每行
+    各自带时间才知道那会儿在做什么。注意换行符在时间戳之前，续行才不会被污染。
+    并发时也逐行加锁式打印，所以时间戳的顺序与实际写出顺序一致。
+    总是 flush：后台运行或管道里被缓冲的话，时间戳就失去意义了。
+
+    同时（若已分配日志文件）以同样格式落盘，所以日志就是屏幕内容的副本。
+    颜色只加在控制台上，日志文件始终是纯文本——转义码进了文件就不好读了，
+    也会破坏按列解析。
+    写失败一律吞掉：日志写不进去、或下游把管道关了（`| head`），都不该让整轮
+    任务半路崩掉——那会留下做了一半的输出和临时目录。
+    """
+    global _console_dead
+    stamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    line = f"{stamp} {message}"
+    if not _console_dead:
+        try:
+            print(paint(line), file=file, flush=True)
+        except OSError:
+            _console_dead = True          # 管道被下游关闭，之后只写文件
+    if _log_file is not None:
+        try:
+            _log_file.write(line + "\n")
+            _log_file.flush()
+        except (OSError, ValueError):
+            pass
 
 # caesiumclt 1.5.0 读不了这些，实测每次都失败：
 #   .avif/.heic/.heif/.jxl -> 报错退出
@@ -88,34 +183,6 @@ def setup_console() -> None:
         try:
             stream.reconfigure(encoding="utf-8")  # type: ignore[attr-defined]
         except (AttributeError, OSError, ValueError):
-            pass
-
-
-def log(message: str = "", file=None, **_ignored) -> None:
-    """带人类可读时间戳的输出。
-
-    时间戳打在**每一行**上，因为多行结果（例如"输出目录完整"那两行）只有每行
-    各自带时间才知道那会儿在做什么。注意换行符在时间戳之前，续行才不会被污染。
-    并发时也逐行加锁式打印，所以时间戳的顺序与实际写出顺序一致。
-    总是 flush：后台运行或管道里被缓冲的话，时间戳就失去意义了。
-
-    同时（若已分配日志文件）以同样格式落盘，所以日志就是屏幕内容的副本。
-    写失败一律吞掉：日志写不进去、或下游把管道关了（`| head`），都不该让整轮
-    任务半路崩掉——那会留下做了一半的输出和临时目录。
-    """
-    global _console_dead
-    stamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    line = f"{stamp} {message}"
-    if not _console_dead:
-        try:
-            print(line, file=file, flush=True)
-        except OSError:
-            _console_dead = True          # 管道被下游关闭，之后只写文件
-    if _log_file is not None:
-        try:
-            _log_file.write(line + "\n")
-            _log_file.flush()
-        except (OSError, ValueError):
             pass
 
 
@@ -445,10 +512,13 @@ def verify_video(ffprobe: str, src: Path, out: Path, info: dict) -> str:
 # ------------------------------ 扫描与主流程 ------------------------------
 
 def classify(path: Path) -> str:
-    """返回 image / video / passthrough / junk / other。
+    """返回 image / video / passthrough / junk。
 
-    passthrough 表示"不压缩、但可以原样搬过去"：caesiumclt 读不了的格式。
-    这类文件必须进队列，否则 --copy-unprocessed 管不到它，输出目录会缺文件。
+    passthrough 表示"不压缩、但会原样搬到输出目录"，包含两类：
+      * caesiumclt 读不了的图像格式；
+      * 所有非媒体文件（.txt/.srt/.nfo/.md ...）。
+    两类都必须进队列，否则输出目录会缺文件——而这个脚本的用途是"压完删源目录"，
+    缺文件就等于丢数据。只有明确的操作系统垃圾（Thumbs.db 等）才丢下不管。
     """
     if path.name.lower() in JUNK_NAMES:
         return "junk"
@@ -457,14 +527,20 @@ def classify(path: Path) -> str:
         return "passthrough" if suffix in PASSTHROUGH_EXTS else "image"
     if suffix in VIDEO_EXTS:
         return "video"
-    return "other"
+    return "passthrough"
 
 
 Item = tuple[Path, Path, Path]               # (源文件, 输入根目录, 输出根目录)
 
 
-def collect(paths: list[Path], output: str | None) -> tuple[list[Item], list[Item], list[Item]]:
-    """展开输入为 (图像, 视频, 仅复制) 三个列表，过程不读取任何文件内容。
+def collect(paths: list[Path], output: str | None) \
+        -> tuple[list[Item], list[Item], list[Item], int, int]:
+    """展开输入为 (图像, 视频, 仅复制, 扫描总数, 丢弃的垃圾数)，不读取文件内容。
+
+    "仅复制"包括非媒体文件（.txt/.srt/.nfo/...）和 caesiumclt 读不了的图像格式，
+    它们不压缩但会原样搬进输出目录——这个脚本的用途是"压完删源目录"，漏一个就是
+    丢数据。返回总数让调用方能交叉校验：凡是扫到却没有去处的文件都说明输出目录会
+    缺东西，必须报警而不是宣称"可以删源目录"。
 
     每个输入各自决定输出根目录：显式 --output 时是所有输入共用的那一个，
     否则是该输入自己的 <目录>/_compressed/。
@@ -472,6 +548,8 @@ def collect(paths: list[Path], output: str | None) -> tuple[list[Item], list[Ite
     images: list[Item] = []
     videos: list[Item] = []
     passthrough: list[Item] = []
+    scanned = 0
+    junk = 0
     for path in paths:
         if path.is_file():
             root, files, base = path.parent, [path], path.parent
@@ -482,8 +560,9 @@ def collect(paths: list[Path], output: str | None) -> tuple[list[Item], list[Ite
         out_root = Path(output).expanduser().resolve() if output \
             else (base / DEFAULT_OUTPUT_DIR).resolve()
         for item in files:
-            if out_root in item.parents:
+            if out_root in item.parents or item == out_root:
                 continue                      # 不处理自己的输出
+            scanned += 1
             kind = classify(item)
             if kind == "image":
                 images.append((item, root, out_root))
@@ -491,7 +570,9 @@ def collect(paths: list[Path], output: str | None) -> tuple[list[Item], list[Ite
                 videos.append((item, root, out_root))
             elif kind == "passthrough":
                 passthrough.append((item, root, out_root))
-    return images, videos, passthrough
+            else:
+                junk += 1                     # 操作系统垃圾，有意不搬
+    return images, videos, passthrough, scanned, junk
 
 
 def destination(src: Path, root: Path, out_root: Path, suffix: str) -> Path:
@@ -559,7 +640,13 @@ def main(argv: list[str]) -> int:
                         help="write a log next to the output (default: auto, i.e. "
                              "<output>/media-compress-<timestamp>.log). 'no' disables it; "
                              "a path writes/appends there instead.")
+    parser.add_argument("--color", choices=("auto", "always", "never"), default="auto",
+                        help="colourise console output: auto (default, only on a real "
+                             "terminal), always, never. The log file is always plain text.")
     args = parser.parse_args(argv[1:])
+    # 颜色要在这里就定下来：下面所有校验失败都会打 [ERROR]，放到校验之后就染不上色了。
+    global _color
+    _color = want_color(args.color)
     if not 0 <= args.image_quality <= 100:
         log("[ERROR] --image-quality must be between 0 and 100", file=sys.stderr)
         return 2
@@ -612,12 +699,24 @@ def main(argv: list[str]) -> int:
 def compress_all(args, paths: list[Path], preset_name: str,
                  container_ext: str) -> int:
     """打开日志之后的主体；单独成函数，好让日志在 finally 里可靠关闭。"""
-    images, videos, passthrough = collect(paths, args.output)
+    images, videos, passthrough, scanned, junk = collect(paths, args.output)
+    ignored = 0
     if args.only == "image":
+        ignored = len(videos) + len(passthrough)
         videos = []
+        passthrough = []
     elif args.only == "video":
+        ignored = len(images) + len(passthrough)
         images = []
         passthrough = []
+
+    # 交叉校验：扫到的文件必须都有去处——入队、被 --only 有意忽略、或被明确判为
+    # 系统垃圾。剩下的就是"无处可去"，那会在输出目录里缺席，也就是最后那句
+    # "可以删源目录"在说谎。这条断言存在的意义就是让那种情况不可能静默发生。
+    accounted = len(images) + len(videos) + len(passthrough) + ignored + junk
+    if scanned != accounted:
+        log(f"[WARNING] scanned {scanned} file(s) but only {accounted} are accounted for; "
+            f"{scanned - accounted} would be missing from the output tree", file=sys.stderr)
 
     # 先算出真正需要哪些工具，再去解析它们；不处理的那一类连查找都不做。
     # 图像也要 ffprobe：--image-max-edge 要先知道源的最长边才能决定是否下传
@@ -891,7 +990,7 @@ def compress_all(args, paths: list[Path], preset_name: str,
         log(f"WARNING: {len(gaps)} file(s) are NOT in the output tree; "
               f"do NOT delete the source folder:", file=sys.stderr)
         for kind, reason, path in gaps:
-            log(f"  [{kind}] {reason}  {path}", file=sys.stderr)
+            log(f"  [MISSING] [{kind}] {reason}  {path}", file=sys.stderr)
     else:
         log(f"output tree complete for {todo} file(s); "
               f"the source folder can be replaced by the output tree")

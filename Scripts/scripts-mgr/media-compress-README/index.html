@@ -7223,6 +7223,11 @@
 <td><code>auto</code></td>
 <td>默认在输出根写 <code>media-compress-&lt;时间戳&gt;.log</code>；<code>no</code> 关闭；给路径则写到那里</td>
 </tr>
+<tr>
+<td><code>--color &lt;模式&gt;</code></td>
+<td><code>auto</code></td>
+<td>控制台着色：<code>auto</code>（仅真终端）/<code>always</code>/<code>never</code>。日志始终纯文本</td>
+</tr>
 </tbody>
 </table>
 <div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Bash</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1"> 1</a></span>
@@ -7262,8 +7267,8 @@
 <div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Text Only</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-2-1">1</a></span>
 <span class="normal"><a href="#__codelineno-2-2">2</a></span>
 <span class="normal"><a href="#__codelineno-2-3">3</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1"></a>2026-10-07 11:44:23 WARNING: 3 file(s) are NOT in the output tree; do NOT delete the source folder:
-<a id="__codelineno-2-2" name="__codelineno-2-2"></a>2026-10-07 11:44:23   [IMAGE] not_smaller  ...\tiny.jpg
-<a id="__codelineno-2-3" name="__codelineno-2-3"></a>2026-10-07 11:44:23   [VIDEO] modern_codec  ...\sub\modern.mp4
+<a id="__codelineno-2-2" name="__codelineno-2-2"></a>2026-10-07 11:44:23   [MISSING] [IMAGE] not_smaller  ...\tiny.jpg
+<a id="__codelineno-2-3" name="__codelineno-2-3"></a>2026-10-07 11:44:23   [MISSING] [VIDEO] modern_codec  ...\sub\modern.mp4
 </code></pre></div></td></tr></tbody></table></div>
 <p>用 <code>--copy-unprocessed no</code> 时输出目录**必然不完整**（头部行会写明），此时它只能用来<br>
 取压缩产物，<strong>不能用来替换原目录</strong>。</p>
@@ -7289,27 +7294,37 @@
 <tr>
 <th>状态</th>
 <th>含义</th>
+<th>颜色</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>[OK]</code></td>
 <td>已压缩，输出文件存在</td>
+<td>绿</td>
 </tr>
 <tr>
 <td><code>[COPY]</code></td>
 <td>未压缩但**已在输出目录**（原样复制）</td>
+<td>青</td>
 </tr>
 <tr>
 <td><code>[SKIP]</code></td>
 <td><strong>输出目录里没有这个文件 —— 缺口，不可删原目录</strong></td>
+<td>黄</td>
 </tr>
 <tr>
 <td><code>[FAIL]</code></td>
 <td>出错，原因跟在后面</td>
+<td>红</td>
 </tr>
 </tbody>
 </table>
+<p><code>exec:</code> / <code>command:</code> 行是灰色，<code>WARNING:</code> 及缺口明细行是橘色。</p>
+<p><strong>着色规则</strong>：默认 <code>auto</code>——只有输出到真终端时才上色，重定向到文件或管道一律无色，<br>
+所以不会往日志或别人的管道里灌转义码。要强制上色（比如用支持 ANSI 的日志查看器）<br>
+用 <code>--color always</code>；要彻底关掉用 <code>--color never</code>。<strong>日志文件永远是纯文本</strong>，不受该<br>
+选项影响，这样按列解析和用编辑器查看都不会被转义码破坏。</p>
 <p>补充：</p>
 <ul>
 <li>百分比是**体积缩减量**，基数取源文件：<code>-64%</code> 表示新大小是原来的 36%</li>
@@ -7424,6 +7439,9 @@
 <code>5120</code>（5K，默认）、<code>6144</code>、<code>7680</code>、<code>8192</code>、<code>0</code>（不限）</li>
 <li>压不动的图像、已高效的视频、caesiumclt 读不了的格式，默认都会原样复制进输出目录<br>
   （<code>[COPY]</code>），所以输出目录不会缺文件</li>
+<li><strong>非媒体文件也会原样复制</strong>（<code>.txt</code>/<code>.srt</code>/<code>.nfo</code>/<code>.md</code> 等等一切其他文件），<br>
+  因为输出目录要能整体替代源目录；只有 <code>Thumbs.db</code>/<code>desktop.ini</code>/<code>.DS_Store</code><br>
+  这类系统垃圾会被有意丢弃</li>
 <li><code>.tif/.tiff/.bmp</code> 和 <code>.avif/.heic/.heif/.jxl</code> 不会被压缩，只会原样复制</li>
 <li><code>--image-strip-exif</code> 保留方向标签，所以带 EXIF 旋转的照片不会躺倒</li>
 <li>省得不够的视频每次运行都会重算一遍（脚本不记状态），但它会被复制，不影响完整性</li>
@@ -7457,7 +7475,7 @@
     <span class="md-icon" title="最后更新">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"></path></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-datetime" title="2026年10月7日 13:08:10 CST">2026年10月7日 13:08:10</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-datetime" title="2026年10月7日 14:08:04 CST">2026年10月7日 14:08:04</span>
   </span>
 
     
