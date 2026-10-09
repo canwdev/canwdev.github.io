@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Canvas 图标主色替换 Demo</title>
+<style>
+  *{box-sizing:border-box}
+  body{
+    margin:0;min-height:100vh;padding:32px 20px 64px;
+    background:radial-gradient(1200px 600px at 15% -10%,#1b2a3a,#0c1117 60%);
+    color:#e6edf3;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
+  }
+  .wrap{max-width:1060px;margin:0 auto}
+  h1{font-size:22px;margin:0 0 8px;font-weight:600;letter-spacing:.3px}
+  .sub{color:#8b98a5;font-size:13px;line-height:1.7;margin:0 0 26px;max-width:720px}
+  .layout{display:grid;grid-template-columns:340px 1fr;gap:20px;align-items:start}
+  @media(max-width:840px){.layout{grid-template-columns:1fr}}
+
+  .card{
+    background:rgba(24,32,41,.86);border:1px solid #263140;border-radius:14px;
+    padding:18px;backdrop-filter:blur(8px);
+  }
+  .field{margin-bottom:20px}
+  .field:last-child{margin-bottom:0}
+  label{display:block;font-size:12px;color:#8b98a5;margin-bottom:9px;letter-spacing:.4px}
+  .row{display:flex;gap:9px;align-items:center}
+
+  input[type=color]{
+    -webkit-appearance:none;appearance:none;width:46px;height:40px;
+    border:none;background:transparent;cursor:pointer;padding:0;flex:none;
+  }
+  input[type=color]::-webkit-color-swatch-wrapper{padding:0}
+  input[type=color]::-webkit-color-swatch{border:2px solid #30404f;border-radius:10px}
+  input[type=color]::-moz-color-swatch{border:2px solid #30404f;border-radius:10px}
+
+  .hex{
+    flex:1;min-width:0;height:40px;border-radius:10px;background:#0e151c;
+    border:1px solid #2a3542;color:#e6edf3;padding:0 12px;outline:none;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:13px;letter-spacing:.6px;transition:.15s;
+  }
+  .hex:focus{border-color:#2196f3;background:#0c1218}
+
+  button{
+    height:40px;padding:0 14px;border-radius:10px;cursor:pointer;
+    background:#22303e;border:1px solid #2f4054;color:#cfe0f0;
+    font-size:13px;transition:.15s;white-space:nowrap;
+  }
+  button:hover{background:#2b3c4d;border-color:#3d5670}
+  button:active{transform:translateY(1px)}
+  button.wide{width:100%;margin-top:10px}
+  button.primary{background:#2196f3;border-color:#2196f3;color:#fff}
+  button.primary:hover{background:#1a86e0;border-color:#1a86e0}
+
+  .swatches{display:grid;grid-template-columns:repeat(8,1fr);gap:8px;margin-top:12px}
+  .swatch{
+    aspect-ratio:1;border-radius:8px;cursor:pointer;transition:.15s;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);
+  }
+  .swatch:hover{transform:scale(1.12);box-shadow:inset 0 0 0 2px #2196f3}
+
+  .drop{
+    border:1.5px dashed #33475e;border-radius:12px;padding:18px 12px;text-align:center;
+    color:#7f8fa0;font-size:13px;cursor:pointer;transition:.2s;background:#0f161d;
+    margin-bottom:20px;line-height:1.6;
+  }
+  .drop:hover,.drop.over{border-color:#2196f3;color:#9dc8f0;background:#12202c}
+  .drop b{color:#c7d8e8;font-weight:600}
+
+  .preview-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}
+  .preview-head h2{font-size:14px;margin:0;font-weight:600;color:#c7d8e8;letter-spacing:.4px}
+  .head-actions{display:flex;align-items:center;gap:14px}
+  @media(max-width:560px){
+    .preview-head{flex-wrap:wrap}
+    .head-actions{width:100%;justify-content:space-between}
+  }
+
+  /* 自定义开关 */
+  .toggle{
+    display:inline-flex;align-items:center;gap:8px;margin:0;position:relative;
+    font-size:12px;color:#8b98a5;letter-spacing:.3px;cursor:pointer;user-select:none;
+  }
+  .toggle:hover{color:#c7d8e8}
+  .toggle input{position:absolute;opacity:0;width:0;height:0;pointer-events:none}
+  .toggle .switch{
+    width:34px;height:20px;border-radius:20px;background:#2a3542;
+    border:1px solid #33475e;position:relative;transition:.2s;flex:none;
+  }
+  .toggle .switch::after{
+    content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;
+    border-radius:50%;background:#8b98a5;transition:.2s;
+  }
+  .toggle input:checked + .switch{background:rgba(33,150,243,.25);border-color:#2196f3}
+  .toggle input:checked + .switch::after{left:16px;background:#2196f3}
+  .toggle input:focus-visible + .switch{box-shadow:0 0 0 3px rgba(33,150,243,.35)}
+
+  .preview-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:560px){.preview-grid{grid-template-columns:1fr}}
+  figure{margin:0}
+  figcaption{font-size:12px;color:#7f8fa0;margin-top:10px;text-align:center}
+
+  .canvas-wrap{
+    border-radius:12px;border:1px solid #263140;padding:14px;
+    display:flex;align-items:center;justify-content:center;min-height:170px;
+    background-color:#1a222b;
+    background-image:
+      linear-gradient(45deg,#242f3a 25%,transparent 25%),
+      linear-gradient(-45deg,#242f3a 25%,transparent 25%),
+      linear-gradient(45deg,transparent 75%,#242f3a 75%),
+      linear-gradient(-45deg,transparent 75%,#242f3a 75%);
+    background-size:16px 16px;
+    background-position:0 0,0 8px,8px -8px,-8px 0;
+  }
+  .canvas-wrap canvas{max-width:100%;max-height:180px;display:block;cursor:crosshair}
+  #outCanvas{cursor:default}
+
+  .hint{font-size:11px;color:#61707e;margin-top:8px;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Canvas 图标主色替换</h1>
+  <p class="sub">
+    上传 PNG 图标 → 指定它的原始主色 → 选择目标颜色，把整张图的色相精确重映射到目标色。
+    主色像素会<strong>分毫不差</strong>地变成你选中的颜色；替换结果会<strong>实时同步为浏览器标签页图标</strong>。
+  </p>
+
+  <div class="layout">
+    <!-- ============ 控制面板 ============ -->
+    <div class="card">
+      <div class="drop" id="drop">
+        <b>点击上传</b> 或拖拽 PNG 到此处<br>
+        <span style="font-size:12px">（不传则使用内置示例图标）</span>
+        <input type="file" id="file" accept="image/png,image/*" hidden>
+      </div>
+
+      <div class="field">
+        <label>① 源主色 · 图标当前的主色调</label>
+        <div class="row">
+          <input type="color" id="srcColor" value="#2196f3">
+          <input class="hex" id="srcHex" value="#2196f3" spellcheck="false">
+        </div>
+        <button class="wide" id="detectBtn">🔍 从原图自动检测主色</button>
+      </div>
+
+      <div class="field">
+        <label>② 目标主色 · 取色器</label>
+        <div class="row">
+          <input type="color" id="dstColor" value="#f44336">
+          <input class="hex" id="dstHex" value="#f44336" spellcheck="false">
+          <button id="eyeBtn" style="display:none;padding:0 12px">💧取色</button>
+        </div>
+        <div class="swatches" id="swatches"></div>
+      </div>
+    </div>
+
+    <!-- ============ 预览区 ============ -->
+    <div class="card">
+      <div class="preview-head">
+        <h2>预览</h2>
+        <div class="head-actions">
+          <label class="toggle" title="把「替换后」的结果实时设为浏览器标签页图标">
+            <input type="checkbox" id="faviconToggle" checked>
+            <span class="switch"></span>
+            <span>同步标签页图标</span>
+          </label>
+          <button class="primary" id="downloadBtn">下载 PNG</button>
+        </div>
+      </div>
+      <div class="preview-grid">
+        <figure>
+          <div class="canvas-wrap"><canvas id="srcCanvas"></canvas></div>
+          <figcaption>原始图标</figcaption>
+        </figure>
+        <figure>
+          <div class="canvas-wrap"><canvas id="outCanvas"></canvas></div>
+          <figcaption>替换后</figcaption>
+        </figure>
+      </div>
+      <p class="hint">
+        提示：在上方「原始图标」上点击任意位置，可直接把该处颜色设为源主色。<br>
+        Favicon 会自动跟随「替换后」的画面实时刷新，方便直接在标签页上确认效果。
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* =========================================================
+   * 1. 颜色工具
+   * =======================================================*/
+  function hexToRgb(hex) {
+    let h = String(hex).trim().replace(/^#/, '');
+    if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+    const n = parseInt(h, 16);
+    if (isNaN(n)) return [0, 0, 0];
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  }
+  function rgbToHex(r, g, b) {
+    return '#' + [r, g, b].map(function (v) {
+      const c = Math.max(0, Math.min(255, Math.round(v)));
+      return c.toString(16).padStart(2, '0');
+    }).join('');
+  }
+  /** 返回 [h(0-360), s(0-1), l(0-1)] */
+  function rgbToHsl(r, g, b) {
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    const l = (max + min) / 2;
+    let h = 0, s = 0;
+    const d = max - min;
+    if (d > 1e-6) {
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      if (max === r)      h = (g - b) / d + (g < b ? 6 : 0);
+      else if (max === g) h = (b - r) / d + 2;
+      else                h = (r - g) / d + 4;
+      h *= 60;
+    }
+    return [h, s, l];
+  }
+  function hue2rgb(p, q, t) {
+    if (t < 0) t += 1;
+    if (t > 1) t -= 1;
+    if (t < 1 / 6) return p + (q - p) * 6 * t;
+    if (t < 1 / 2) return q;
+    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+    return p;
+  }
+  function hslToRgb(h, s, l) {
+    h = (((h % 360) + 360) % 360) / 360;
+    if (s <= 0) {
+      const v = Math.round(l * 255);
+      return [v, v, v];
+    }
+    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    const p = 2 * l - q;
+    return [
+      Math.round(hue2rgb(p, q, h + 1 / 3) * 255),
+      Math.round(hue2rgb(p, q, h) * 255),
+      Math.round(hue2rgb(p, q, h - 1 / 3) * 255)
+    ];
+  }
+  function hexToHsl(hex) { const c = hexToRgb(hex); return rgbToHsl(c[0], c[1], c[2]); }
+
+  /* =========================================================
+   * 2. DOM
+   * =======================================================*/
+  const $ = function (id) { return document.getElementById(id); };
+
+  const srcColorEl = $('srcColor'), srcHexEl = $('srcHex');
+  const dstColorEl = $('dstColor'), dstHexEl = $('dstHex');
+  const srcCanvas  = $('srcCanvas'),  outCanvas = $('outCanvas');
+  const srcCtx = srcCanvas.getContext('2d');
+  const outCtx = outCanvas.getContext('2d', { willReadFrequently: true });
+  const dropEl = $('drop'), fileEl = $('file');
+
+  const MAX_SIZE = 320;        // 处理时的最大边长
+  let sourceData = null;       // 原始 ImageData（只算一次）
+  let rafId = 0;
+
+  /* =========================================================
+   * 3. 核心：逐像素 HSL 色相重映射
+   * =======================================================*/
+  function recolor() {
+    if (!sourceData) return;
+
+    const w = sourceData.width, h = sourceData.height;
+    const out = outCtx.createImageData(w, h);
+    const sd = sourceData.data;
+    const od = out.data;
+
+    /* --- 根据源主色 / 目标主色求出变换参数 --- */
+    const S = hexToHsl(srcColorEl.value);   // [h, s, l]
+    const T = hexToHsl(dstColorEl.value);
+
+    // 色相走最短路径
+    let dH = T[0] - S[0];
+    if (dH > 180) dH -= 360;
+    else if (dH < -180) dH += 360;
+
+    // 饱和 / 亮度按比例缩放：这样"源主色像素"会被精确映射到"目标色"
+    const satK = S[1] > 0.02 ? T[1] / S[1] : 1;
+    const ligK = S[2] > 0.02 ? T[2] / S[2] : 1;
+
+    // 同色像素缓存，纯色图标可快 10 倍以上
+    const cache = new Map();
+
+    for (let i = 0; i < sd.length; i += 4) {
+      const a = sd[i + 3];
+      if (a === 0) continue;                       // 全透明像素保持透明
+
+      const r = sd[i], g = sd[i + 1], b = sd[i + 2];
+      const key = (r << 16) | (g << 8) | b;
+
+      let rgb = cache.get(key);
+      if (rgb === undefined) {
+        const hsl = rgbToHsl(r, g, b);
+        const nh = hsl[0] + dH;
+        const ns = Math.min(1, hsl[1] * satK);
+        const nl = Math.min(1, hsl[2] * ligK);
+        rgb = hslToRgb(nh, ns, nl);
+        cache.set(key, rgb);
+      }
+
+      od[i]     = rgb[0];
+      od[i + 1] = rgb[1];
+      od[i + 2] = rgb[2];
+      od[i + 3] = a;
+    }
+
+    outCtx.putImageData(out, 0, 0);
+
+    /* 输出画布已更新 → 同步 favicon */
+    updateFavicon();
+  }
+
+  /* 用 rAF 合并高频输入 */
+  function scheduleRender() {
+    if (rafId) return;
+    rafId = requestAnimationFrame(function () { rafId = 0; recolor(); });
+  }
+
+  /* =========================================================
+   * 3.5 Favicon 自动同步
+   * =======================================================*/
+  const FAVICON_SIZE = 64;
+
+  // 动态创建 <link rel="icon">，避免空 href 触发一次无谓的请求
+  const faviconLink = document.createElement('link');
+  faviconLink.rel = 'icon';
+  faviconLink.type = 'image/png';
+  document.head.appendChild(faviconLink);
+
+  const favCanvas = document.createElement('canvas');
+  favCanvas.width = favCanvas.height = FAVICON_SIZE;
+  const favCtx = favCanvas.getContext('2d');
+  const faviconToggle = $('faviconToggle');
+
+  /** 把 outCanvas 等比缩放居中绘制到 64×64，再转成 dataURL 写入 favicon */
+  function updateFavicon() {
+    if (!faviconToggle.checked || !sourceData) return;
+
+    const w = outCanvas.width, h = outCanvas.height;
+    if (!w || !h) return;
+
+    const s  = Math.min(FAVICON_SIZE / w, FAVICON_SIZE / h);
+    const dw = Math.max(1, Math.round(w * s));
+    const dh = Math.max(1, Math.round(h * s));
+
+    favCtx.clearRect(0, 0, FAVICON_SIZE, FAVICON_SIZE);
+    favCtx.imageSmoothingEnabled = true;
+    favCtx.imageSmoothingQuality = 'high';
+    favCtx.drawImage(
+      outCanvas,
+      Math.round((FAVICON_SIZE - dw) / 2),
+      Math.round((FAVICON_SIZE - dh) / 2),
+      dw, dh
+    );
+
+    try {
+      faviconLink.href = favCanvas.toDataURL('image/png');
+    } catch (err) { /* 极端情况下忽略 */ }
+  }
+
+  faviconToggle.addEventListener('change', function () {
+    if (faviconToggle.checked) updateFavicon();   // 重新打开时立刻补一次
+  });
+
+  /* =========================================================
+   * 4. 图片载入
+   * =======================================================*/
+  function setImage(img) {
+    const scale = Math.min(1, MAX_SIZE / Math.max(img.width, img.height));
+    const w = Math.max(1, Math.round(img.width * scale));
+    const h = Math.max(1, Math.round(img.height * scale));
+
+    const tmp = document.createElement('canvas');
+    tmp.width = w; tmp.height = h;
+    const tctx = tmp.getContext('2d', { willReadFrequently: true });
+    tctx.clearRect(0, 0, w, h);
+    tctx.drawImage(img, 0, 0, w, h);
+    sourceData = tctx.getImageData(0, 0, w, h);
+
+    srcCanvas.width = w;  srcCanvas.height = h;
+    outCanvas.width = w;  outCanvas.height = h;
+    srcCtx.clearRect(0, 0, w, h);
+    srcCtx.putImageData(sourceData, 0, 0);
+
+    recolor();
+  }
+
+  function loadFile(file) {
+    if (!file || !/^image\//.test(file.type)) return;
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = function () {
+      setImage(img);
+      URL.revokeObjectURL(url);
+    };
+    img.onerror = function () { URL.revokeObjectURL(url); };
+    img.src = url;
+  }
+
+  /* =========================================================
+   * 5. 主色检测（按色相分桶统计，忽略低饱和 / 全透明像素）
+   * =======================================================*/
+  function detectDominant(data) {
+    const d = data.data;
+    const buckets = new Map();
+
+    for (let i = 0; i < d.length; i += 4) {
+      if (d[i + 3] < 128) continue;
+      const r = d[i], g = d[i + 1], b = d[i + 2];
+      const hsl = rgbToHsl(r, g, b);
+      if (hsl[1] < 0.15 || hsl[2] < 0.08) continue;   // 跳过灰 / 近黑
+
+      const key = (Math.round(hsl[0] / 20) * 20) % 360;
+      let acc = buckets.get(key);
+      if (!acc) { acc = { n: 0, r: 0, g: 0, b: 0 }; buckets.set(key, acc); }
+      acc.n++; acc.r += r; acc.g += g; acc.b += b;
+    }
+
+    let best = null;
+    buckets.forEach(function (acc) {
+      if (!best || acc.n > best.n) best = acc;
+    });
+    if (!best) return null;
+    return rgbToHex(best.r / best.n, best.g / best.n, best.b / best.n);
+  }
+
+  /* =========================================================
+   * 6. UI 事件
+   * =======================================================*/
+  const HEX_RE = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i;
+
+  function normalizeHex(v) {
+    v = String(v).trim();
+    if (!HEX_RE.test(v)) return null;
+    v = v.replace(/^#/, '');
+    if (v.length === 3) v = v[0] + v[0] + v[1] + v[1] + v[2] + v[2];
+    return '#' + v.toLowerCase();
+  }
+
+  /* --- 源色 --- */
+  srcColorEl.addEventListener('input', function () {
+    srcHexEl.value = srcColorEl.value;
+    scheduleRender();
+  });
+  srcHexEl.addEventListener('input', function () {
+    const v = normalizeHex(srcHexEl.value);
+    if (v) { srcColorEl.value = v; scheduleRender(); }
+  });
+  srcHexEl.addEventListener('blur', function () {
+    const v = normalizeHex(srcHexEl.value);
+    srcHexEl.value = v || srcColorEl.value;
+  });
+
+  /* --- 目标色 --- */
+  dstColorEl.addEventListener('input', function () {
+    dstHexEl.value = dstColorEl.value;
+    scheduleRender();
+  });
+  dstHexEl.addEventListener('input', function () {
+    const v = normalizeHex(dstHexEl.value);
+    if (v) { dstColorEl.value = v; scheduleRender(); }
+  });
+  dstHexEl.addEventListener('blur', function () {
+    const v = normalizeHex(dstHexEl.value);
+    dstHexEl.value = v || dstColorEl.value;
+  });
+
+  /* --- 预设色板 --- */
+  const PRESETS = [
+    '#f44336', '#e91e63', '#9c27b0', '#673ab7',
+    '#3f51b5', '#2196f3', '#00bcd4', '#009688',
+    '#4caf50', '#8bc34a', '#ff9800', '#ff5722',
+    '#795548', '#607d8b', '#111111', '#ffffff'
+  ];
+  const swatchBox = $('swatches');
+  PRESETS.forEach(function (c) {
+    const el = document.createElement('div');
+    el.className = 'swatch';
+    el.style.background = c;
+    el.title = c;
+    el.addEventListener('click', function () {
+      dstColorEl.value = c;
+      dstHexEl.value = c;
+      scheduleRender();
+    });
+    swatchBox.appendChild(el);
+  });
+
+  /* --- 屏幕吸管（Chrome 等支持 EyeDropper 的浏览器） --- */
+  if ('EyeDropper' in window) {
+    const eyeBtn = $('eyeBtn');
+    eyeBtn.style.display = '';
+    eyeBtn.addEventListener('click', function () {
+      new window.EyeDropper().open().then(function (res) {
+        const hex = res.sRGBHex;
+        dstColorEl.value = hex;
+        dstHexEl.value = hex;
+        scheduleRender();
+      }).catch(function () { /* 用户取消 */ });
+    });
+  }
+
+  /* --- 在原图上点击取源色 --- */
+  srcCanvas.addEventListener('click', function (e) {
+    if (!sourceData) return;
+    const rect = srcCanvas.getBoundingClientRect();
+    const x = Math.floor((e.clientX - rect.left) / rect.width  * srcCanvas.width);
+    const y = Math.floor((e.clientY - rect.top ) / rect.height * srcCanvas.height);
+    if (x < 0 || y < 0 || x >= srcCanvas.width || y >= srcCanvas.height) return;
+
+    const d = srcCtx.getImageData(x, y, 1, 1).data;
+    if (d[3] === 0) return;                       // 透明处忽略
+    const hex = rgbToHex(d[0], d[1], d[2]);
+    srcColorEl.value = hex;
+    srcHexEl.value = hex;
+    scheduleRender();
+  });
+
+  /* --- 自动检测主色 --- */
+  $('detectBtn').addEventListener('click', function () {
+    if (!sourceData) return;
+    const hex = detectDominant(sourceData);
+    if (hex) {
+      srcColorEl.value = hex;
+      srcHexEl.value = hex;
+      scheduleRender();
+    }
+  });
+
+  /* --- 上传 --- */
+  dropEl.addEventListener('click', function () { fileEl.click(); });
+  fileEl.addEventListener('change', function () {
+    if (fileEl.files && fileEl.files[0]) loadFile(fileEl.files[0]);
+    fileEl.value = '';
+  });
+  ['dragenter', 'dragover'].forEach(function (t) {
+    dropEl.addEventListener(t, function (e) {
+      e.preventDefault(); dropEl.classList.add('over');
+    });
+  });
+  ['dragleave', 'drop'].forEach(function (t) {
+    dropEl.addEventListener(t, function (e) {
+      e.preventDefault(); dropEl.classList.remove('over');
+    });
+  });
+  dropEl.addEventListener('drop', function (e) {
+    const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if (f) loadFile(f);
+  });
+
+  /* --- 下载 --- */
+  $('downloadBtn').addEventListener('click', function () {
+    if (!sourceData) return;
+    const a = document.createElement('a');
+    a.download = 'icon-recolored.png';
+    a.href = outCanvas.toDataURL('image/png');
+    a.click();
+  });
+
+  /* =========================================================
+   * 7. 默认示例图标（Material 云朵，主色正好是 #2196f3）
+   * =======================================================*/
+  const DEFAULT_SVG =
+    '<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 24 24">' +
+    '<path fill="#2196f3" d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04' +
+    'A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/>' +
+    '</svg>';
+
+  const demoImg = new Image();
+  demoImg.onload = function () { setImage(demoImg); };
+  demoImg.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(DEFAULT_SVG);
+
+})();
+</script>
+</body>
+</html>
