@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Gist 读写工具</title>
+    <style>
+        :root {
+            --bg: #f6f8fa;
+            --card-bg: #fff;
+            --border: #d0d7de;
+            --text: #1f2328;
+            --text-secondary: #656d76;
+            --accent: #0969da;
+            --accent-hover: #0550ae;
+            --success: #1a7f37;
+            --danger: #cf222e;
+            --radius: 8px
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 32px 16px
+        }
+
+        .container {
+            width: 100%;
+            max-width: 860px
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 28px
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 6px
+        }
+
+        header p {
+            color: var(--text-secondary);
+            font-size: .9rem
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 16px
+        }
+
+        .field {
+            margin-bottom: 14px
+        }
+
+        .field:last-child {
+            margin-bottom: 0
+        }
+
+        .field label {
+            display: block;
+            font-size: .85rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--text-secondary)
+        }
+
+        .field input,
+        .field textarea,
+        .field select {
+            width: 100%;
+            padding: 8px 12px;
+            font-size: .9rem;
+            font-family: inherit;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--bg);
+            color: var(--text);
+            transition: border-color .15s, box-shadow .15s;
+            outline: none
+        }
+
+        .field input:focus,
+        .field textarea:focus,
+        .field select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(9, 105, 218, .15);
+            background: var(--card-bg)
+        }
+
+        .field textarea {
+            resize: vertical;
+            min-height: 220px;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: .85rem;
+            line-height: 1.55
+        }
+
+        .field input[type="password"] {
+            font-family: "SFMono-Regular", Consolas, monospace;
+            letter-spacing: .5px
+        }
+
+        .field-row {
+            display: flex;
+            gap: 8px;
+            align-items: stretch
+        }
+
+        .field-row select,
+        .field-row input {
+            flex: 1;
+            width: auto;
+            min-width: 0
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+            align-items: center
+        }
+
+        button {
+            padding: 9px 22px;
+            font-size: .9rem;
+            font-weight: 600;
+            font-family: inherit;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all .15s;
+            background: var(--card-bg);
+            color: var(--text);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px
+        }
+
+        button:hover:not(:disabled) {
+            background: var(--bg)
+        }
+
+        button:disabled {
+            opacity: .55;
+            cursor: not-allowed
+        }
+
+        button.primary {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent)
+        }
+
+        button.primary:hover:not(:disabled) {
+            background: var(--accent-hover);
+            border-color: var(--accent-hover)
+        }
+
+        button.small {
+            padding: 6px 14px;
+            font-size: .8rem;
+            white-space: nowrap
+        }
+
+        .status {
+            margin-top: 12px;
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: .85rem;
+            display: none;
+            word-break: break-all
+        }
+
+        .status.show {
+            display: block
+        }
+
+        .status.success {
+            background: #dafbe1;
+            color: var(--success);
+            border: 1px solid #aceebb
+        }
+
+        .status.error {
+            background: #ffebe9;
+            color: var(--danger);
+            border: 1px solid #ffcecb
+        }
+
+        .status.info {
+            background: #ddf4ff;
+            color: var(--accent);
+            border: 1px solid #b6e3ff
+        }
+
+        .hint {
+            font-size: .78rem;
+            color: var(--text-secondary);
+            margin-top: 5px
+        }
+
+        .hint a {
+            color: var(--accent);
+            text-decoration: none
+        }
+
+        .hint a:hover {
+            text-decoration: underline
+        }
+
+        .hint code {
+            background: var(--bg);
+            padding: 1px 5px;
+            border-radius: 4px;
+            font-family: "SFMono-Regular", Consolas, monospace;
+            border: 1px solid var(--border)
+        }
+
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: .85rem;
+            color: var(--text-secondary);
+            margin-top: 14px
+        }
+
+        .checkbox-row input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+            cursor: pointer;
+            flex-shrink: 0
+        }
+
+        .checkbox-row label {
+            cursor: pointer;
+            user-select: none
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 24px;
+            font-size: .78rem;
+            color: var(--text-secondary)
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>📝 Gist 读写工具</h1>
+            <p>纯前端 · 通过 GitHub Gist API 直接读写</p>
+        </header>
+
+        <div class="card">
+            <div class="field">
+                <label for="token">GitHub Token（需要 gist 权限）</label>
+                <div class="field-row">
+                    <input type="password" id="token" placeholder="ghp_xxxxxxxxxxxx" autocomplete="off">
+                    <button type="button" class="small" id="btnToggleToken" title="显示 / 隐藏 Token">👁 显示</button>
+                </div>
+                <div class="hint">
+                    <a href="https://github.com/settings/tokens/new?scopes=gist" target="_blank" rel="noopener">生成 Token
+                        →</a>
+                    仅勾选 <code>gist</code> 权限即可
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="gistId">选择 Gist</label>
+                <div class="field-row">
+                    <select id="gistId">
+                        <option value="">— 填写 Token 后点击刷新 —</option>
+                    </select>
+                    <button type="button" class="small" id="btnRefresh">🔄 刷新列表</button>
+                </div>
+                <div class="hint">前往 <a href="https://gist.github.com" target="_blank" rel="noopener"
+                        id="gistLink">gist.github.com</a> 查看 Gist</div>
+            </div>
+
+            <div class="field">
+                <label for="filename">文件名</label>
+                <input type="text" id="filename" value="note.txt" placeholder="note.txt">
+                <div class="hint">单文件 Gist 的文件名，可自定义</div>
+            </div>
+
+            <div class="field">
+                <label for="content">内容</label>
+                <textarea id="content" placeholder="在此输入内容，或点击 Pull 从 Gist 拉取..."></textarea>
+            </div>
+
+            <div class="checkbox-row">
+                <input type="checkbox" id="saveConfig">
+                <label for="saveConfig">保存 Token / 选择的 Gist / 文件名 到 localStorage</label>
+            </div>
+
+            <div class="btn-group">
+                <button class="primary" id="btnPush">⬆ Push（写入 Gist）</button>
+                <button id="btnPull">⬇ Pull（覆盖本地）</button>
+            </div>
+
+            <div class="status" id="status"></div>
+        </div>
+
+        <div class="footer">Gist API · 纯前端实现 · 无后端依赖</div>
+    </div>
+
+    <script>
+        const $ = (id) => document.getElementById(id);
+        const STORAGE_KEY = 'gist_tool_config';
+        let pendingGistId = '';
+        let busy = false;
+        const gistFilesMap = {};   // gistId -> [文件名, ...]
+        const gistUrlMap = {};     // gistId -> html_url
+
+        function setStatus(type, msg) { const el = $('status'); el.className = 'status show ' + type; el.textContent = msg; }
+        function clearStatus() { $('status').className = 'status'; }
+        function updateButtons() {
+            const isNew = !getGistId();
+            $('btnPush').disabled = busy;
+            $('btnPull').disabled = busy || isNew;   // 「新建 Gist」仅支持 Push
+            $('btnRefresh').disabled = busy;
+        }
+        function setBusy(b) { busy = b; updateButtons(); }
+        function getToken() {
+            // 只保留 ASCII 可见字符，去掉中文空格、零宽字符、换行等
+            return $('token').value.replace(/[^\x20-\x7E]/g, '').trim();
+        }
+        function getGistId() { return $('gistId').value; }
+        function getFilename() { return $('filename').value.trim() || 'note.txt'; }
+
+        function updateGistLink() {
+            const id = getGistId();
+            const link = $('gistLink');
+            if (id) {
+                link.href = gistUrlMap[id] || `https://gist.github.com/${id}`;
+                link.textContent = `gist.github.com/${id.slice(0, 8)}…`;
+            } else {
+                link.href = 'https://gist.github.com';
+                link.textContent = 'gist.github.com';
+            }
+        }
+
+        function applyGistSelection() {
+            const id = getGistId();
+            // 文件名根据选中的 Gist 自动更新；「新建 Gist」时保留自定义文件名
+            if (id && gistFilesMap[id] && gistFilesMap[id].length) {
+                $('filename').value = gistFilesMap[id][0];
+            }
+            updateGistLink();
+            updateButtons();
+        }
+
+        function saveConfig() {
+            if ($('saveConfig').checked) {
+                try {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                        token: getToken(),
+                        gistId: getGistId(),
+                        filename: getFilename()
+                    }));
+                } catch (e) { /* ignore */ }
+            } else {
+                try { localStorage.removeItem(STORAGE_KEY); } catch (e) { /* ignore */ }
+            }
+        }
+
+        function loadConfig() {
+            let raw;
+            try { raw = localStorage.getItem(STORAGE_KEY); } catch (e) { return; }
+            if (!raw) return;
+            try {
+                const cfg = JSON.parse(raw);
+                $('token').value = cfg.token || '';
+                $('filename').value = cfg.filename || 'note.txt';
+                $('saveConfig').checked = true;
+                pendingGistId = cfg.gistId || '';
+            } catch (e) { /* ignore */ }
+        }
+
+        async function refreshGistList(silent) {
+            const token = getToken();
+            if (!token) {
+                if (!silent) setStatus('error', '❌ 请先填写 GitHub Token');
+                return false;
+            }
+            try {
+                const res = await fetch('https://api.github.com/gists?per_page=100', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/vnd.github+json',
+                        'X-GitHub-Api-Version': '2022-11-28'
+                    }
+                });
+                if (!res.ok) {
+                    const e = await res.json().catch(() => ({}));
+                    throw new Error(e.message || `HTTP ${res.status}`);
+                }
+                const list = await res.json();
+                const sel = $('gistId');
+                const want = pendingGistId || sel.value || '';
+                Object.keys(gistFilesMap).forEach(k => delete gistFilesMap[k]);
+                Object.keys(gistUrlMap).forEach(k => delete gistUrlMap[k]);
+                sel.innerHTML = '<option value="">➕ 新建 Gist（仅支持 Push）</option>';
+                list.forEach(g => {
+                    const fileNames = Object.keys(g.files || {});
+                    gistFilesMap[g.id] = fileNames;
+                    gistUrlMap[g.id] = g.html_url || `https://gist.github.com/${g.id}`;
+                    const files = fileNames.join(', ') || '(无文件)';
+                    const desc = g.description || '(无描述)';
+                    const opt = document.createElement('option');
+                    opt.value = g.id;
+                    opt.textContent = `${desc} — ${files} — ${g.id.slice(0, 8)}…`;
+                    sel.appendChild(opt);
+                });
+                if (want) {
+                    for (const opt of sel.options) {
+                        if (opt.value === want) { sel.value = want; break; }
+                    }
+                }
+                pendingGistId = '';
+                applyGistSelection();
+                return true;
+            } catch (err) {
+                if (!silent) setStatus('error', `❌ 获取列表失败：${err.message}`);
+                return false;
+            }
+        }
+
+        async function onRefreshClick() {
+            setBusy(true);
+            clearStatus();
+            const ok = await refreshGistList(false);
+            setBusy(false);
+            if (ok) {
+                const n = $('gistId').options.length - 1;
+                setStatus('success', `✅ 已加载 ${n} 个 Gist`);
+            }
+        }
+
+        async function pushGist() {
+            const token = getToken();
+            const content = $('content').value;
+            if (!token) { setStatus('error', '❌ 请先填写 GitHub Token'); return; }
+            if (!content) { setStatus('error', '❌ 内容为空，无法 Push'); return; }
+            setBusy(true);
+            clearStatus();
+            const filename = getFilename();
+            const gistId = getGistId();
+            try {
+                let url, method, body;
+                if (gistId) {
+                    url = `https://api.github.com/gists/${gistId}`;
+                    method = 'PATCH';
+                    body = { files: { [filename]: { content } } };
+                } else {
+                    url = 'https://api.github.com/gists';
+                    method = 'POST';
+                    body = { description: 'Created by Gist 读写工具', public: false, files: { [filename]: { content } } };
+                }
+                const res = await fetch(url, {
+                    method,
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/vnd.github+json',
+                        'Content-Type': 'application/json',
+                        'X-GitHub-Api-Version': '2022-11-28'
+                    },
+                    body: JSON.stringify(body)
+                });
+                if (!res.ok) {
+                    const e = await res.json().catch(() => ({}));
+                    throw new Error(e.message || `HTTP ${res.status}`);
+                }
+                const data = await res.json();
+                if (!gistId) {
+                    pendingGistId = data.id;
+                    await refreshGistList(true);
+                    $('gistId').value = data.id;
+                    setStatus('success', `✅ 新 Gist 已创建并选中！ID: ${data.id}`);
+                } else {
+                    setStatus('success', `✅ 已更新 Gist ${data.id}`);
+                }
+                saveConfig();
+            } catch (err) {
+                setStatus('error', `❌ Push 失败：${err.message}`);
+            } finally {
+                setBusy(false);
+            }
+        }
+
+        async function pullGist() {
+            const gistId = getGistId();
+            const filename = getFilename();
+            const token = getToken();
+            if (!gistId) { setStatus('error', '❌ 请先选择 Gist（或先 Push 创建）'); return; }
+            setBusy(true);
+            clearStatus();
+            try {
+                const headers = {
+                    'Accept': 'application/vnd.github+json',
+                    'X-GitHub-Api-Version': '2022-11-28'
+                };
+                if (token) headers['Authorization'] = `Bearer ${token}`;
+                const metaRes = await fetch(`https://api.github.com/gists/${gistId}`, { headers });
+                if (!metaRes.ok) {
+                    const e = await metaRes.json().catch(() => ({}));
+                    throw new Error(e.message || `HTTP ${metaRes.status}`);
+                }
+                const meta = await metaRes.json();
+                const files = meta.files || {};
+                let targetFile = files[filename];
+                if (!targetFile) {
+                    const firstKey = Object.keys(files)[0];
+                    if (!firstKey) throw new Error('Gist 中没有文件');
+                    targetFile = files[firstKey];
+                }
+                // 关键修复：直接用 API 返回的 content 字段，不再请求 raw_url（避免跨域）
+                const text = targetFile.content !== undefined ? targetFile.content : '';
+                $('content').value = text;
+                $('filename').value = targetFile.filename || filename;
+                if (targetFile.truncated) {
+                    setStatus('info', `⚠️ 文件过大被 API 截断，仅拉取到 ${text.length} 字符`);
+                } else {
+                    setStatus('success', `✅ 已从 Gist ${gistId.slice(0, 8)}… 拉取内容（${text.length} 字符）`);
+                }
+                saveConfig();
+            } catch (err) {
+                setStatus('error', `❌ Pull 失败：${err.message}`);
+            } finally {
+                setBusy(false);
+            }
+        }
+
+        async function init() {
+            loadConfig();
+            applyGistSelection();
+            if (getToken() && $('saveConfig').checked) {
+                await refreshGistList(true);
+            }
+        }
+
+        $('btnPush').addEventListener('click', pushGist);
+        $('btnPull').addEventListener('click', pullGist);
+        $('btnRefresh').addEventListener('click', onRefreshClick);
+
+        $('btnToggleToken').addEventListener('click', () => {
+            const t = $('token');
+            const show = t.type === 'password';
+            t.type = show ? 'text' : 'password';
+            $('btnToggleToken').textContent = show ? '🙈 隐藏' : '👁 显示';
+        });
+
+        $('gistId').addEventListener('change', () => {
+            applyGistSelection();
+            saveConfig();
+        });
+
+        ['token', 'filename'].forEach(id => {
+            $(id).addEventListener('change', saveConfig);
+        });
+
+        $('saveConfig').addEventListener('change', () => {
+            saveConfig();
+            if ($('saveConfig').checked) {
+                setStatus('info', 'ℹ️ 配置已保存到 localStorage');
+            } else {
+                setStatus('info', 'ℹ️ 已清除 localStorage 中的配置');
+            }
+        });
+
+        init();
+    </script>
+</body>
+
+</html>
