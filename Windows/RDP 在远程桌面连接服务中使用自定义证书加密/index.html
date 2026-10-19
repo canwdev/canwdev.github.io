@@ -6972,7 +6972,7 @@
 <blockquote>
 <p>由于安全证书存在问题，因此远程计算机无法通过身份验证。继续操作可能不安全。  </p>
 </blockquote>
-<p><a class="glightbox" data-type="image" data-width="100%" data-height="auto" href="../assets/windows-rdp-ssl.assets/image-20200706165450303.webp" data-title="image-20200706165450303" data-desc-position="bottom"><img alt="image-20200706165450303" src="../assets/windows-rdp-ssl.assets/image-20200706165450303.webp"></a>  </p>
+<p>  </p>
 <p>这在家里的局域网内没什么问题，但是如果服务器暴露在外网，则容易受到中间人攻击。  </p>
 <p>在远程桌面服务器上使用了可信任的证书（<code>.p12</code> 文件）加密后，可以使用该证书对 RDP 服务器进行更安全的加密通信。  </p>
 <p>提示：下列操作都是在RDP服务端进行的。TL;DR  </p>
@@ -6990,20 +6990,20 @@
 </li>
 <li>
 <p>在【控制台根节点】点击**文件** -&gt; <strong>添加/删除管理单元</strong> -&gt; 在左侧 <strong>可用的管理单元</strong> 找到 <strong>证书</strong> 添加到右侧，选择**计算机账户** -&gt; 选择 <strong>本地计算机</strong> -&gt; 完成 -&gt; 确定  </p>
-<p><a class="glightbox" data-type="image" data-width="100%" data-height="auto" href="../assets/windows-rdp-ssl.assets/image-20200707094422495.webp" data-title="image-20200707094422495" data-desc-position="bottom"><img alt="image-20200707094422495" src="../assets/windows-rdp-ssl.assets/image-20200707094422495.webp"></a>  </p>
-<p><a class="glightbox" data-type="image" data-width="100%" data-height="auto" href="../assets/windows-rdp-ssl.assets/image-20200707094706700.webp" data-title="image-20200707094706700" data-desc-position="bottom"><img alt="image-20200707094706700" src="../assets/windows-rdp-ssl.assets/image-20200707094706700.webp"></a>  </p>
-<p><a class="glightbox" data-type="image" data-width="100%" data-height="auto" href="../assets/windows-rdp-ssl.assets/image-20200707094848365.webp" data-title="image-20200707094848365" data-desc-position="bottom"><img alt="image-20200707094848365" src="../assets/windows-rdp-ssl.assets/image-20200707094848365.webp"></a>  </p>
+<p>  </p>
+<p>  </p>
+<p>  </p>
 </li>
 <li>
 <p>在 证书(本地计算机) -&gt; 个人 -&gt; 证书 -&gt; 所有任务 -&gt; 导入  </p>
 </li>
 <li>
 <p>右击导入的证书，在**所有任务**中选择**管理私钥**，添加 <code>NETWORK SERVICE</code> 组的权限  </p>
-<p><a class="glightbox" data-type="image" data-width="100%" data-height="auto" href="../assets/windows-rdp-ssl.assets/image-20200707095408605.webp" data-title="./image-20200707095408605" data-desc-position="bottom"><img alt="./image-20200707095408605" src="../assets/windows-rdp-ssl.assets/image-20200707095408605.webp"></a>  </p>
+<p>  </p>
 </li>
 <li>
 <p>双击刚添加的证书，将【详细信息-指纹】复制以便后续使用  </p>
-<p><a class="glightbox" data-type="image" data-width="100%" data-height="auto" href="../assets/windows-rdp-ssl.assets/image-20200707095600000.webp" data-title="image-20200707095600000" data-desc-position="bottom"><img alt="image-20200707095600000" src="../assets/windows-rdp-ssl.assets/image-20200707095600000.webp"></a>  </p>
+<p>  </p>
 </li>
 </ol>
 <h3 id="3-在注册表指定证书">3. 在注册表指定证书<a class="headerlink" href="#3-在注册表指定证书" title="Permanent link">¶</a></h3>
@@ -7022,7 +7022,7 @@
 <a id="__codelineno-0-6" name="__codelineno-0-6"></a>
 <a id="__codelineno-0-7" name="__codelineno-0-7"></a><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">splitedArr</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">','</span><span class="p">))</span><span class="w">  </span>
 </code></pre></div></td></tr></tbody></table></div>
-<p><a class="glightbox" data-type="image" data-width="100%" data-height="auto" href="../assets/windows-rdp-ssl.assets/image-20200707100310509.webp" data-title="image-20200707100310509" data-desc-position="bottom"><img alt="image-20200707100310509" src="../assets/windows-rdp-ssl.assets/image-20200707100310509.webp"></a>  </p>
+<p>  </p>
 <p>新建一个 <code>.reg</code> 注册表文件，粘贴以下内容，将 <code>ff,ff,...</code> 替换成控制台输出的结果，保存后双击执行即可导入注册表  </p>
 <div class="highlight"><table class="highlighttable"><tbody><tr><th colspan="2" class="filename"><span class="filename">Text Only</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-1-1">1</a></span>
 <span class="normal"><a href="#__codelineno-1-2">2</a></span>
@@ -7033,8 +7033,8 @@
 <a id="__codelineno-1-4" name="__codelineno-1-4"></a>"SSLCertificateSHA1Hash"=hex:ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff,ff  
 </code></pre></div></td></tr></tbody></table></div>
 <p>完成后，再次进行远程桌面的效果：使用服务器证书已验证远程计算机的身份。  </p>
-<p><a class="glightbox" data-type="image" data-width="100%" data-height="auto" href="../assets/windows-rdp-ssl.assets/image-20200706165133023.webp" data-title="image-20200706165133023" data-desc-position="bottom"><img alt="image-20200706165133023" src="../assets/windows-rdp-ssl.assets/image-20200706165133023.webp"></a>  </p>
-<p><a class="glightbox" data-type="image" data-width="100%" data-height="auto" href="../assets/windows-rdp-ssl.assets/image-20200706165253268.webp" data-title="image-20200706165253268" data-desc-position="bottom"><img alt="image-20200706165253268" src="../assets/windows-rdp-ssl.assets/image-20200706165253268.webp"></a></p>
+<p>  </p>
+<p></p>
 
 
 

@@ -7051,7 +7051,7 @@
 <p><a href="https://docs.microsoft.com/en-us/sysinternals/downloads/disk2vhd">disk2vhd</a> 是微软官方工具集 <a href="https://docs.microsoft.com/en-us/sysinternals/">Sysinternals</a> 中的一个小工具，下载地址：<a href="https://download.sysinternals.com/files/Disk2vhd.zip">https://download.sysinternals.com/files/Disk2vhd.zip</a>  </p>
 <p>使用这个工具，可以在系统开机运行的状态下，完美的备份出一个 vhdx 文件。<br>
 记得仅勾选 EFI 分区和系统分区，如有需要也可勾选 Prepar for use in Virtual PC，这样此镜像就可以直接再 Hyper-V 运行。  </p>
-<p><a class="glightbox" data-type="image" data-width="100%" data-height="auto" href="../assets/windows-vhd-backup-recovery.assets/disk2vhd.webp" data-title="截图说明" data-desc-position="bottom"><img alt="截图说明" src="../assets/windows-vhd-backup-recovery.assets/disk2vhd.webp"></a>  </p>
+<p>  </p>
 <h2 id="2-系统还原">2. 系统还原<a class="headerlink" href="#2-系统还原" title="Permanent link">¶</a></h2>
 <p>备份出 vhdx 后，镜像还原主要有以下几个步骤：  </p>
 <ol>
@@ -7062,15 +7062,15 @@
 </ol>
 <h3 id="装载镜像">装载镜像：<a class="headerlink" href="#装载镜像" title="Permanent link">¶</a></h3>
 <p>现代的 Win10 PE（如：FirPE、WePE、飞扬时空PE），都支持右键挂载 vhdx 镜像为虚拟硬盘。  </p>
-<p><a class="glightbox" data-type="image" data-width="100%" data-height="auto" href="../assets/windows-vhd-backup-recovery.assets/mount-vhd.webp" data-title="截图说明" data-desc-position="bottom"><img alt="截图说明" src="../assets/windows-vhd-backup-recovery.assets/mount-vhd.webp"></a>  </p>
+<p>  </p>
 <p>装载后的磁盘可以使用 DiskGenius 或系统的磁盘管理工具查看。  </p>
-<p><a class="glightbox" data-type="image" data-width="100%" data-height="auto" href="../assets/windows-vhd-backup-recovery.assets/dg.webp" data-title="dg" data-desc-position="bottom"><img alt="dg" src="../assets/windows-vhd-backup-recovery.assets/dg.webp"></a>  </p>
+<p>  </p>
 <h3 id="使用-diskgenius-进行系统还原">使用 DiskGenius 进行系统还原：<a class="headerlink" href="#使用-diskgenius-进行系统还原" title="Permanent link">¶</a></h3>
 <p>选择虚拟磁盘的系统分区，右键 &gt; 克隆分区  </p>
-<p><a class="glightbox" data-type="image" data-width="100%" data-height="auto" href="../assets/windows-vhd-backup-recovery.assets/dg1.webp" data-title="dg" data-desc-position="bottom"><img alt="dg" src="../assets/windows-vhd-backup-recovery.assets/dg1.webp"></a>  </p>
+<p>  </p>
 <p>选择目标硬盘分区（新系统分区），并确认  </p>
-<p><a class="glightbox" data-type="image" data-width="100%" data-height="auto" href="../assets/windows-vhd-backup-recovery.assets/dg2.webp" data-title="dg" data-desc-position="bottom"><img alt="dg" src="../assets/windows-vhd-backup-recovery.assets/dg2.webp"></a><br>
-<a class="glightbox" data-type="image" data-width="100%" data-height="auto" href="../assets/windows-vhd-backup-recovery.assets/dg3.webp" data-title="dg" data-desc-position="bottom"><img alt="dg" src="../assets/windows-vhd-backup-recovery.assets/dg3.webp"></a>  </p>
+<p><br>
+  </p>
 <h3 id="修复引导">修复引导<a class="headerlink" href="#修复引导" title="Permanent link">¶</a></h3>
 <p>PE 一般会自带引导修复工具，选择系统安装盘和EFI分区即可一键修复。推荐使用飞扬时空PE的内置工具，或手动修复：<a href="../Windows%20UEFI%20BCD%20%E5%BC%95%E5%AF%BC%E4%BF%AE%E5%A4%8D/">Windows UEFI BCD 引导修复</a>  </p>
 <hr>

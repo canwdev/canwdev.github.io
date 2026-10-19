@@ -7591,13 +7591,13 @@
 <p>请求端（Client）的报文称为请求报文，响应端（Server）的报文称为响应报文，HTTP报文是由多行（使用CR+LF换行）字符串文本</p>
 <p>HTTP报文的结构：报文首部+空行（CR+LF）+报文主体</p>
 <p>可以使用Fiddler查看原始报文内容</p>
-<p><a class="glightbox" data-type="image" data-width="100%" data-height="auto" href="https://ws3.sinaimg.cn/large/005BYqpgly1g1cooeomnvj31350rgqcb.jpg" data-title="Fiddler" data-desc-position="bottom"><img alt="Fiddler" src="https://ws3.sinaimg.cn/large/005BYqpgly1g1cooeomnvj31350rgqcb.jpg"></a></p>
+<p></p>
 <p>报文主体和实体主体的差异：<br>
 1. 报文是HTTP通信的基本单位，通过HTTP通信传输<br>
 2. 实体作为请求或响应的有效载荷数据被传输，器内容由实体首部和实体主体组成</p>
 <p>压缩传输的内容编码</p>
 <p>通过服务器压缩后发送，客户端接收并解码</p>
-<p><a class="glightbox" data-type="image" data-width="100%" data-height="auto" href="https://ws3.sinaimg.cn/large/005BYqpggy1g1coprlhdmj31350rg489.jpg" data-title="gizp" data-desc-position="bottom"><img alt="gizp" src="https://ws3.sinaimg.cn/large/005BYqpggy1g1coprlhdmj31350rg489.jpg"></a></p>
+<p></p>
 <p>常用的内容编码方式：gzip（GNU）、compress（UNIX）、deflate（zlib）、identity（不进行编码）</p>
 <p>可以通过分割发送的分块传输编码，让浏览器逐步显示页面；而不是全部传输完成，解码之后再显示页面。</p>
 <p>通过MIME和Multipart方式，发送多种数据的多部分对象集合</p>
@@ -7622,14 +7622,14 @@
 <h2 id="第五章-与http协作的web服务器">第五章 与HTTP协作的Web服务器<a class="headerlink" href="#第五章-与http协作的web服务器" title="Permanent link">¶</a></h2>
 <p>使用单台虚拟主机（Virtual Host）实现多个域名，域名通过DNS服务映射到IP地址，由于虚拟主机可以寄存多个不同主机名和域名的网站，因此在发送HTTP请求时，必须在Host首部指定主机名或域名的URI</p>
 <h3 id="通信数据转发程序代理网关隧道">通信数据转发程序：代理、网关、隧道<a class="headerlink" href="#通信数据转发程序代理网关隧道" title="Permanent link">¶</a></h3>
-<p><a class="glightbox" data-type="image" data-width="100%" data-height="auto" href="https://ws3.sinaimg.cn/large/005BYqpgly1g1cq0ksamlj30m209eac4.jpg" data-title="代理" data-desc-position="bottom"><img alt="代理" src="https://ws3.sinaimg.cn/large/005BYqpgly1g1cq0ksamlj30m209eac4.jpg"></a></p>
+<p></p>
 <p>代理可以做到对指定URI的访问控制；**缓存代理**通过将资源缓存到代理服务器加快客户端访问速度；**透明代理**不会对报文进行任何加工处理</p>
-<p><a class="glightbox" data-type="image" data-width="100%" data-height="auto" href="https://ws3.sinaimg.cn/large/005BYqpggy1g1cq56aav6j30ku06k3zf.jpg" data-title="网关" data-desc-position="bottom"><img alt="网关" src="https://ws3.sinaimg.cn/large/005BYqpggy1g1cq56aav6j30ku06k3zf.jpg"></a></p>
+<p></p>
 <p>网关的工作机制与代理十分相似，网关能使通信线路上的服务器提供非HTTP协议的服务，使用网关能提高通信的安全性</p>
-<p><a class="glightbox" data-type="image" data-width="100%" data-height="auto" href="https://ws3.sinaimg.cn/large/005BYqpggy1g1cq5e5c8wj30md0703zn.jpg" data-title="隧道" data-desc-position="bottom"><img alt="隧道" src="https://ws3.sinaimg.cn/large/005BYqpggy1g1cq5e5c8wj30md0703zn.jpg"></a></p>
+<p></p>
 <p>隧道可按要求建立起一条与其他服务器的通信线路，使用SSL等加密进行通信，保证客户端与服务端的安全通信</p>
 <h2 id="第六章-http首部">第六章 HTTP首部<a class="headerlink" href="#第六章-http首部" title="Permanent link">¶</a></h2>
-<p><a class="glightbox" data-type="image" data-width="100%" data-height="auto" href="https://ws3.sinaimg.cn/large/005BYqpgly1g1cooeomnvj31350rgqcb.jpg" data-title="请求报文和响应报文的首部" data-desc-position="bottom"><img alt="请求报文和响应报文的首部" src="https://ws3.sinaimg.cn/large/005BYqpgly1g1cooeomnvj31350rgqcb.jpg"></a></p>
+<p></p>
 <p>请求报文由方法、URI、HTTP版本、HTTP首部字段构成</p>
 <p>响应报文由HTTP版本、状态码（数字和原因短语）、HTTP首部字段构成</p>
 <p>HTTP首部字段传递许多重要信息，首部字段由字段名和字段值构成，中间用冒号分隔</p>
@@ -7637,14 +7637,14 @@
 <p>首部字段可以有多个值：</p>
 <p><code>Keep-Alive: timeout=5, max=100</code></p>
 <h3 id="4种首部字段类型">4种首部字段类型<a class="headerlink" href="#4种首部字段类型" title="Permanent link">¶</a></h3>
-<p><a class="glightbox" data-type="image" data-width="100%" data-height="auto" href="https://ws3.sinaimg.cn/large/005BYqpggy1g1crnhd4b1j30mi0gi75x.jpg" data-title="响应报文和请求报文首部" data-desc-position="bottom"><img alt="响应报文和请求报文首部" src="https://ws3.sinaimg.cn/large/005BYqpggy1g1crnhd4b1j30mi0gi75x.jpg"></a></p>
+<p></p>
 <p>通用首部字段：请求报文和响应报文都会使用的首部</p>
 <p>请求首部字段：客户端向服务端发送请求报文时使用的首部</p>
 <p>响应首部字段：从服务端向客户端返回响应报文时使用的首部</p>
 <p>实体首部字段：补充了资源内容更新时间等与实体有关的信息</p>
 <p>Cookie、Set-Cookie等首部字段属于非HTTP/1.1正式的首部字段，使用频率很高</p>
 <p>通过Cache-Control首部字段控制缓存</p>
-<p><a class="glightbox" data-type="image" data-width="100%" data-height="auto" href="https://ws3.sinaimg.cn/large/005BYqpgly1g1cooeomnvj31350rgqcb.jpg" data-title="权重值" data-desc-position="bottom"><img alt="权重值" src="https://ws3.sinaimg.cn/large/005BYqpgly1g1cooeomnvj31350rgqcb.jpg"></a></p>
+<p></p>
 <p>上图中，Accept首部字段告知服务器客户端能处理的媒体类型，以及优先级，其中<code>q=</code>代表权重，权重的范围在0~1之间（可精确到小数点后3位），默认权重是1，用分号<code>;</code>隔开</p>
 <p>使用Host首部字段可以区分虚拟主机中指定的主机</p>
 <p>User-Agent首部字段用于传达浏览器的种类</p>
@@ -7672,9 +7672,9 @@ Cookie：请求首部字段，服务器接收到的Cookie信息</p>
 <p>确认登录者本人的方式：密码、动态令牌、数字证书、生物认证、IC卡</p>
 <p>HTTP使用的认证方式：BASIC认证（基本认证）、DIGEST认证（摘要认证）、SSL客户端认证、FormBase认证（基于表单认证）</p>
 <p>BASIC认证（HTTP/1.0起），是服务器与客户端之间的认证方式，BASIC认证在使用上不够便捷灵活（浏览器无法实现认证注销），达不到多数网站期望的安全等级（账号密码明文传输），因此并不常用</p>
-<p><a class="glightbox" data-type="image" data-width="100%" data-height="auto" href="https://ws3.sinaimg.cn/large/005BYqpgly1g1dphg6b1aj30r90intbd.jpg" data-title="BASIC认证" data-desc-position="bottom"><img alt="BASIC认证" src="https://ws3.sinaimg.cn/large/005BYqpgly1g1dphg6b1aj30r90intbd.jpg"></a></p>
+<p></p>
 <p>DIGEST认证（HTTP/1.1起），提供了高于BASIC认证的安全等级，提供密码防窃听，但不存在防止用户伪装的保护机制，使用范围也有限</p>
-<p><a class="glightbox" data-type="image" data-width="100%" data-height="auto" href="https://ws3.sinaimg.cn/large/005BYqpgly1g1dq19o15lj30qr0mhado.jpg" data-title="DIGEST认证" data-desc-position="bottom"><img alt="DIGEST认证" src="https://ws3.sinaimg.cn/large/005BYqpgly1g1dq19o15lj30qr0mhado.jpg"></a></p>
+<p></p>
 <h3 id="ssl客户端认证">SSL客户端认证<a class="headerlink" href="#ssl客户端认证" title="Permanent link">¶</a></h3>
 <p>使用ID和密码进行的认证，如果ID和密码被盗，就有可能被第三者冒充，利用SSL客户端认证可以避免该情况发生。</p>
 <p>为了达到SSL客户端认证的目的，需要事先将客户端证书分发给客户端，并且客户端必须安装此证书</p>
@@ -7711,7 +7711,7 @@ Cookie：请求首部字段，服务器接收到的Cookie信息</p>
 5. 服务器提示功能</p>
 <h3 id="使用浏览器进行全双工通信的-websocket">使用浏览器进行全双工通信的 WebSocket<a class="headerlink" href="#使用浏览器进行全双工通信的-websocket" title="Permanent link">¶</a></h3>
 <p>WebSocket允许**服务端主动向客户端推送数据**。在WebSocket API中，浏览器和服务器只需要完成**一次握手**，两者之间就直接可以创建**持久性的连接**，并进行双向数据传输**双向数据传输**。</p>
-<p><a class="glightbox" data-type="image" data-width="100%" data-height="auto" href="https://ws3.sinaimg.cn/large/005BYqpgly1g1dsuur47cj30pa0ka0vs.jpg" data-title="WebSocket通信" data-desc-position="bottom"><img alt="WebSocket通信" src="https://ws3.sinaimg.cn/large/005BYqpgly1g1dsuur47cj30pa0ka0vs.jpg"></a></p>
+<p></p>
 <h3 id="http2">HTTP/2<a class="headerlink" href="#http2" title="Permanent link">¶</a></h3>
 <p>HTTP/2是HTTP协议自1999年HTTP 1.1发布后的首个更新，主要基于SPDY协议。——<a href="https://zh.wikipedia.org/wiki/HTTP/2">维基百科</a></p>
 <h3 id="webdav">WebDAV<a class="headerlink" href="#webdav" title="Permanent link">¶</a></h3>
