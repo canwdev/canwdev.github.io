@@ -18,8 +18,6 @@
 1. 查看 1080 端口的占用情况：`netstat -aon|findstr "1080"`
 2. 根据 PID 找到应用程序：`tasklist|findstr "9820"`
 
-## 在 Powershell 安装 oh-my-posh
-[[Powershell 如何安装 OnMyPosh]]
 
 ## 无法加载文件 xxx.ps1，因为在此系统上禁止运行脚本
 
