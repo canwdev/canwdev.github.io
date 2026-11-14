@@ -4157,6 +4157,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../../Windows/Windows%20%E5%AE%98%E6%96%B9%20ISO%20%E9%95%9C%E5%83%8F%E5%8D%87%E7%BA%A7%E7%B3%BB%E7%BB%9F%E5%91%BD%E4%BB%A4%E8%A1%8C/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Windows 官方 ISO 镜像升级系统命令行
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../../Windows/Windows%20%E6%9B%B4%E6%96%B0%E7%9A%84%E7%9B%B8%E5%85%B3%E8%AE%BE%E7%BD%AE/" class="md-nav__link">
         
   
@@ -7278,6 +7306,8 @@
 <li>输出到各自的 <code>&lt;源目录&gt;/_compressed/</code>，镜像源目录结构，<strong>原文件始终不动</strong></li>
 <li>未压缩的文件默认**原样复制**进输出目录，所以输出目录可以替代源目录</li>
 <li>在输出目录写一份带完整命令行的日志，可用 <code>--log no</code> 关闭</li>
+<li>附带 <code>media-fix-caesium-webp</code>：就地修复 caesiumclt 生成的在浏览器里打不开的 webp</li>
+<li>本工具不做原地覆盖功能</li>
 </ul>
 <h2 id="下载工具">下载工具<a class="headerlink" href="#下载工具" title="Permanent link">¶</a></h2>
 <ul>
@@ -7312,6 +7342,11 @@
 <td><code>--only image\|video\|audio</code></td>
 <td>全部</td>
 <td>只**压缩**这一类；其余仍按 <code>--copy-unprocessed</code> 处理（复制而非压缩）</td>
+</tr>
+<tr>
+<td><code>--skip &lt;正则&gt;</code></td>
+<td>无</td>
+<td>路径命中正则的文件**一律不压缩**，仍原样复制进输出目录；匹配相对输入根的 POSIX 路径，可重复</td>
 </tr>
 <tr>
 <td><code>--video-config &lt;文件&gt;</code></td>
@@ -7390,25 +7425,32 @@
 <span class="normal"><a href="#__codelineno-0-13">13</a></span>
 <span class="normal"><a href="#__codelineno-0-14">14</a></span>
 <span class="normal"><a href="#__codelineno-0-15">15</a></span>
-<span class="normal"><a href="#__codelineno-0-16">16</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1"></a>media-compress<span class="w"> </span>./media<span class="w">                                  </span><span class="c1"># 输出到 ./media/_compressed/</span>
+<span class="normal"><a href="#__codelineno-0-16">16</a></span>
+<span class="normal"><a href="#__codelineno-0-17">17</a></span>
+<span class="normal"><a href="#__codelineno-0-18">18</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1"></a>media-compress<span class="w"> </span>./media<span class="w">                                  </span><span class="c1"># 输出到 ./media/_compressed/</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2"></a>media-compress<span class="w"> </span>./pics<span class="w"> </span>--only<span class="w"> </span>image<span class="w"> </span>--image-quality<span class="w"> </span><span class="m">70</span><span class="w">   </span><span class="c1"># 只压图，质量 70</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3"></a>media-compress<span class="w"> </span>./pics<span class="w"> </span>--image-format<span class="w"> </span>webp<span class="w">               </span><span class="c1"># 图像统一转 webp</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4"></a>media-compress<span class="w"> </span>./pics<span class="w"> </span>--image-strip-exif<span class="w">                </span><span class="c1"># 顺带清掉 GPS 等 EXIF 信息</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5"></a>media-compress<span class="w"> </span>./pics<span class="w"> </span>--image-max-edge<span class="w"> </span><span class="m">1920</span><span class="w">             </span><span class="c1"># 最长边限制到 1920</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6"></a>media-compress<span class="w"> </span>./pics<span class="w"> </span>--image-max-edge<span class="w"> </span><span class="m">0</span><span class="w">                </span><span class="c1"># 完全不缩放</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7"></a>media-compress<span class="w"> </span>./pics<span class="w"> </span>--image-jobs<span class="w"> </span><span class="m">4</span><span class="w">                    </span><span class="c1"># 图像开 4 并发</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8"></a>media-compress<span class="w"> </span>./music<span class="w"> </span>--only<span class="w"> </span>audio<span class="w">                     </span><span class="c1"># 只压音乐</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9"></a>media-compress<span class="w"> </span>./music<span class="w"> </span>--audio-codec<span class="w"> </span>opus<span class="w"> </span>--audio-bitrate<span class="w"> </span>128k<span class="w">   </span><span class="c1"># 体积最小</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10"></a>media-compress<span class="w"> </span>./music<span class="w"> </span>--audio-codec<span class="w"> </span>flac<span class="w">               </span><span class="c1"># 无损压缩</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11"></a>media-compress<span class="w"> </span>./media<span class="w"> </span>--copy-unprocessed<span class="w"> </span>no<span class="w">            </span><span class="c1"># 只要压缩产物，不复制其余文件</span>
-<a id="__codelineno-0-12" name="__codelineno-0-12"></a>media-compress<span class="w"> </span>./media<span class="w"> </span>--log<span class="w"> </span>no<span class="w">                         </span><span class="c1"># 不写日志</span>
-<a id="__codelineno-0-13" name="__codelineno-0-13"></a>media-compress<span class="w"> </span>./media<span class="w"> </span>--log<span class="w"> </span>D:<span class="se">\l</span>ogs<span class="se">\r</span>un.log<span class="w">            </span><span class="c1"># 写到指定文件（追加）</span>
-<a id="__codelineno-0-14" name="__codelineno-0-14"></a>media-compress<span class="w"> </span>./media<span class="w"> </span>--video-preset<span class="w"> </span>1080p-h265<span class="w">        </span><span class="c1"># 用内置配置里的另一个预设</span>
-<a id="__codelineno-0-15" name="__codelineno-0-15"></a>media-compress<span class="w"> </span>./media<span class="w"> </span>--video-config<span class="w"> </span>D:<span class="se">\m</span>y-presets.json<span class="w">  </span><span class="c1"># 换成自己的预设文件</span>
-<a id="__codelineno-0-16" name="__codelineno-0-16"></a>media-compress<span class="w"> </span>./media<span class="w"> </span>--dry-run<span class="w">                        </span><span class="c1"># 先看清楚会执行什么</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4"></a>media-compress<span class="w"> </span>./pics<span class="w"> </span>--skip<span class="w"> </span><span class="s1">'\.webp$'</span><span class="w">                   </span><span class="c1"># 已有 webp 不再重编</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5"></a>media-compress<span class="w"> </span>./pics<span class="w"> </span>--skip<span class="w"> </span><span class="s1">'^cache/'</span><span class="w"> </span>--skip<span class="w"> </span><span class="s1">'\.tmp$'</span><span class="w">   </span><span class="c1"># 跳过这些路径</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6"></a>media-compress<span class="w"> </span>./pics<span class="w"> </span>--image-strip-exif<span class="w">                </span><span class="c1"># 顺带清掉 GPS 等 EXIF 信息</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7"></a>media-compress<span class="w"> </span>./pics<span class="w"> </span>--image-max-edge<span class="w"> </span><span class="m">1920</span><span class="w">             </span><span class="c1"># 最长边限制到 1920</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8"></a>media-compress<span class="w"> </span>./pics<span class="w"> </span>--image-max-edge<span class="w"> </span><span class="m">0</span><span class="w">                </span><span class="c1"># 完全不缩放</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9"></a>media-compress<span class="w"> </span>./pics<span class="w"> </span>--image-jobs<span class="w"> </span><span class="m">4</span><span class="w">                    </span><span class="c1"># 图像开 4 并发</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10"></a>media-compress<span class="w"> </span>./music<span class="w"> </span>--only<span class="w"> </span>audio<span class="w">                     </span><span class="c1"># 只压音乐</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11"></a>media-compress<span class="w"> </span>./music<span class="w"> </span>--audio-codec<span class="w"> </span>opus<span class="w"> </span>--audio-bitrate<span class="w"> </span>128k<span class="w">   </span><span class="c1"># 体积最小</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12"></a>media-compress<span class="w"> </span>./music<span class="w"> </span>--audio-codec<span class="w"> </span>flac<span class="w">               </span><span class="c1"># 无损压缩</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13"></a>media-compress<span class="w"> </span>./media<span class="w"> </span>--copy-unprocessed<span class="w"> </span>no<span class="w">            </span><span class="c1"># 只要压缩产物，不复制其余文件</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14"></a>media-compress<span class="w"> </span>./media<span class="w"> </span>--log<span class="w"> </span>no<span class="w">                         </span><span class="c1"># 不写日志</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15"></a>media-compress<span class="w"> </span>./media<span class="w"> </span>--log<span class="w"> </span>D:<span class="se">\l</span>ogs<span class="se">\r</span>un.log<span class="w">            </span><span class="c1"># 写到指定文件（追加）</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16"></a>media-compress<span class="w"> </span>./media<span class="w"> </span>--video-preset<span class="w"> </span>1080p-h265<span class="w">        </span><span class="c1"># 用内置配置里的另一个预设</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17"></a>media-compress<span class="w"> </span>./media<span class="w"> </span>--video-config<span class="w"> </span>D:<span class="se">\m</span>y-presets.json<span class="w">  </span><span class="c1"># 换成自己的预设文件</span>
+<a id="__codelineno-0-18" name="__codelineno-0-18"></a>media-compress<span class="w"> </span>./media<span class="w"> </span>--dry-run<span class="w">                        </span><span class="c1"># 先看清楚会执行什么</span>
 </code></pre></div></td></tr></tbody></table></div>
 <p><code>--image-format</code> 只换容器、不换画质（画质看 <code>--image-quality</code>），输出的扩展名会自动<br>
 跟着变（如 <code>&lt;名字&gt;.webp</code>）。指定与源相同的格式也没问题，等于 <code>original</code>。</p>
+<p><code>--image-format webp</code> 时源里已有的 <code>.webp</code> 也会被 caesiumclt <strong>就地重压一遍</strong>（同格式<br>
+没法用 <code>--format</code> 转换，脚本会省掉那个开关），这等于白白损失一次画质。想让它们保持<br>
+原样，加 <code>--skip '\.webp$'</code>：命中的文件不压缩，只原样复制。</p>
 <h2 id="压缩音乐">压缩音乐<a class="headerlink" href="#压缩音乐" title="Permanent link">¶</a></h2>
 <p>处理的是**独立音频文件**，不是视频里的音轨（视频的音频由预设决定，见下）。</p>
 <p>规则：<strong>除了已经是目标格式的，全都转</strong>；同格式的文件只有在你**显式改了码率**时才重编。</p>
@@ -7686,7 +7728,19 @@
 <code>desktop.ini</code>/<code>.DS_Store</code> 这类系统垃圾会被有意丢弃。用 <code>--copy-unprocessed no</code><br>
   时输出目录**不完整**，只能用来取产物</li>
 <li><code>.tif/.tiff/.bmp</code> 和 <code>.avif/.heic/.heif/.jxl</code> 图像不会被压缩，只会原样复制</li>
-<li><code>--image-strip-exif</code> 保留方向标签，所以带 EXIF 旋转的照片不会躺倒</li>
+<li><strong>webp 打不开就交给它</strong>：caesiumclt 1.5.0 有个已知 bug——转换"带 ICC 且带透明"的<br>
+  PNG 时，生成的 webp 在 Chrome/Edge/Safari 里打不开（ffmpeg 却能解，所以不容易发现）。<br>
+  本脚本会自动修好自己生成的产物；已经躺在硬盘上的坏文件用<br>
+<code>media-fix-caesium-webp &lt;文件或目录&gt;</code> 原地批量修复。原理见两个脚本的注释。同目录缺了<br>
+  这个修复模块时脚本直接报错退出（退出码 1），不会产出打不开的 webp</li>
+<li><strong>时间戳会保留</strong>：图像、视频、音频三类产物在写入目标目录后都会把源的 atime/mtime<br>
+  回写上去（原样复制的文件由 <code>shutil.copy2</code> 保留）。所以按修改时间排序、或用 mtime 做<br>
+  同步判断都不受压缩影响。Windows 的**创建时间**搬不过去，会显示成处理时间；EXIF 里的<br>
+  拍摄时间只有 <code>--image-strip-exif</code> 才会丢</li>
+<li><code>--skip</code> 是**正则**，匹配对象是**相对输入根的 POSIX 路径**（<code>sub/a.png</code>），不是整条<br>
+  绝对路径——这样 <code>^cache/</code> 在 Windows 上也能用，而 <code>\</code> 不会变成正则转义符。命中的文件<br>
+<strong>不压缩但仍原样复制</strong>（受 <code>--copy-unprocessed</code> 管）：<code>--copy-unprocessed no</code> 时它们会<br>
+  出现在 <code>[MISSING]</code> 清单里，不会静默消失。日志开头会回显 <code>skip: &lt;模式&gt;</code></li>
 <li><strong>独立的字幕文件</strong>（<code>.ass</code>/<code>.srt</code>/<code>.ssa</code>/<code>.vtt</code>/<code>.sub</code>/<code>.idx</code>/<code>.sup</code>）不会被压缩，<br>
   一律原样复制（连 BOM 都保持），所以外挂字幕不会丢</li>
 <li>**视频里的字幕轨**丢不丢完全看预设的 <code>SubtitleTrackSelectionBehavior</code></li>
@@ -7699,7 +7753,7 @@
   （日志会写 <code>cleaned up N leftover temp file(s)</code>）。<code>.mctmp</code> 是脚本专有后缀，<br>
   你自己的文件（包括 <code>.tmp</code>）不会被误删</li>
 <li><code>--output</code> 不能与源目录重叠（等于、在内部、包住它都会被拒绝），否则结果会悄悄出错</li>
-<li>退出码：<code>0</code> 成功或跳过 / <code>1</code> 有失败或工具缺失 / <code>2</code> 参数错误</li>
+<li>退出码：<code>0</code> 成功或跳过 / <code>1</code> 有失败，或工具 / webp 修复模块缺失 / <code>2</code> 参数错误</li>
 </ul>
 
 
@@ -7723,7 +7777,7 @@
     <span class="md-icon" title="最后更新">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"></path></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-datetime" title="2026年10月7日 21:55:15 CST">2026年10月7日 21:55:15</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-datetime" title="2026年11月14日 13:01:37 CST">2026年11月14日 13:01:37</span>
   </span>
 
     
