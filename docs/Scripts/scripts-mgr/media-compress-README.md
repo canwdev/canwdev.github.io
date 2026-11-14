@@ -8,6 +8,8 @@
 - 输出到各自的 `<源目录>/_compressed/`，镜像源目录结构，**原文件始终不动**
 - 未压缩的文件默认**原样复制**进输出目录，所以输出目录可以替代源目录
 - 在输出目录写一份带完整命令行的日志，可用 `--log no` 关闭
+- 附带 `media-fix-caesium-webp`：就地修复 caesiumclt 生成的在浏览器里打不开的 webp
+- 本工具不做原地覆盖功能
 
 ## 下载工具
 
@@ -22,28 +24,31 @@
 
 ## 参数
 
-| 参数 | 默认 | 说明 |
-|---|---|---|
-| `<文件或目录...>` | 必填 | 可多个，目录会递归扫描 |
-| `-o, --output <目录>` | 各自的 `_compressed/` | 所有输入共用一个输出目录 |
-| `--only image\|video\|audio` | 全部 | 只**压缩**这一类；其余仍按 `--copy-unprocessed` 处理（复制而非压缩） |
-| `--video-config <文件>` | 脚本旁的 `media-compress.json` | 换成另一个 HandBrake 预设 JSON |
-| `--video-preset <名字>` | 该文件里第一个预设 | 从多预设文件里挑一个（**区分大小写**） |
-| `--image-quality <0-100>` | `82` | 图像质量，越大越清晰 |
-| `--image-format <格式>` | `original` | 图像输出格式：`original`/`jpeg`/`png`/`gif`/`webp`/`tiff` |
-| `--image-strip-exif` | 关 | 去掉图像的 EXIF（含 GPS 等隐私信息）；默认保留 |
-| `--image-max-edge <像素>` | `5120` | 图像最长边上限，超出才缩；`0` 表示不限制 |
-| `--image-jobs <n>` | `3` | 图像并发数；`1` 为串行 |
-| `--audio-codec <格式>` | `mp3` | 音频输出格式：`mp3`/`flac`/`opus`/`aac` |
-| `--audio-bitrate <码率>` | `192k` | 仅对有损格式生效（`flac` 忽略）：`128k`/`192k`/`256k`/`320k` |
-| `--copy-unprocessed <yes\|no>` | `yes` | 把未压缩的文件原样复制进输出目录；`no` 则不复制 |
-| `--dry-run` | 关 | 只打印将执行的命令，**零写入**（连日志和输出目录都不建） |
-| `--log [no\|路径]` | `auto` | 默认在输出根写 `media-compress-<时间戳>.log`；`no` 关闭；给路径则写到那里 |
+| 参数                             | 默认                         | 说明                                                  |
+| ------------------------------ | -------------------------- | --------------------------------------------------- |
+| `<文件或目录...>`                   | 必填                         | 可多个，目录会递归扫描                                         |
+| `-o, --output <目录>`            | 各自的 `_compressed/`         | 所有输入共用一个输出目录                                        |
+| `--only image\|video\|audio`   | 全部                         | 只**压缩**这一类；其余仍按 `--copy-unprocessed` 处理（复制而非压缩）     |
+| `--skip <正则>`                  | 无                          | 路径命中正则的文件**一律不压缩**，仍原样复制进输出目录；匹配相对输入根的 POSIX 路径，可重复 |
+| `--video-config <文件>`          | 脚本旁的 `media-compress.json` | 换成另一个 HandBrake 预设 JSON                             |
+| `--video-preset <名字>`          | 该文件里第一个预设                  | 从多预设文件里挑一个（**区分大小写**）                               |
+| `--image-quality <0-100>`      | `82`                       | 图像质量，越大越清晰                                          |
+| `--image-format <格式>`          | `original`                 | 图像输出格式：`original`/`jpeg`/`png`/`gif`/`webp`/`tiff`  |
+| `--image-strip-exif`           | 关                          | 去掉图像的 EXIF（含 GPS 等隐私信息）；默认保留                        |
+| `--image-max-edge <像素>`        | `5120`                     | 图像最长边上限，超出才缩；`0` 表示不限制                              |
+| `--image-jobs <n>`             | `3`                        | 图像并发数；`1` 为串行                                       |
+| `--audio-codec <格式>`           | `mp3`                      | 音频输出格式：`mp3`/`flac`/`opus`/`aac`                    |
+| `--audio-bitrate <码率>`         | `192k`                     | 仅对有损格式生效（`flac` 忽略）：`128k`/`192k`/`256k`/`320k`     |
+| `--copy-unprocessed <yes\|no>` | `yes`                      | 把未压缩的文件原样复制进输出目录；`no` 则不复制                          |
+| `--dry-run`                    | 关                          | 只打印将执行的命令，**零写入**（连日志和输出目录都不建）                      |
+| `--log [no\|路径]`               | `auto`                     | 默认在输出根写 `media-compress-<时间戳>.log`；`no` 关闭；给路径则写到那里 |
 
 ```bash
 media-compress ./media                                  # 输出到 ./media/_compressed/
 media-compress ./pics --only image --image-quality 70   # 只压图，质量 70
 media-compress ./pics --image-format webp               # 图像统一转 webp
+media-compress ./pics --skip '\.webp$'                   # 已有 webp 不再重编
+media-compress ./pics --skip '^cache/' --skip '\.tmp$'   # 跳过这些路径
 media-compress ./pics --image-strip-exif                # 顺带清掉 GPS 等 EXIF 信息
 media-compress ./pics --image-max-edge 1920             # 最长边限制到 1920
 media-compress ./pics --image-max-edge 0                # 完全不缩放
@@ -61,6 +66,10 @@ media-compress ./media --dry-run                        # 先看清楚会执行�
 
 `--image-format` 只换容器、不换画质（画质看 `--image-quality`），输出的扩展名会自动
 跟着变（如 `<名字>.webp`）。指定与源相同的格式也没问题，等于 `original`。
+
+`--image-format webp` 时源里已有的 `.webp` 也会被 caesiumclt **就地重压一遍**（同格式
+没法用 `--format` 转换，脚本会省掉那个开关），这等于白白损失一次画质。想让它们保持
+原样，加 `--skip '\.webp$'`：命中的文件不压缩，只原样复制。
 
 ## 压缩音乐
 
@@ -215,7 +224,19 @@ note: source is already mp3 @ 286k, target 320k would not be smaller — skippin
   `desktop.ini`/`.DS_Store` 这类系统垃圾会被有意丢弃。用 `--copy-unprocessed no`
   时输出目录**不完整**，只能用来取产物
 - `.tif/.tiff/.bmp` 和 `.avif/.heic/.heif/.jxl` 图像不会被压缩，只会原样复制
-- `--image-strip-exif` 保留方向标签，所以带 EXIF 旋转的照片不会躺倒
+- **webp 打不开就交给它**：caesiumclt 1.5.0 有个已知 bug——转换"带 ICC 且带透明"的
+  PNG 时，生成的 webp 在 Chrome/Edge/Safari 里打不开（ffmpeg 却能解，所以不容易发现）。
+  本脚本会自动修好自己生成的产物；已经躺在硬盘上的坏文件用
+  `media-fix-caesium-webp <文件或目录>` 原地批量修复。原理见两个脚本的注释。同目录缺了
+  这个修复模块时脚本直接报错退出（退出码 1），不会产出打不开的 webp
+- **时间戳会保留**：图像、视频、音频三类产物在写入目标目录后都会把源的 atime/mtime
+  回写上去（原样复制的文件由 `shutil.copy2` 保留）。所以按修改时间排序、或用 mtime 做
+  同步判断都不受压缩影响。Windows 的**创建时间**搬不过去，会显示成处理时间；EXIF 里的
+  拍摄时间只有 `--image-strip-exif` 才会丢
+- `--skip` 是**正则**，匹配对象是**相对输入根的 POSIX 路径**（`sub/a.png`），不是整条
+  绝对路径——这样 `^cache/` 在 Windows 上也能用，而 `\` 不会变成正则转义符。命中的文件
+  **不压缩但仍原样复制**（受 `--copy-unprocessed` 管）：`--copy-unprocessed no` 时它们会
+  出现在 `[MISSING]` 清单里，不会静默消失。日志开头会回显 `skip: <模式>`
 - **独立的字幕文件**（`.ass`/`.srt`/`.ssa`/`.vtt`/`.sub`/`.idx`/`.sup`）不会被压缩，
   一律原样复制（连 BOM 都保持），所以外挂字幕不会丢
 - **视频里的字幕轨**丢不丢完全看预设的 `SubtitleTrackSelectionBehavior`
@@ -228,4 +249,4 @@ note: source is already mp3 @ 286k, target 320k would not be smaller — skippin
   （日志会写 `cleaned up N leftover temp file(s)`）。`.mctmp` 是脚本专有后缀，
   你自己的文件（包括 `.tmp`）不会被误删
 - `--output` 不能与源目录重叠（等于、在内部、包住它都会被拒绝），否则结果会悄悄出错
-- 退出码：`0` 成功或跳过 / `1` 有失败或工具缺失 / `2` 参数错误
+- 退出码：`0` 成功或跳过 / `1` 有失败，或工具 / webp 修复模块缺失 / `2` 参数错误

@@ -2,9 +2,9 @@
 """媒体压缩：图像走 caesiumclt，视频走 HandBrakeCLI，工具路径自动查找。
 
 用法:
-    media-compress <文件或目录...> [-o <输出目录>] [--only image|video]
-                   [--image-quality N] [--image-format F] [--image-strip-exif]
-                   [--dry-run]
+    media-compress <文件或目录...> [-o <输出目录>] [--only image|video|audio]
+                   [--skip REGEX] [--image-quality N] [--image-format F]
+                   [--image-strip-exif] [--dry-run]
 
 视频参数完全由脚本旁的 media-compress.json 决定（HandBrake 预设导出格式，
 直接原样交给 `--preset-import-file`），脚本不提供任何视频参数开关：
@@ -12,9 +12,13 @@
 VideoQualitySlider，要改分辨率就改 PictureWidth/PictureHeight，字幕取舍
 看 SubtitleTrackSelectionBehavior（"all" 保留全部字幕轨）。
 
-输出到源目录的 _compressed/，镜像源目录结构，原文件始终不动。没有日志文件、
-没有台账、没有锁文件，唯一产物就是压缩后的文件本身——图像压不动时原样复制，
-保证输出目录不缺图。
+输出到源目录的 _compressed/，镜像源目录结构，原文件始终不动。没有台账、没有锁
+文件，产物就是压缩后的文件本身加一份日志（`--log no` 可关）——图像压不动时原样
+复制，保证输出目录不缺图。
+
+图像压缩成功后，产物还会交给同目录的 media-fix-caesium-webp.py 自检并修好
+caesiumclt 的 webp 容器缺陷（原因和修法只写在那一个模块里，这里不复制实现）。
+缺了那个文件就直接报错退出（退出码 1），不压出一堆浏览器打不开的 webp。
 
 工具查找顺序: 环境变量 CAESIUM_CLT / HANDBRAKE_CLI / FFPROBE / FFMPEG -> PATH ->
 常见安装目录。缺失的工具只在真正需要处理该类媒体时才会报错。
@@ -24,6 +28,7 @@ VideoQualitySlider，要改分辨率就改 PictureWidth/PictureHeight，字幕�
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import os
 import re
@@ -47,9 +52,16 @@ _console_dead = False
 # 临时文件名里用的递增序号，配合 pid 保证同一次运行内不重名。
 _temp_seq = 0
 _temp_lock = Lock()
+# 同目录的 webp 修复小工具：caesiumclt 的容器缺陷由它修，主脚本只借用同一份实现。
+WEBP_FIXER_PATH = SOURCE_DIR / "media-fix-caesium-webp.py"
+_webp_fixer = None                  # 已加载的模块；False = 加载失败过
+_webp_fixer_error = ""              # 上次加载失败的原因，供报错用
+_webp_fixer_lock = Lock()
 # 日志开头那行配置信息所需的内容：(配置文件, 实际选中的预设, 容器扩展名, 可用预设)。
 # 用模块级变量是因为它要在 Logger.open() 里、第一行 command 之后立刻打印。
 _config_note: tuple = (None, "", "", [])
+# 本次生效的 --skip 模式（原样字符串），只用于日志开头回显。
+_skip_note: tuple = ()
 # 是否给控制台输出上色：只在输出到真终端时为真。
 _color = False
 
@@ -281,6 +293,8 @@ class Logger:
             others = [n for n in names if n != preset]
             log(f"config: {config}  preset={preset}  container={container}"
                 + (f"  others: {', '.join(others)}" if others else ""))
+        if _skip_note:
+            log("skip: " + "  ".join(_skip_note))
 
     def close(self) -> None:
         global _log_file
@@ -651,6 +665,7 @@ def compress_audio(ffmpeg: str, ffprobe: str, src: Path, target: Path, codec: st
         if size >= src.stat().st_size or size > src.stat().st_size * (1 - AUDIO_MIN_SAVINGS):
             return 0, "not_smaller"
         os.replace(temp, target)                      # 同卷改名，原子
+        keep_timestamps(src, target)                  # ffmpeg 自己不会保留 mtime
         return size, ""
     finally:
         temp.unlink(missing_ok=True)
@@ -742,6 +757,46 @@ def make_temp_dir(out_root: Path) -> Path:
     return tmp
 
 
+def webp_fixer():
+    """按路径导入同目录的 media-fix-caesium-webp.py（文件名带连字符，走不了 import）。
+
+    "什么算坏、怎么修、怎么判定"只在那个模块里实现一份：这个坑和修法属于它的职责，
+    主脚本再抄一遍就迟早两处漂移。这里只借用它，而且只用在自己**刚生成**的文件上。
+    加载失败不算可降级的意外：压出来的 webp 浏览器打不开，比不压更糟。所以这里只
+    记住失败原因、返回 None，由调用方当成"配置缺失"直接失败。
+    """
+    global _webp_fixer, _webp_fixer_error
+    with _webp_fixer_lock:
+        if _webp_fixer is None:
+            try:
+                spec = importlib.util.spec_from_file_location(
+                    "media_fix_caesium_webp", WEBP_FIXER_PATH)
+                module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(module)      # type: ignore[union-attr]
+                _webp_fixer = module
+            except (OSError, ImportError, AttributeError, SyntaxError) as exc:
+                _webp_fixer_error = str(exc)
+                _webp_fixer = False
+        return _webp_fixer or None
+
+
+def webp_repair(path: Path) -> tuple[str, str]:
+    """把刚生成的产物交给 media-fix-caesium-webp 检查/修好，返回 (状态, 说明)。
+
+    状态沿用那个模块的取值: fixed / clean / bad / failed。非 webp 产物是 clean，
+    既不用读文件也不用加载模块（png/jpeg 产物走这条快速路）。模块不在就是 failed。
+    """
+    if path.suffix.lower() != ".webp":
+        return "clean", ""
+    module = webp_fixer()
+    if module is None:
+        return "failed", f"{WEBP_FIXER_PATH.name} is unavailable: {_webp_fixer_error}"
+    try:
+        return module.repair_file(path)
+    except Exception as exc:                 # 借来的实现不该带崩整轮压缩
+        return "failed", f"webp repair failed: {exc}"
+
+
 def compress_image(caesium: str, src: Path, target: Path, quality: int, image_format: str,
                    strip_exif: bool, max_edge: int, tmp: Path) -> tuple[int, str]:
     """压缩单张图像，成功返回 (压缩后字节数, "")；失败或省得不够返回 (0, 原因)。
@@ -782,11 +837,19 @@ def compress_image(caesium: str, src: Path, target: Path, quality: int, image_fo
     produced = Path(str(entry.get("output_path") or ""))
     if not produced.is_file():
         return 0, "tool produced no file"
+    repair_status, repair_note = webp_repair(produced)
+    if repair_status == "fixed":
+        log(f"    note: {repair_note}")
+    elif repair_status in ("bad", "failed"):
+        # 产物结构不对（或修不动）就不能交付：宁可回退成复制源文件，输出树照样完整，
+        # 但绝不把"浏览器打不开"的 webp 当成成功结果。
+        return 0, f"webp output rejected: {repair_note}"
     size = produced.stat().st_size
     if not keeps_enough(src.stat().st_size, size):
         return 0, "not_smaller"
     target.parent.mkdir(parents=True, exist_ok=True)   # os.replace 不会建目标目录
     os.replace(produced, target)                  # 同卷改名，原子
+    keep_timestamps(src, target)                  # 不依赖 caesiumclt 的 --keep-dates
     return size, ""
 
 
@@ -834,6 +897,7 @@ def compress_video(handbrake: str, ffprobe: str, src: Path, target: Path, temp: 
         if not keeps_enough(src.stat().st_size, size):
             return 0, "not_smaller"
         os.replace(temp, target)
+        keep_timestamps(src, target)                  # HandBrake 更不会保留 mtime
         return size, ""
     finally:
         temp.unlink(missing_ok=True)
@@ -841,6 +905,25 @@ def compress_video(handbrake: str, ffprobe: str, src: Path, target: Path, temp: 
 
 def keeps_enough(before: int, after: int) -> bool:
     return after > 0 and after < before and after <= before * (1 - MIN_SAVINGS_RATIO)
+
+
+def keep_timestamps(src: Path, target: Path) -> None:
+    """把源的访问/修改时间回写到**最终产物**上，统一三类媒体的时间戳行为。
+
+    图像本来靠 caesiumclt 的 `--keep-dates` 就能保住，但音频（ffmpeg）和视频
+    （HandBrake）没有任何对应开关：产物是编码器新写的文件，`os.replace` 只改名、
+    不改时间，于是 mtime 变成"编码完成那一刻"。删掉源目录后这个信息就再也回不来了。
+    所以三处收尾都调一次，行为不依赖于某个工具的版本或某个命令行开关。
+
+    只回写 atime/mtime。Windows 的**创建时间**没法从文件系统层面搬（`os.utime`
+    不碰它），复制的那些文件同理——不必假装能保住。
+    失败一律吞掉：时间戳只是元数据，不值得为它让一次成功的压缩变成失败或缺口。
+    """
+    try:
+        st = src.stat()
+        os.utime(target, ns=(st.st_atime_ns, st.st_mtime_ns))
+    except OSError:
+        pass
 
 
 def verify_video(ffprobe: str, src: Path, out: Path, info: dict) -> str:
@@ -862,8 +945,9 @@ def verify_video(ffprobe: str, src: Path, out: Path, info: dict) -> str:
 
 # ------------------------------ 扫描与主流程 ------------------------------
 
-def classify(path: Path, audio_codec: str, audio_bitrate: str) -> str:
-    """返回 image / video / audio / audio-copy / passthrough / junk。
+def classify(path: Path, root: Path, audio_codec: str, audio_bitrate: str,
+             skip_res: tuple = ()) -> str:
+    """返回 image / video / audio / audio-copy / passthrough / skip / junk。
 
     passthrough 表示"不压缩、但会原样搬到输出目录"，包含两类：
       * caesiumclt 读不了的图像格式；
@@ -873,9 +957,25 @@ def classify(path: Path, audio_codec: str, audio_bitrate: str) -> str:
 
     audio-copy 与 audio 分开：前者（源已是目标格式且没调码率）只复制，后者才真的送去
     转码。分开是为了让"哪些会被压缩"在输出里一眼可见。
+
+    skip 来自 --skip 模式：命中就**一律不压缩**，但仍进队列并原样复制（是否复制由
+    --copy-unprocessed 决定，与 passthrough 同一规则）。所以 `--skip '\\.webp$'` 的
+    意思是"已有 webp 别再重编一遍"，而不是"把它扔出输出目录"。
+
+    匹配对象是**相对输入根**的 POSIX 路径（`sub/a.png`），不是整条绝对路径：Windows
+    的 `\\` 在正则里是转义符，直接匹配绝对路径会让 `^D:\\pics` 这类写法炸掉，而 `/`
+    分隔才让 `^cache/` 这种模式跨平台通用。单独指定的文件（此时 root 是它的父目录）
+    自然退化成只匹配文件名。
     """
     if path.name.lower() in JUNK_NAMES:
-        return "junk"
+        return "junk"                     # 系统垃圾优先，免得被模式当成待复制文件
+    if skip_res:
+        try:
+            rel = path.relative_to(root).as_posix()
+        except ValueError:
+            rel = path.as_posix()
+        if any(pattern.search(rel) for pattern in skip_res):
+            return "skip"
     suffix = path.suffix.lower()
     if suffix in IMAGE_EXTS:
         return "passthrough" if suffix in PASSTHROUGH_EXTS else "image"
@@ -891,9 +991,15 @@ Item = tuple[Path, Path, Path]               # (源文件, 输入根目录, 输�
 
 
 def collect(paths: list[Path], output: str | None, audio_codec: str,
-            audio_bitrate: str) \
-        -> tuple[list[Item], list[Item], list[Item], list[Item], int, int]:
-    """展开输入为 (图像, 视频, 音频, 仅复制, 扫描总数, 垃圾数)，不读取文件内容。
+            audio_bitrate: str, skip_res: tuple = ()) \
+        -> tuple[list[Item], list[Item], list[Item], list[Item], list[Item], int, int]:
+    """展开输入为 (图像, 视频, 音频, 仅复制, 被 --skip 命中, 扫描总数, 垃圾数)，
+    不读取文件内容。
+
+    被 --skip 命中的文件单独成列，而不是并进 passthrough：它们既不压缩，也不是"格式
+    不支持"，日志里必须能分清——否则 `--skip` 关掉 webp 重编之后，输出里写的是
+    "unsupported format, copied as is" 这种假话。它们同样要计入 accounted 的交叉
+    校验，这样 `--copy-unprocessed no` 造成的缺口不会被静默吞掉。
 
     "仅复制"包括非媒体文件（.txt/.srt/.nfo/...）、caesiumclt 读不了的图像格式，以及
     按当前设置不转码的音频（见 classify）。它们不压缩但会原样搬进输出目录——这个脚本
@@ -907,6 +1013,7 @@ def collect(paths: list[Path], output: str | None, audio_codec: str,
     videos: list[Item] = []
     audios: list[Item] = []
     passthrough: list[Item] = []
+    skips: list[Item] = []
     scanned = 0
     junk = 0
     for path in paths:
@@ -930,18 +1037,20 @@ def collect(paths: list[Path], output: str | None, audio_codec: str,
             if out_root in item.parents:
                 continue
             scanned += 1
-            kind = classify(item, audio_codec, audio_bitrate)
+            kind = classify(item, root, audio_codec, audio_bitrate, skip_res)
             if kind == "image":
                 images.append((item, root, out_root))
             elif kind == "video":
                 videos.append((item, root, out_root))
             elif kind == "audio":
                 audios.append((item, root, out_root))
+            elif kind == "skip":
+                skips.append((item, root, out_root))
             elif kind in ("passthrough", "audio-copy"):
                 passthrough.append((item, root, out_root))
             else:
                 junk += 1                     # 操作系统垃圾，有意不搬
-    return images, videos, audios, passthrough, scanned, junk
+    return images, videos, audios, passthrough, skips, scanned, junk
 
 
 def destination(src: Path, root: Path, out_root: Path, suffix: str, keep: bool = False,
@@ -1006,6 +1115,12 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--only", choices=("image", "video", "audio"),
                         help="compress one media kind only; the others are still handled "
                              "by --copy-unprocessed (copied, not compressed)")
+    parser.add_argument("--skip", metavar="REGEX", action="append", default=[],
+                        help="never compress inputs whose path matches this regular "
+                             "expression; they are still copied into the output tree "
+                             "(subject to --copy-unprocessed). Matched against the "
+                             "POSIX-style path relative to the input root, so '^cache/' "
+                             "and '\\.webp$' work on Windows too. Repeatable")
     parser.add_argument("--image-quality", type=int, default=82,
                         help="image quality 0-100 (default: 82)")
     parser.add_argument("--image-format", default="original", choices=tuple(FORMAT_EXTS),
@@ -1064,6 +1179,17 @@ def main(argv: list[str]) -> int:
         log(f"[ERROR] --audio-bitrate must be one of: {', '.join(AUDIO_BITRATES)}",
             file=sys.stderr)
         return 2
+
+    # --skip 的语法错误必须在这里就拦下：它决定"哪些文件不压缩"，跑到一半才发现写错，
+    # 前面白压的那些已经动了源目录的输出。非法正则按参数错误（退出码 2）处理。
+    # 同时只编译一次：几百个文件逐个 re.compile 是纯浪费。
+    global _skip_note
+    try:
+        skip_res = tuple(re.compile(pattern) for pattern in args.skip)
+    except re.error as exc:
+        log(f"[ERROR] --skip: invalid regular expression ({exc})", file=sys.stderr)
+        return 2
+    _skip_note = tuple(args.skip)
 
     # 配置和预设要在扫描之前定下来并校验：参数写错却先跑，会白做几百个文件
     # （而且它们已经进了输出目录）。--video-config 的相对路径按调用者的当前目录解析，
@@ -1136,7 +1262,8 @@ def main(argv: list[str]) -> int:
             return 1
 
     try:
-        return compress_all(args, paths, config_path, preset_name, container_ext, file_format)
+        return compress_all(args, paths, skip_res, config_path, preset_name,
+                            container_ext, file_format)
     finally:
         if logger is not None:
             logger.close()
@@ -1191,11 +1318,11 @@ def wanted_pair(src: Path, root: Path, out_root: Path, suffix: str,
     return target, destination(src, root, out_root, suffix, keep=True)
 
 
-def compress_all(args, paths: list[Path], config_path: Path, preset_name: str,
-                 container_ext: str, file_format: str) -> int:
+def compress_all(args, paths: list[Path], skip_res: tuple, config_path: Path,
+                 preset_name: str, container_ext: str, file_format: str) -> int:
     """打开日志之后的主体；单独成函数，好让日志在 finally 里可靠关闭。"""
-    images, videos, audios, passthrough, scanned, junk = collect(
-        paths, args.output, args.audio_codec, args.audio_bitrate)
+    images, videos, audios, passthrough, skips, scanned, junk = collect(
+        paths, args.output, args.audio_codec, args.audio_bitrate, skip_res)
 
     # --only 表示"只**压缩**这一类"，不是"只出现在输出目录"。其余类照样按
     # --copy-unprocessed 处理：yes 时原样复制（输出目录因此仍是完整的，可以替换源
@@ -1216,7 +1343,8 @@ def compress_all(args, paths: list[Path], config_path: Path, preset_name: str,
     # 交叉校验：扫到的文件必须都有去处——入队、被 --only 有意丢弃、或被明确判为
     # 系统垃圾。剩下的就是"无处可去"，那会在输出目录里缺席，也就是最后那句
     # "可以删源目录"在说谎。这条断言存在的意义就是让那种情况不可能静默发生。
-    accounted = len(images) + len(videos) + len(audios) + len(passthrough) + ignored + junk
+    accounted = (len(images) + len(videos) + len(audios) + len(passthrough)
+                 + len(skips) + ignored + junk)
     if scanned != accounted:
         log(f"[WARNING] scanned {scanned} file(s) but only {accounted} are accounted for; "
             f"{scanned - accounted} would be missing from the output tree", file=sys.stderr)
@@ -1238,6 +1366,18 @@ def compress_all(args, paths: list[Path], config_path: Path, preset_name: str,
               file=sys.stderr)
         return 1
 
+    # 图像压缩产出的 webp 必须经 media-fix-caesium-webp 自检（caesiumclt 1.5.0 会写坏
+    # 容器顺序）。缺这个模块就按"配置缺失"失败，绝不压出一堆浏览器打不开的产物。
+    # 只在**可能产出 webp**时才要求它：--image-format png 处理纯 png 库跟它无关。
+    produces_webp = args.image_format == "webp" \
+        or any(src.suffix.lower() == ".webp" for src, _root, _out in images)
+    if images and produces_webp and webp_fixer() is None:
+        log(f"[ERROR] cannot load {WEBP_FIXER_PATH} ({_webp_fixer_error})", file=sys.stderr)
+        log("        it is required to validate the webp caesiumclt writes; refusing to "
+            "compress images rather than emit files browsers cannot open",
+            file=sys.stderr)
+        return 1
+
     # 按媒体类型给出 (源, 输出, 输出根, 原样复制路径)，并一次性滤掉已有输出与过长的路径。
     # COPY 一类永远不压缩，只在 --copy-unprocessed yes 时原样搬进输出目录。
     plan: list[tuple[str, set, list[tuple[Path, Path, Path, Path]]]] = []
@@ -1256,7 +1396,8 @@ def compress_all(args, paths: list[Path], config_path: Path, preset_name: str,
     phases = (("IMAGE", sorted(images, key=lambda i: str(i[0])), image_ext),
               ("VIDEO", sorted(videos, key=lambda i: str(i[0])), container_ext),
               ("AUDIO", sorted(audios, key=lambda i: str(i[0])), audio_ext),
-              ("COPY", sorted(passthrough, key=lambda i: str(i[0])), ""))
+              ("COPY", sorted(passthrough, key=lambda i: str(i[0])), ""),
+              ("SKIP", sorted(skips, key=lambda i: str(i[0])), ""))
 
     # 名字策略：不冲突就用最简名（`a.webp`），只有真的会和**别的源**撞名时才把源扩展名
     # 也写进去（`a.png.webp`）。正常目录里保持简洁，同 stem 多格式时才限定。
@@ -1325,7 +1466,7 @@ def compress_all(args, paths: list[Path], config_path: Path, preset_name: str,
     # 执行顺序：先原样复制（最快，且复制都是纯 IO），再图像，然后音频，最后视频。
     # 视频放最后是因为它最慢、且 HandBrake 的管线吃 CPU，放在末尾不会拖住别的阶段。
     # 收集与命名的顺序仍走 phases，不随之改变——命名只跟源集合有关，与先后无关。
-    for kind in ("COPY", "IMAGE", "AUDIO", "VIDEO"):
+    for kind in ("COPY", "SKIP", "IMAGE", "AUDIO", "VIDEO"):
         pending = by_phase.get(kind)
         if pending:
             plan.append((kind, set(), pending))
@@ -1347,7 +1488,8 @@ def compress_all(args, paths: list[Path], config_path: Path, preset_name: str,
 
     log(f"IMAGE {len(images)} / VIDEO {len(videos)} / AUDIO {len(audios)}"
           f" / COPY {len(passthrough)}"
-          f"  (preset {preset_name}, container {container_ext})"
+          + (f" / SKIP {len(skips)}" if skips else "")
+          + f"  (preset {preset_name}, container {container_ext})"
           + (f"  [{prefiltered} skipped beforehand]" if prefiltered else "")
           + ("  [dry-run]" if args.dry_run else "")
           + ("" if args.copy_unprocessed == "yes"
@@ -1394,10 +1536,13 @@ def compress_all(args, paths: list[Path], config_path: Path, preset_name: str,
         if real_target != target:
             log(f"    note: {target.name} taken in this run, writing {real_target.name}")
 
-        if kind == "COPY":                    # 不压缩，只看 --copy-unprocessed
+        if kind in ("COPY", "SKIP"):         # 不压缩，只看 --copy-unprocessed
             # 措辞按文件性质分开：音频不是"格式不支持"，只是它已经是目标格式、
             # 或没调码率所以不值得重编。一律说"unsupported format"会误导。
-            if src.suffix.lower() in AUDIO_EXTS:
+            # --skip 命中的也不能说成"格式不支持"——那是用户自己要求的。
+            if kind == "SKIP":
+                copied_note = "matched --skip, not compressed"
+            elif src.suffix.lower() in AUDIO_EXTS:
                 copied_note = "already in the target format, copied as is"
             else:
                 copied_note = "unsupported format, copied as is"
